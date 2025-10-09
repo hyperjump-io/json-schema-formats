@@ -1,0 +1,36 @@
+{
+  "name": "@hyperjump/json-schema-formats",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "JSON Schema",
+    "format",
+    "rfc3339"
+  ],
+  "author": "Jason Desrosiers <jdesrosi@gmail.com>",
+  "license": "MIT",
+  "repository": "github:hyperjump-io/json-schema-formats",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/hyperjump-io"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit",
+    "docs": "typedoc --excludeExternals"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "*",
+    "@types/node": "*",
+    "eslint-import-resolver-typescript": "*",
+    "eslint-plugin-import": "*",
+    "typedoc": "*",
+    "typescript-eslint": "*",
+    "vitest": "*"
+  }
+}

@@ -1,0 +1,6 @@
+.github/
+eslint.config.js
+**/*.test.js
+tsconfig.json
+scratch/
+TODO*
