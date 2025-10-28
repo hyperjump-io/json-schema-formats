@@ -63,23 +63,7 @@ await testSuite("draft2020-12/optional/format/email", (email) => typeof email !=
 await testSuite("draft6/optional/format/hostname", (hostname) => typeof hostname !== "string" || isHostname(hostname));
 await testSuite("draft2020-12/optional/format/hostname", (hostname) => typeof hostname !== "string" || isAsciiIdn(hostname));
 await testSuite("draft2020-12/optional/format/idn-email", (email) => typeof email !== "string" || isIdnEmail(email));
-await testSuite("draft2020-12/optional/format/idn-hostname", (hostname) => typeof hostname !== "string" || isIdn(hostname), {
-  "validation of internationalized host names": new Set([
-    "contains illegal char U+302E Hangul single dot tone mark",
-    "Exceptions that are DISALLOWED, right-to-left chars",
-    "Exceptions that are DISALLOWED, left-to-right chars",
-    "MIDDLE DOT with no preceding 'l'",
-    "MIDDLE DOT with nothing preceding",
-    "MIDDLE DOT with no following 'l'",
-    "MIDDLE DOT with nothing following",
-    "Greek KERAIA not followed by Greek",
-    "Greek KERAIA not followed by anything",
-    "Hebrew GERESH not preceded by anything",
-    "Hebrew GERSHAYIM not preceded by anything",
-    "KATAKANA MIDDLE DOT with no Hiragana, Katakana, or Han",
-    "KATAKANA MIDDLE DOT with no other characters"
-  ])
-});
+await testSuite("draft2020-12/optional/format/idn-hostname", (hostname) => typeof hostname !== "string" || isIdn(hostname));
 await testSuite("draft2020-12/optional/format/ipv4", (ip) => typeof ip !== "string" || isIPv4(ip));
 await testSuite("draft2020-12/optional/format/ipv6", (ip) => typeof ip !== "string" || isIPv6(ip));
 await testSuite("draft2020-12/optional/format/iri-reference", (iri) => typeof iri !== "string" || isIriReference(iri));

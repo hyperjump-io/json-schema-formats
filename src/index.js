@@ -1,7 +1,5 @@
 /**
  * @module
- *
- * @document ../documents/idna2008-limitations.md
  */
 
 // JSON Schema Validation - Dates, Times, and Duration
@@ -13,7 +11,7 @@ export { isIdnEmail } from "./rfc6531.js";
 
 // JSON Schema Validation - Hostnames
 export { isHostname } from "./rfc1123.js";
-export { isAsciiIdn, isIdn } from "./idna2008.js";
+export { isAsciiIdn, isIdn } from "./uts46.js";
 
 // JSON Schema Validation - IP Addresses
 export { isIPv4 } from "./rfc2673.js";
