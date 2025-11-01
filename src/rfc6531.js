@@ -1,5 +1,9 @@
 import { isIdn } from "./uts46.js";
 
+/**
+ * @import * as API from "./index.d.ts"
+ */
+
 const ucschar = `[\\u{A0}-\\u{D7FF}\\u{F900}-\\u{FDCF}\\u{FDF0}-\\u{FFEF}\\u{10000}-\\u{1FFFD}\\u{20000}-\\u{2FFFD}\\u{30000}-\\u{3FFFD}\\u{40000}-\\u{4FFFD}\\u{50000}-\\u{5FFFD}\\u{60000}-\\u{6FFFD}\\u{70000}-\\u{7FFFD}\\u{80000}-\\u{8FFFD}\\u{90000}-\\u{9FFFD}\\u{A0000}-\\u{AFFFD}\\u{B0000}-\\u{BFFFD}\\u{C0000}-\\u{CFFFD}\\u{D0000}-\\u{DFFFD}\\u{E1000}-\\u{EFFFD}]`;
 
 const alpha = `[a-zA-Z]`;
@@ -43,15 +47,7 @@ const mailbox = `(?<localPart>${localPart})@(?:(?<ip>${addressLiteral})|(?<domai
 
 const mailboxPattern = new RegExp(`^${mailbox}$`, "u");
 
-/**
- * The 'idn-email' format. Validates that a string represents an email as
- * defined by the "Mailbox" ABNF rule in [RFC 6531, section 3.3](https://www.rfc-editor.org/rfc/rfc6531.html#section-3.3).
- *
- * @see [JSON Schema Core, section 7.3.2](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.2)
- *
- * @param {string} email
- * @returns {boolean}
- */
+/** @type API.isIdnEmail */
 export const isIdnEmail = (email) => {
   const parsedEmail = mailboxPattern.exec(email)?.groups;
 
