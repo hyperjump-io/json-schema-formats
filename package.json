@@ -1,6 +1,6 @@
 {
   "name": "@hyperjump/json-schema-formats",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A collection of validation functions for the JSON Schema `format` keyword.",
   "keywords": [
     "JSON Schema",
