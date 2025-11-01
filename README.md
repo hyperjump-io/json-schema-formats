@@ -1,6 +1,6 @@
 # Hyperjump - JSON Schema Formats 
 
-TODO: Write a description
+A collection of validation functions for the JSON Schema `format` keyword.
 
 ## Install
 
@@ -24,10 +24,6 @@ but you need to change a couple settings in your `tsconfig.json` for it to work.
     "module": "Node16", // or "NodeNext"
     "moduleResolution": "Node16", // or "NodeNext"
 ```
-
-## Usage
-
-TODO: Basic usage examples
 
 ## API
 
