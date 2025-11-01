@@ -1,19 +1,27 @@
 import { readFile } from "node:fs/promises";
 import { describe, test, expect } from "vitest";
-import { isDate, isDateTime, isDuration, isTime } from "./rfc3339.js";
-import { isRegex } from "./ecma262.js";
-import { isEmail } from "./rfc5321.js";
-import { isHostname } from "./rfc1123.js";
-import { isAsciiIdn, isIdn } from "./idna2008.js";
-import { isIdnEmail } from "./rfc6531.js";
-import { isIPv4 } from "./rfc2673.js";
-import { isIPv6 } from "./rfc4291.js";
-import { isIriReference } from "./rfc3987.js";
-import { isJsonPointer } from "./rfc6901.js";
-import { isRelativeJsonPointer } from "./draft-bhutton-relative-json-pointer-00.js";
-import { isUri, isUriReference } from "./rfc3986.js";
-import { isUriTemplate } from "./rfc6570.js";
-import { isUuid } from "./rfc4122.js";
+import {
+  isAsciiIdn,
+  isDate,
+  isDateTime,
+  isDuration,
+  isEmail,
+  isHostname,
+  isIdn,
+  isIdnEmail,
+  isIPv4,
+  isIPv6,
+  isIri,
+  isIriReference,
+  isJsonPointer,
+  isRegex,
+  isRelativeJsonPointer,
+  isTime,
+  isUri,
+  isUriReference,
+  isUriTemplate,
+  isUuid
+} from "./index.js";
 
 /**
  * @typedef {{
@@ -67,6 +75,7 @@ await testSuite("draft2020-12/optional/format/idn-hostname", (hostname) => typeo
 await testSuite("draft2020-12/optional/format/ipv4", (ip) => typeof ip !== "string" || isIPv4(ip));
 await testSuite("draft2020-12/optional/format/ipv6", (ip) => typeof ip !== "string" || isIPv6(ip));
 await testSuite("draft2020-12/optional/format/iri-reference", (iri) => typeof iri !== "string" || isIriReference(iri));
+await testSuite("draft2020-12/optional/format/iri", (iri) => typeof iri !== "string" || isIri(iri));
 await testSuite("draft2020-12/optional/format/json-pointer", (pointer) => typeof pointer !== "string" || isJsonPointer(pointer));
 await testSuite("draft2020-12/optional/format/regex", (pattern) => typeof pattern !== "string" || isRegex(pattern));
 await testSuite("draft2020-12/optional/format/relative-json-pointer", (pointer) => typeof pointer !== "string" || isRelativeJsonPointer(pointer));
