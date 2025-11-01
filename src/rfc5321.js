@@ -1,3 +1,7 @@
+/**
+ * @import * as API from "./index.d.ts"
+ */
+
 const alpha = `[a-zA-Z]`;
 const hexdig = `[\\da-fA-F]`;
 
@@ -36,11 +40,7 @@ const addressLiteral = `\\[(?:${ipv4Address}|${ipv6AddressLiteral}|${generalAddr
 const mailbox = `${localPart}@(?:${domain}|${addressLiteral})`;
 
 /**
- * The 'email' format. Validates that a string represents an email as defined by
- * the "Mailbox" ABNF rule in [RFC 5321, section 4.1.2](https://www.rfc-editor.org/rfc/rfc5321.html#section-4.1.2).
- *
- * @see [JSON Schema Core, section 7.3.2](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.2)
- *
+ * @type API.isEmail
  * @function
  */
 export const isEmail = RegExp.prototype.test.bind(new RegExp(`^${mailbox}$`));

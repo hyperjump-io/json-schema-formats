@@ -1,3 +1,7 @@
+/**
+ * @import * as API from "./index.d.ts"
+ */
+
 const alpha = `[a-zA-Z]`;
 const hexdig = `[\\da-fA-F]`;
 const pctEncoded = `%${hexdig}${hexdig}`;
@@ -28,11 +32,7 @@ const literals = `(?:[\\x21\\x23-\\x24\\x26-\\x3B\\x3D\\x3F-\\x5B\\x5D\\x5F\\x61
 const uriTemplate = `(?:${literals}|${expression})*`;
 
 /**
- * The 'uri-template' format. Validates that a string represents a URI Template
- * as defined by [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.html).
- *
- * @see [JSON Schema Core, section 7.3.6](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.6)
- *
+ * @type API.isUriTemplate
  * @function
  */
 export const isUriTemplate = RegExp.prototype.test.bind(new RegExp(`^${uriTemplate}$`, "u"));
