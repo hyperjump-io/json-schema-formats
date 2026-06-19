@@ -33,14 +33,25 @@ const ipv6Address = `(?:(?:${h16}:){6}${ls32}|::(?:${h16}:){5}${ls32}|(?:${h16})
 const ipv6AddressLiteral = `IPv6:${ipv6Address}`;
 
 const dcontent = `[\\x21-\\x5A\\x5E-\\x7E]`; // Printable US-ASCII excluding "[", "\", "]"
-const generalAddressLiteral = `${ldhStr}:${dcontent}+`;
+const generalAddressLiteral = `(?<addressLiteralTag>${ldhStr}):${dcontent}+`;
 
 const addressLiteral = `\\[(?:${ipv4Address}|${ipv6AddressLiteral}|${generalAddressLiteral})]`;
 
 const mailbox = `${localPart}@(?:${domain}|${addressLiteral})`;
 
-/**
- * @type API.isEmail
- * @function
- */
-export const isEmail = RegExp.prototype.test.bind(new RegExp(`^${mailbox}$`));
+const mailboxPattern = new RegExp(`^${mailbox}$`);
+
+/** @type API.isEmail */
+export const isEmail = (email) => {
+  const result = mailboxPattern.exec(email);
+
+  if (result === null) {
+    return false;
+  }
+
+  if (result.groups?.addressLiteralTag) {
+    throw Error(`Encountered unknown Address Literal Tag: ${result.groups?.addressLiteralTag}`);
+  }
+
+  return true;
+};
