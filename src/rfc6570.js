@@ -17,7 +17,7 @@ const operator = `(?:${opLevel2}|${opLevel3}${opReserve})`;
 
 const varchar = `(?:${alpha}|\\d|_|${pctEncoded})`;
 const varname = `${varchar}(?:\\.?${varchar})*`;
-const maxLength = `(?:[1-9]|\\d{0,3})`; // positive integer < 10000
+const maxLength = `[1-9]\\d{0,3}`; // positive integer < 10000
 const prefix = `:${maxLength}`;
 const explode = `\\*`;
 const modifierLevel4 = `(?:${prefix}|${explode})`;
