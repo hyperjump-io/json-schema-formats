@@ -35,63 +35,94 @@ import {
 /**
  * @typedef {{
  *   description: string;
+ *   compatibility?: string;
+ *   tags?: string[];
  *   tests: Test[];
  * }} TestCase
  */
 
 /**
- * @typedef {TestCase[]} TestSuite
+ * @typedef {{
+ *   description: string;
+ *   tests: TestCase[];
+ * }} TestSuite
  */
 
-/** @type (format: string, fn: (value: any) => boolean, skip?: Record<string, Set<string>>) => Promise<void> */
-export const testSuite = async (format, fn, skip = {}) => {
-  const testSuiteJson = await readFile(`./node_modules/json-schema-test-suite/tests/${format}.json`, "utf8");
+/**
+ * The compatibility matching algorithm from the test suite's README. Releases
+ * are numbered by draft number or year. 9999 is the unreleased v1 spec.
+ *
+ * @type (compatibility: string | undefined, release: number) => boolean
+ */
+const isCompatible = (compatibility, release) => {
+  if (compatibility === undefined) {
+    return true;
+  }
+
+  let isValid = true;
+  for (const constraint of compatibility.split(",")) {
+    const [, operator, version] = /^(<=|=)?(\d+)$/.exec(constraint) ?? [];
+    const constraintRelease = Number(version);
+
+    if (operator === "<=") {
+      isValid = release <= constraintRelease;
+    } else if (operator === "=") {
+      isValid = release === constraintRelease;
+    } else {
+      isValid = release >= constraintRelease;
+    }
+
+    if (release <= constraintRelease) {
+      break;
+    }
+  }
+
+  return isValid;
+};
+
+/** @type (format: string, release: number, fn: (value: any) => boolean) => Promise<void> */
+export const testSuite = async (format, release, fn) => {
+  const testSuiteJson = await readFile(`./node_modules/json-schema-test-suite/validation/tests/${format}.json`, "utf8");
   /** @type TestSuite */
   const testSuite = JSON.parse(testSuiteJson); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 
-  for (const testCase of testSuite) {
-    describe(testCase.description, () => {
-      for (const formatTest of testCase.tests) {
-        if (skip[testCase.description]?.has(formatTest.description)) {
-          continue;
-        }
-
-        test(formatTest.description, () => {
-          expect(fn(formatTest.data)).to.equal(formatTest.valid);
-        });
+  describe(`${testSuite.description} (${release})`, () => {
+    for (const testCase of testSuite.tests) {
+      // These functions assert formats. They don't have an annotation-only mode.
+      if (!isCompatible(testCase.compatibility, release) || testCase.tags?.includes("format-annotation")) {
+        continue;
       }
-    });
-  }
+
+      describe(testCase.description, () => {
+        for (const formatTest of testCase.tests) {
+          test(formatTest.description, () => {
+            expect(fn(formatTest.data)).to.equal(formatTest.valid);
+          });
+        }
+      });
+    }
+  });
 };
 
-await testSuite("draft2020-12/optional/format/date-time", (dateTime) => typeof dateTime !== "string" || isDateTime(dateTime));
-await testSuite("v1/format/date-time", (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
-await testSuite("draft2020-12/optional/format/date", (date) => typeof date !== "string" || isDate(date));
-await testSuite("draft2020-12/optional/format/duration", (duration) => typeof duration !== "string" || isDuration(duration));
-await testSuite("draft2020-12/optional/format/ecmascript-regex", (pattern) => typeof pattern !== "string" || isRegex(pattern));
-await testSuite("draft2020-12/optional/format/email", (email) => typeof email !== "string" || isEmail(email));
-await testSuite("draft6/optional/format/hostname", (hostname) => typeof hostname !== "string" || isHostname(hostname));
-await testSuite("draft2020-12/optional/format/hostname", (hostname) => typeof hostname !== "string" || isAsciiIdn(hostname));
-await testSuite("draft2020-12/optional/format/idn-email", (email) => typeof email !== "string" || isIdnEmail(email));
-await testSuite("draft2020-12/optional/format/idn-hostname", (hostname) => typeof hostname !== "string" || isIdn(hostname));
-await testSuite("draft2020-12/optional/format/ipv4", (ip) => typeof ip !== "string" || isIPv4(ip));
-await testSuite("draft2020-12/optional/format/ipv6", (ip) => typeof ip !== "string" || isIPv6(ip));
-await testSuite("draft2020-12/optional/format/iri-reference", (iri) => typeof iri !== "string" || isIriReference(iri));
-await testSuite("draft2020-12/optional/format/iri", (iri) => typeof iri !== "string" || isIri(iri));
-await testSuite("draft2020-12/optional/format/json-pointer", (pointer) => typeof pointer !== "string" || isJsonPointer(pointer));
-await testSuite("draft2020-12/optional/format/regex", (pattern) => typeof pattern !== "string" || isRegex(pattern));
-await testSuite("draft2020-12/optional/format/relative-json-pointer", (pointer) => typeof pointer !== "string" || isRelativeJsonPointer(pointer));
-await testSuite("draft2020-12/optional/format/time", (time) => typeof time !== "string" || isTime(time), {
-  "validation of time strings": new Set([
-    "a valid time string with leap second, Zulu",
-    "valid leap second, zero time-offset",
-    "valid leap second, positive time-offset",
-    "valid leap second, large positive time-offset",
-    "valid leap second, negative time-offset",
-    "valid leap second, large negative time-offset"
-  ])
-});
-await testSuite("draft2020-12/optional/format/uri-reference", (uri) => typeof uri !== "string" || isUriReference(uri));
-await testSuite("draft2020-12/optional/format/uri-template", (uri) => typeof uri !== "string" || isUriTemplate(uri));
-await testSuite("draft2020-12/optional/format/uri", (uri) => typeof uri !== "string" || isUri(uri));
-await testSuite("draft2020-12/optional/format/uuid", (uuid) => typeof uuid !== "string" || isUuid(uuid));
+await testSuite("format-date-time", 2020, (dateTime) => typeof dateTime !== "string" || isDateTime(dateTime));
+await testSuite("format-date-time", 9999, (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
+await testSuite("format-date", 2020, (date) => typeof date !== "string" || isDate(date));
+await testSuite("format-duration", 2020, (duration) => typeof duration !== "string" || isDuration(duration));
+await testSuite("optional/format-regex", 2020, (pattern) => typeof pattern !== "string" || isRegex(pattern));
+await testSuite("format-email", 2020, (email) => typeof email !== "string" || isEmail(email));
+await testSuite("format-hostname", 9999, (hostname) => typeof hostname !== "string" || isHostname(hostname));
+await testSuite("format-hostname", 2020, (hostname) => typeof hostname !== "string" || isAsciiIdn(hostname));
+await testSuite("format-idn-email", 2020, (email) => typeof email !== "string" || isIdnEmail(email));
+await testSuite("format-idn-hostname", 2020, (hostname) => typeof hostname !== "string" || isIdn(hostname));
+await testSuite("format-ipv4", 2020, (ip) => typeof ip !== "string" || isIPv4(ip));
+await testSuite("format-ipv6", 2020, (ip) => typeof ip !== "string" || isIPv6(ip));
+await testSuite("format-iri-reference", 2020, (iri) => typeof iri !== "string" || isIriReference(iri));
+await testSuite("format-iri", 2020, (iri) => typeof iri !== "string" || isIri(iri));
+await testSuite("format-json-pointer", 2020, (pointer) => typeof pointer !== "string" || isJsonPointer(pointer));
+await testSuite("format-regex", 2020, (pattern) => typeof pattern !== "string" || isRegex(pattern));
+await testSuite("format-relative-json-pointer", 2020, (pointer) => typeof pointer !== "string" || isRelativeJsonPointer(pointer));
+await testSuite("format-time", 9999, (time) => typeof time !== "string" || isTime(time));
+await testSuite("format-uri-reference", 2020, (uri) => typeof uri !== "string" || isUriReference(uri));
+await testSuite("format-uri-template", 2020, (uri) => typeof uri !== "string" || isUriTemplate(uri));
+await testSuite("format-uri", 2020, (uri) => typeof uri !== "string" || isUri(uri));
+await testSuite("format-uuid", 2020, (uuid) => typeof uuid !== "string" || isUuid(uuid));
