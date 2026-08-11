@@ -13,7 +13,7 @@ const iprivate = `[\\u{E000}-\\u{F8FF}\\u{F0000}-\\u{FFFFD}\\u{100000}-\\u{10FFF
 const opLevel2 = `[+#]`;
 const opLevel3 = `[./;?&]`;
 const opReserve = `[=,!@|]`;
-const operator = `(?:${opLevel2}|${opLevel3}${opReserve})`;
+const operator = `(?:${opLevel2}|${opLevel3}|${opReserve})`;
 
 const varchar = `(?:${alpha}|\\d|_|${pctEncoded})`;
 const varname = `${varchar}(?:\\.?${varchar})*`;
