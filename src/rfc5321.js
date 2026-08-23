@@ -21,7 +21,7 @@ const localPart = `(?:${dotString}|${quotedString})`; // MAY be case-sensitive
 
 const letDig = `(?:${alpha}|\\d)`;
 const ldhStr = `(?:${letDig}|-)*${letDig}`;
-const subDomain = `${letDig}${ldhStr}?`;
+const subDomain = `${letDig}(?:${ldhStr})?`;
 const domain = `${subDomain}(?:\\.${subDomain})*`;
 
 const decOctet = `(?:\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])`;
