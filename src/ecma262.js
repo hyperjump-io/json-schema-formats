@@ -7,7 +7,7 @@ export const isRegex = (regex) => {
   try {
     new RegExp(regex, "u");
     return true;
-  } catch (_error) {
+  } catch {
     return false;
   }
 };

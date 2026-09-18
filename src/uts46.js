@@ -14,7 +14,8 @@ export const isAsciiIdn = (hostname) => {
 export const isIdn = (hostname) => {
   try {
     return isIdnHostname(hostname);
-  } catch (_error) {
+  } catch (error) {
+    console.log(error);
     return false;
   }
 };
