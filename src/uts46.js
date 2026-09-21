@@ -12,6 +12,11 @@ export const isAsciiIdn = (hostname) => {
 
 /** @type API.isIdn */
 export const isIdn = (hostname) => {
+  const endsWithSeparator = /[\x2E\uFF0E\u3002\uFF61]$/.test(hostname);
+  if (endsWithSeparator) {
+    return false;
+  }
+
   try {
     return isIdnHostname(hostname);
   } catch (error) {
