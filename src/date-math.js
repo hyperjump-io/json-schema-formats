@@ -40,7 +40,9 @@ export const isLeapYear = (year) => {
 
 /** @type (date: Date) => boolean */
 export const hasLeapSecond = (date) => {
-  const utcDate = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const utcDate = `${date.getUTCFullYear()}-${month}-${day}`;
   return leapSecondDates.has(utcDate)
     && date.getUTCHours() === 23
     && date.getUTCMinutes() === 59;
