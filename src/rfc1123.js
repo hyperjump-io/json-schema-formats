@@ -9,5 +9,5 @@ const domainPattern = new RegExp(`^${domain}$`);
 
 /** @type API.isHostname */
 export const isHostname = (hostname) => {
-  return domainPattern.test(hostname) && hostname.length < 256;
+  return hostname.length < 256 && domainPattern.test(hostname);
 };
