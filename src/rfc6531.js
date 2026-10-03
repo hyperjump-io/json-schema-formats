@@ -12,12 +12,12 @@ const alpha = `[a-zA-Z]`;
 const hexdig = `[\\da-fA-F]`;
 
 // Printable US-ASCII characters not including specials.
-const atext = `(?:[\\w!#$%&'*+\\-/=?^\`{|}~]|${ucschar}|${utf8NonAscii})`;
+const atext = `(?:[\\w!#$%&'*+\\-/=?^\`{|}~]|${utf8NonAscii})`;
 const atom = `${atext}+`;
 const dotString = `${atom}(?:\\.${atom})*`;
 
 // Any ASCII graphic or space without blackslash-quoting except double-quote and the backslash itself.
-const qtextSMTP = `(?:[\\x20-\\x21\\x23-\\x5B\\x5D-\\x7E]|${ucschar}|${utf8NonAscii})`;
+const qtextSMTP = `(?:[\\x20-\\x21\\x23-\\x5B\\x5D-\\x7E]|${utf8NonAscii})`;
 // backslash followed by any ASCII graphic or space
 const quotedPairSMTP = `\\\\[\\x20-\\x7E]`;
 const qcontentSMTP = `(?:${qtextSMTP}|${quotedPairSMTP})`;
