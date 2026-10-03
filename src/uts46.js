@@ -19,8 +19,7 @@ export const isIdn = (hostname) => {
 
   try {
     return isIdnHostname(hostname);
-  } catch (error) {
-    console.log(error);
+  } catch {
     return false;
   }
 };
