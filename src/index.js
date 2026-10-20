@@ -4,6 +4,7 @@
 
 // JSON Schema Validation - Dates, Times, and Duration
 export { isDate, isTime, isDateTime, isDuration } from "./rfc3339.js";
+export { isDateTimeExt } from "./rfc9557.js";
 
 // JSON Schema Validation - Email Addresses
 export { isEmail } from "./rfc5321.js";

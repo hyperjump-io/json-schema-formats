@@ -6,6 +6,7 @@
     "JSON Schema",
     "format",
     "rfc3339",
+    "rfc9557",
     "date",
     "date-time",
     "duration",

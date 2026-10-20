@@ -4,6 +4,7 @@ import {
   isAsciiIdn,
   isDate,
   isDateTime,
+  isDateTimeExt,
   isDuration,
   isEmail,
   isHostname,
@@ -64,6 +65,7 @@ export const testSuite = async (format, fn, skip = {}) => {
 };
 
 await testSuite("draft2020-12/optional/format/date-time", (dateTime) => typeof dateTime !== "string" || isDateTime(dateTime));
+await testSuite("v1/format/date-time", (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
 await testSuite("draft2020-12/optional/format/date", (date) => typeof date !== "string" || isDate(date));
 await testSuite("draft2020-12/optional/format/duration", (duration) => typeof duration !== "string" || isDuration(duration));
 await testSuite("draft2020-12/optional/format/ecmascript-regex", (pattern) => typeof pattern !== "string" || isRegex(pattern));

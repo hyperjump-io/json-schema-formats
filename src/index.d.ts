@@ -21,9 +21,24 @@ export const isTime: (time: string) => boolean;
  * The 'date-time' format. Validates that a string represents a date-time
  * according to [RFC 3339, section 5.6](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6).
  *
+ * **NOTE**: The 'date-time' format changed in v1. Use {@link isDateTimeExt}
+ * for v1 and later.
+ *
  * @see [JSON Schema Core, section 7.3.1](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.1)
  */
 export const isDateTime: (dateTime: string) => boolean;
+
+/**
+ * The 'date-time' format since v1. Validates that a string represents a
+ * date-time with an optional time zone and suffix tags according to the
+ * "date-time-ext" rule in [RFC 9557, section 4.1](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1).
+ *
+ * **NOTE**: Validation is syntactic only. Time zone names are not checked
+ * against the IANA Time Zone Database and the offset is not checked for
+ * consistency with the time zone. Use {@link isDateTime} for draft2020-12 and
+ * earlier.
+ */
+export const isDateTimeExt: (dateTimeExt: string) => boolean;
 
 /**
  * The 'duration' format. Validates that a string represents a duration
