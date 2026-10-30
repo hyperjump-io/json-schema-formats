@@ -1,4 +1,5 @@
 import { isIdn } from "./uts46.js";
+import { checkAddressLiteralTag } from "./rfc5321.js";
 
 /**
  * @import * as API from "./index.d.ts"
@@ -38,10 +39,10 @@ const ipv4Address = `${decOctet}\\.${decOctet}\\.${decOctet}\\.${decOctet}`;
 const h16 = `${hexdig}{1,4}`;
 const ls32 = `(?:${h16}:${h16}|${ipv4Address})`;
 const ipv6Address = `(?:(?:${h16}:){6}${ls32}|::(?:${h16}:){5}${ls32}|(?:${h16})?::(?:${h16}:){4}${ls32}|(?:(?:${h16}:){0,1}${h16})?::(?:${h16}:){3}${ls32}|(?:(?:${h16}:){0,2}${h16})?::(?:${h16}:){2}${ls32}|(?:(?:${h16}:){0,3}${h16})?::(?:${h16}:){1}${ls32}|(?:(?:${h16}:){0,4}${h16})?::${ls32}|(?:(?:${h16}:){0,5}${h16})?::${h16}|(?:(?:${h16}:){0,6}${h16})?::)`;
-const ipv6AddressLiteral = `IPv6:${ipv6Address}`;
+const ipv6AddressLiteral = `[Ii][Pp][Vv]6:${ipv6Address}`;
 
 const dcontent = `[\\x21-\\x5A\\x5E-\\x7E]`; // Printable US-ASCII excluding "[", "\", "]"
-const generalAddressLiteral = `${ldhStr}:${dcontent}+`;
+const generalAddressLiteral = `(?<addressLiteralTag>${ldhStr}):${dcontent}+`;
 
 const addressLiteral = `\\[(?:${ipv4Address}|${ipv6AddressLiteral}|${generalAddressLiteral})\\]`;
 
@@ -53,5 +54,13 @@ const mailboxPattern = new RegExp(`^${mailbox}$`, "u");
 export const isIdnEmail = (email) => {
   const parsedEmail = mailboxPattern.exec(email)?.groups;
 
-  return !!parsedEmail && (!parsedEmail.domain || isIdn(parsedEmail.domain));
+  if (!parsedEmail) {
+    return false;
+  }
+
+  if (parsedEmail.domain) {
+    return isIdn(parsedEmail.domain);
+  }
+
+  return checkAddressLiteralTag(parsedEmail.addressLiteralTag);
 };

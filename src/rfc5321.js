@@ -49,9 +49,19 @@ export const isEmail = (email) => {
     return false;
   }
 
-  if (result.groups?.addressLiteralTag) {
-    throw Error(`Encountered unknown Address Literal Tag: ${result.groups?.addressLiteralTag}`);
+  return checkAddressLiteralTag(result.groups?.addressLiteralTag);
+};
+
+/** @type (tag: string | undefined) => boolean */
+export const checkAddressLiteralTag = (tag) => {
+  if (tag === undefined) {
+    return true;
   }
 
-  return true;
+  // A known tag only matches the general address literal when its address is malformed
+  if (tag.toUpperCase() === "IPV6") {
+    return false;
+  }
+
+  throw Error(`Encountered unknown Address Literal Tag: ${tag}`);
 };
