@@ -1,41 +1,16 @@
-import { abnf } from "@hyperjump/abnf";
 import { daysInMonth, hasLeapSecond } from "./date-math.js";
 import {
-  FormatError, delimiter, end, field, invalidCharacter, isProblem, matchEnd, missing, problem, sequence, show,
-  sticky
+  FormatError, delimiter, end, field, invalidCharacter, isProblem, matchEnd, missing, problem, sequence, show
 } from "./diagnose.js";
+import {
+  dateFullyear, dateMday, dateMonth, dateTime as dateTimePattern, digits, duration as durationPattern, fullDate,
+  time as timePattern, timeHour, timeMinute, timeSecond, timeSecondWithoutLeapSecond
+} from "./patterns.js";
 
 /**
  * @import * as API from "./index.d.ts"
  * @import { Problem, Step } from "./diagnose.js"
  */
-
-// RFC 3339, section 5.6. The ranges in the comments are written out as ABNF.
-export const dateTimeRules = `
-  date-fullyear   = 4DIGIT
-  date-month      = "0" %x31-39 / "1" %x30-32 ; 01-12
-  date-mday       = "0" %x31-39 / %x31-32 DIGIT / "3" %x30-31
-                    ; 01-28, 01-29, 01-30, 01-31 based on
-                    ; month/year
-  time-hour       = %x30-31 DIGIT / "2" %x30-33 ; 00-23
-  time-minute     = %x30-35 DIGIT ; 00-59
-  time-second     = %x30-35 DIGIT / "60" ; 00-58, 00-59, 00-60 based on leap second
-                    ; rules
-  time-secfrac    = "." 1*DIGIT
-  time-numoffset  = ("+" / "-") time-hour ":" time-minute
-  time-offset     = "Z" / time-numoffset
-
-  partial-time    = time-hour ":" time-minute ":" time-second
-                    [time-secfrac]
-  full-date       = date-fullyear "-" date-month "-" date-mday
-  full-time       = partial-time time-offset
-
-  date-time       = full-date "T" full-time
-`;
-
-const tag = abnf({ rules: dateTimeRules });
-
-const datePattern = tag`full-date`;
 
 /** @type (date: string) => Problem | undefined */
 const checkDayInMonth = (date) => {
@@ -51,7 +26,7 @@ const checkDayInMonth = (date) => {
 
 /** @type API.isDate */
 export const isDate = (date) => {
-  return datePattern.test(date) && checkDayInMonth(date) === undefined;
+  return fullDate.test(date) && checkDayInMonth(date) === undefined;
 };
 
 /** @type API.assertDate */
@@ -79,15 +54,13 @@ export class InvalidDateError extends FormatError {
 
 // Diagnosing
 
-const digits = sticky(abnf({ anchored: false })`*DIGIT`);
-
 /** @type Step[] */
 const dateSteps = [
-  field("year", digits, tag`date-fullyear`, "4 digits"),
+  field("year", digits, dateFullyear, "4 digits"),
   delimiter("-", "year", "month"),
-  field("month", digits, tag`date-month`, "01-12"),
+  field("month", digits, dateMonth, "01-12"),
   delimiter("-", "month", "day"),
-  field("day", digits, tag`date-mday`, "01-31")
+  field("day", digits, dateMday, "01-31")
 ];
 
 /** @type (date: string) => Problem | undefined */
@@ -102,9 +75,9 @@ const diagnoseDate = (date) => {
  * @type Step[]
  */
 export const numericOffsetSteps = [
-  field("offset hour", digits, tag`time-hour`, "00-23"),
+  field("offset hour", digits, timeHour, "00-23"),
   delimiter(":", "offset hour", "offset minute"),
-  field("offset minute", digits, tag`time-minute`, "00-59")
+  field("offset minute", digits, timeMinute, "00-59")
 ];
 
 /** @type Step */
@@ -148,29 +121,23 @@ const secondAndOffset = (second) => (value, start) => {
 
 /** @type (second: Step) => Step[] */
 const timeSteps = (second) => [
-  field("hour", digits, tag`time-hour`, "00-23"),
+  field("hour", digits, timeHour, "00-23"),
   delimiter(":", "hour", "minute"),
-  field("minute", digits, tag`time-minute`, "00-59"),
+  field("minute", digits, timeMinute, "00-59"),
   delimiter(":", "minute", "second"),
   secondAndOffset(second)
 ];
-
-// Without a date, a leap second can't be valid.
-const timeSecondWithoutLeapSecond = `%x30-35 DIGIT`;
 
 /**
  * @type API.isTime
  * @function
  */
-export const isTime = RegExp.prototype.test.bind(tag`
-  time-hour ":" time-minute ":" time-second [time-secfrac] time-offset
-  time-second = ${timeSecondWithoutLeapSecond}
-`);
+export const isTime = RegExp.prototype.test.bind(timePattern);
 
 /** @type API.assertTime */
 export const assertTime = (time) => {
   if (!isTime(time)) {
-    const second = field("second", digits, tag`${timeSecondWithoutLeapSecond}`, "00-59", "a leap second can't be checked without a date");
+    const second = field("second", digits, timeSecondWithoutLeapSecond, "00-59", "a leap second can't be checked without a date");
     const result = sequence(time, 0, [...timeSteps(second), end("offset")]);
     throw new InvalidTimeError(time, isProblem(result) ? result : undefined);
   }
@@ -191,8 +158,6 @@ export class InvalidTimeError extends FormatError {
     this.name = "InvalidTimeError";
   }
 }
-
-const dateTimePattern = tag`date-time`;
 
 /** @type (dateTime: string) => Problem | undefined */
 const checkLeapSecond = (dateTime) => {
@@ -243,7 +208,7 @@ export const diagnoseDateTime = (dateTime, after = end("offset")) => {
   const result = sequence(dateTime, 0, [
     ...dateSteps,
     delimiter("T", "day", "time", true),
-    ...timeSteps(field("second", digits, tag`time-second`, "00-59, or 60 for a leap second")),
+    ...timeSteps(field("second", digits, timeSecond, "00-59, or 60 for a leap second")),
     after
   ]);
   return isProblem(result) ? result : checkDayInMonth(dateTime) ?? checkLeapSecond(dateTime);
@@ -253,20 +218,7 @@ export const diagnoseDateTime = (dateTime, after = end("offset")) => {
  * @type API.isDuration
  * @function
  */
-export const isDuration = RegExp.prototype.test.bind(abnf()`
-  ; RFC 3339, appendix A, with the designators in upper case only
-  duration   = %s"P" (dur-date / dur-time / dur-week)
-
-  dur-second = 1*DIGIT %s"S"
-  dur-minute = 1*DIGIT %s"M" [dur-second]
-  dur-hour   = 1*DIGIT %s"H" [dur-minute]
-  dur-time   = %s"T" (dur-hour / dur-minute / dur-second)
-  dur-day    = 1*DIGIT %s"D"
-  dur-week   = 1*DIGIT %s"W"
-  dur-month  = 1*DIGIT %s"M" [dur-day]
-  dur-year   = 1*DIGIT %s"Y" [dur-month]
-  dur-date   = (dur-day / dur-month / dur-year) [dur-time]
-`);
+export const isDuration = RegExp.prototype.test.bind(durationPattern);
 
 /** @type API.assertDuration */
 export const assertDuration = (duration) => {

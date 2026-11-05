@@ -134,13 +134,6 @@ export const invalidValue = (part, start, end, expected, hint) => {
 };
 
 /**
- * A pattern compiled with `anchored: false`, which matches as much as it can at a given index.
- *
- * @type (pattern: RegExp) => RegExp
- */
-export const sticky = (pattern) => new RegExp(pattern.source, "uy");
-
-/**
  * Where the longest match of a sticky pattern at `start` ends.
  *
  * @type (pattern: RegExp, value: string, start: number) => number

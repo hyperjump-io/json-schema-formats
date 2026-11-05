@@ -43,9 +43,11 @@
     "lint": "oxlint",
     "test": "vitest run",
     "type-check": "tsc --noEmit",
-    "docs": "typedoc --excludeExternals"
+    "docs": "typedoc --excludeExternals",
+    "generate": "node scripts/generate-patterns.js"
   },
   "devDependencies": {
+    "@hyperjump/abnf": "file:../abnf",
     "@stylistic/eslint-plugin": "*",
     "@types/node": "*",
     "json-schema-test-suite": "github:json-schema-org/json-schema-test-suite",
@@ -56,7 +58,6 @@
     "vitest": "*"
   },
   "dependencies": {
-    "@hyperjump/abnf": "file:../abnf",
     "@hyperjump/uri": "file:../uri",
     "idn-hostname": "^15.1.2"
   }

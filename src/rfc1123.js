@@ -1,17 +1,10 @@
-import { abnf } from "@hyperjump/abnf";
-import { FormatError, invalidCharacter, matchEnd, missing, problem, sticky } from "./diagnose.js";
+import { FormatError, invalidCharacter, matchEnd, missing, problem } from "./diagnose.js";
+import { hostname as domainPattern, letDigHyps } from "./patterns.js";
 
 /**
  * @import * as API from "./index.d.ts"
  * @import { Problem } from "./diagnose.js"
  */
-
-const domainPattern = abnf()`
-  hostname    = label *( "." label )
-  label       = let-dig [ *61let-dig-hyp let-dig ] ; 1-63 characters
-  let-dig     = ALPHA / DIGIT
-  let-dig-hyp = let-dig / "-"
-`;
 
 /** @type API.isHostname */
 export const isHostname = (hostname) => {
@@ -42,8 +35,6 @@ export class InvalidHostnameError extends FormatError {
 }
 
 // Diagnosing
-
-const letDigHyp = sticky(abnf({ anchored: false })`*( ALPHA / DIGIT / "-" )`);
 
 /**
  * What's wrong with the labels of a domain from `start` to `end`. A label is a run of what `chars` (a sticky pattern)
@@ -83,7 +74,7 @@ export const diagnoseLabels = (value, start, end, part, chars, maxLength = Infin
 
 /** @type (hostname: string) => Problem | undefined */
 export const diagnoseHostname = (hostname) => {
-  return diagnoseLabels(hostname, 0, hostname.length, "hostname", letDigHyp, 63)
+  return diagnoseLabels(hostname, 0, hostname.length, "hostname", letDigHyps, 63)
     ?? (hostname.length > 255
       ? problem("too-long", "hostname", 255, hostname.length, "a hostname can't be longer than 255 characters")
       : undefined);

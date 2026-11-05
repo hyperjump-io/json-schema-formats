@@ -1,6 +1,6 @@
-import { abnf } from "@hyperjump/abnf";
-import { FormatError, nest, sticky } from "./diagnose.js";
-import { diagnoseMailbox, isIPv6LiteralIfTagged, mailboxGrammar, mailboxRules } from "./rfc5321.js";
+import { FormatError, nest } from "./diagnose.js";
+import { idnAddressLiteral, idnDotString, idnLabelChars, idnMailbox, idnQuotedContent } from "./patterns.js";
+import { diagnoseMailbox, isIPv6LiteralIfTagged } from "./rfc5321.js";
 import { diagnoseIdn, isIdn } from "./uts46.js";
 
 /**
@@ -8,36 +8,10 @@ import { diagnoseIdn, isIdn } from "./uts46.js";
  * @import { Problem } from "./diagnose.js"
  */
 
-const idnMailboxRules = `
-  ${mailboxRules}
-
-  ; RFC 6531, section 3.3
-  sub-domain     =/ U-label
-  atext          =/ UTF8-non-ascii
-  qtextSMTP      =/ UTF8-non-ascii
-
-  ; A U-label is checked with UTS #46. This matches what it can have.
-  U-label        = U-let-dig [U-ldh-str]
-  U-let-dig      = ALPHA / DIGIT / ucschar
-  U-ldh-str      = *( U-let-dig / "-" ) U-let-dig
-
-  UTF8-non-ascii = %x80-D7FF / %xE000-10FFFF
-
-  ; RFC 3987, section 2.2
-  ucschar        = %xA0-D7FF / %xF900-FDCF / %xFDF0-FFEF
-                 / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD
-                 / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD
-                 / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD
-                 / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD
-                 / %xD0000-DFFFD / %xE1000-EFFFD
-`;
-
-const mailboxPattern = abnf()`Mailbox ${idnMailboxRules}`;
-
 /** @type API.isIdnEmail */
 export const isIdnEmail = (email) => {
   // A domain can't end with "]" or have an "@".
-  return mailboxPattern.test(email)
+  return idnMailbox.test(email)
     && (email.endsWith("]") ? isIPv6LiteralIfTagged(email) : isIdn(email.substring(email.lastIndexOf("@") + 1)));
 };
 
@@ -64,9 +38,13 @@ export class InvalidIdnEmailError extends FormatError {
   }
 }
 
+/** @type import("./rfc5321.js").MailboxGrammar */
 const idnEmailGrammar = {
-  ...mailboxGrammar(idnMailboxRules, () => undefined),
-  labelChars: sticky(abnf({ rules: idnMailboxRules, anchored: false })`*( U-let-dig / "-" )`)
+  dotString: idnDotString,
+  quotedContent: idnQuotedContent,
+  labelChars: idnLabelChars,
+  addressLiteral: idnAddressLiteral,
+  hint: () => undefined
 };
 
 /** @type (email: string) => Problem | undefined */

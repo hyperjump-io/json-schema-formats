@@ -1,40 +1,11 @@
-import { abnf } from "@hyperjump/abnf";
-import { FormatError, invalidCharacter, isProblem, matchEnd, missing, problem, sequence, sticky } from "./diagnose.js";
-import { dateTimeRules, diagnoseDateTime, isDateTime, numericOffsetSteps } from "./rfc3339.js";
+import { FormatError, invalidCharacter, isProblem, matchEnd, missing, problem, sequence } from "./diagnose.js";
+import { suffix as suffixPattern, suffixKey, suffixValues, timeZoneChars, timeZoneInitial } from "./patterns.js";
+import { diagnoseDateTime, isDateTime, numericOffsetSteps } from "./rfc3339.js";
 
 /**
  * @import * as API from "./index.d.ts"
  * @import { Problem, Step } from "./diagnose.js"
  */
-
-const suffixRules = `
-  suffix            = [time-zone] *suffix-tag
-
-  time-zone-initial = ALPHA / "." / "_"
-  time-zone-char    = time-zone-initial / DIGIT / "-" / "+"
-  time-zone-part    = (ALPHA / "_") *13time-zone-char
-                    / "." (ALPHA / "_" / DIGIT / "-" / "+") *12time-zone-char
-                    / ".." 1*12time-zone-char
-                      ; time-zone-initial *13time-zone-char,
-                      ; but not "." or ".."
-  time-zone-name    = time-zone-part *("/" time-zone-part)
-  time-zone         = "[" critical-flag
-                          ( time-zone-name / time-numoffset ) "]"
-
-  key-initial       = lcalpha / "_"
-  key-char          = key-initial / DIGIT / "-"
-  suffix-key        = key-initial *key-char
-  suffix-value      = 1*alphanum
-  suffix-values     = suffix-value *("-" suffix-value)
-  suffix-tag        = "[" critical-flag
-                          suffix-key "=" suffix-values "]"
-
-  critical-flag     = [ "!" ]
-  lcalpha           = %x61-7A
-  alphanum          = ALPHA / DIGIT
-`;
-
-const suffixPattern = abnf({ rules: dateTimeRules })`suffix ${suffixRules}`;
 
 /** @type API.isDateTimeExt */
 export const isDateTimeExt = (dateTimeExt) => {
@@ -71,12 +42,6 @@ export class InvalidDateTimeExtError extends FormatError {
 }
 
 // Diagnosing
-
-const tag = abnf({ rules: dateTimeRules + suffixRules, anchored: false });
-const timeZoneInitial = sticky(tag`time-zone-initial`);
-const timeZoneChars = sticky(tag`*time-zone-char`);
-const suffixKey = sticky(tag`suffix-key`);
-const suffixValues = sticky(tag`suffix-values`);
 
 /** @type Step */
 const suffix = (value, start) => {

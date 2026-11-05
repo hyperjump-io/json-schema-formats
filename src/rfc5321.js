@@ -1,68 +1,15 @@
-import { abnf } from "@hyperjump/abnf";
-import { FormatError, charAt, invalidCharacter, isProblem, matchEnd, missing, nest, sticky } from "./diagnose.js";
+import { FormatError, charAt, invalidCharacter, isProblem, matchEnd, missing, nest } from "./diagnose.js";
+import {
+  addressLiteral, dcontents, dotString, knownAddressLiteral, letDigHyps, mailbox, quotedContent
+} from "./patterns.js";
 import { diagnoseLabels } from "./rfc1123.js";
-import { diagnoseIPv4, ipv4Rules } from "./rfc2673.js";
-import { diagnoseIPv6, ipv6Rules } from "./rfc4291.js";
+import { diagnoseIPv4 } from "./rfc2673.js";
+import { diagnoseIPv6 } from "./rfc4291.js";
 
 /**
  * @import * as API from "./index.d.ts"
  * @import { Problem } from "./diagnose.js"
  */
-
-// RFC 5321, section 4.1.2 and 4.1.3, with atext from RFC 5322. The address
-// literals use the IP address rules from RFC 3986.
-export const mailboxRules = `
-  Mailbox                 = Local-part "@" ( Domain / address-literal )
-  Local-part              = Dot-string / Quoted-string
-                            ; MAY be case-sensitive
-  Dot-string              = Atom *("."  Atom)
-  Atom                    = 1*atext
-  Quoted-string           = DQUOTE *QcontentSMTP DQUOTE
-  QcontentSMTP            = qtextSMTP / quoted-pairSMTP
-  quoted-pairSMTP         = %d92 %d32-126
-                            ; i.e., backslash followed by any ASCII
-                            ; graphic (including itself) or SPace
-  qtextSMTP               = %d32-33 / %d35-91 / %d93-126
-                            ; i.e., within a quoted string, any
-                            ; ASCII graphic or space is permitted
-                            ; without blackslash-quoting except
-                            ; double-quote and the backslash itself.
-
-  Domain                  = sub-domain *("." sub-domain)
-  sub-domain              = Let-dig [Ldh-str]
-  Let-dig                 = ALPHA / DIGIT
-  Ldh-str                 = *( ALPHA / DIGIT / "-" ) Let-dig
-
-  address-literal         = "[" ( IPv4-address-literal /
-                            IPv6-address-literal /
-                            General-address-literal ) "]"
-  IPv4-address-literal    = IPv4address
-  IPv6-address-literal    = "IPv6:" IPv6address
-  General-address-literal = Standardized-tag ":" 1*dcontent
-  Standardized-tag        = Ldh-str
-                            ; Standardized-tag MUST be specified in a
-                            ; Standards-Track RFC and registered with IANA
-  dcontent                = %d33-90 / ; Printable US-ASCII
-                            %d94-126  ; excl. "[", "\\", "]"
-
-  atext                   = ALPHA / DIGIT /    ; Printable US-ASCII
-                            "!" / "#" /        ;  characters not including
-                            "$" / "%" /        ;  specials.  Used for atoms.
-                            "&" / "'" /
-                            "*" / "+" /
-                            "-" / "/" /
-                            "=" / "?" /
-                            "^" / "_" /
-                            "\`" / "{" /
-                            "|" / "}" /
-                            "~"
-
-  ${ipv4Rules}
-  ${ipv6Rules}
-`;
-
-const mailboxPattern = abnf()`Mailbox ${mailboxRules}`;
-const knownAddressLiteralPattern = abnf()`IPv4-address-literal / IPv6-address-literal ${mailboxRules}`;
 
 /**
  * Whether the address literal that a mailbox ends with, like `[IPv6:::1]`, is an IPv6 address if its tag says it is.
@@ -73,12 +20,12 @@ const knownAddressLiteralPattern = abnf()`IPv4-address-literal / IPv6-address-li
  */
 export const isIPv6LiteralIfTagged = (email) => {
   const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
-  return !/^ipv6:/iu.test(addressLiteral) || knownAddressLiteralPattern.test(addressLiteral);
+  return !/^ipv6:/iu.test(addressLiteral) || knownAddressLiteral.test(addressLiteral);
 };
 
 /** @type API.isEmail */
 export const isEmail = (email) => {
-  if (!mailboxPattern.test(email)) {
+  if (!mailbox.test(email)) {
     return false;
   }
 
@@ -89,7 +36,7 @@ export const isEmail = (email) => {
     }
 
     const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
-    if (!knownAddressLiteralPattern.test(addressLiteral)) {
+    if (!knownAddressLiteral.test(addressLiteral)) {
       const tag = addressLiteral.substring(0, addressLiteral.indexOf(":"));
       throw Error(`Encountered unknown Address Literal Tag: ${tag}`);
     }
@@ -135,25 +82,14 @@ export class InvalidEmailError extends FormatError {
  * }} MailboxGrammar
  */
 
-/** @type (rules: string, hint: MailboxGrammar["hint"]) => MailboxGrammar */
-export const mailboxGrammar = (rules, hint) => {
-  const tag = abnf({ rules, anchored: false });
-  return {
-    dotString: sticky(tag`Dot-string`),
-    quotedContent: sticky(tag`*QcontentSMTP`),
-    labelChars: sticky(tag`*( Let-dig / "-" )`),
-    addressLiteral: abnf({ rules })`address-literal`,
-    hint
-  };
-};
-
-const ldhStr = sticky(abnf({ anchored: false })`*( ALPHA / DIGIT / "-" )`);
-const dcontent = sticky(abnf({ rules: mailboxRules, anchored: false })`*dcontent`);
-
 /** @type MailboxGrammar */
-const emailGrammar = mailboxGrammar(mailboxRules, (char) => {
-  return /** @type number */ (char.codePointAt(0)) > 0x7F ? "it's allowed in an idn-email" : undefined;
-});
+const emailGrammar = {
+  dotString,
+  quotedContent,
+  labelChars: letDigHyps,
+  addressLiteral,
+  hint: (char) => /** @type number */ (char.codePointAt(0)) > 0x7F ? "it's allowed in an idn-email" : undefined
+};
 
 /** @type (email: string, problem: Problem | undefined, grammar: MailboxGrammar) => Problem | undefined */
 const withHint = (email, problem, grammar) => {
@@ -243,7 +179,7 @@ const diagnoseDomain = (email, start, grammar) => {
   }
 
   // A General-address-literal: a tag, ":", and the address
-  const tagEnd = matchEnd(ldhStr, email, start + 1);
+  const tagEnd = matchEnd(letDigHyps, email, start + 1);
   if (tagEnd === start + 1) {
     return tagEnd === start + 1 + colon
       ? missing("domain", tagEnd, `it has no tag before ":"`)
@@ -254,7 +190,7 @@ const diagnoseDomain = (email, start, grammar) => {
     return invalidCharacter(email, tagEnd - 1, "domain", "at the end of an address literal's tag");
   }
 
-  const contentEnd = matchEnd(dcontent, email, tagEnd + 1);
+  const contentEnd = matchEnd(dcontents, email, tagEnd + 1);
   return contentEnd === tagEnd + 1 && contentEnd === close
     ? missing("domain", contentEnd, `it has no address after ":"`)
     : invalidCharacter(email, contentEnd, "domain", "in an address literal");

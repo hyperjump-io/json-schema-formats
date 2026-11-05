@@ -1,6 +1,6 @@
-import { abnf } from "@hyperjump/abnf";
-import { FormatError, invalidCharacter, matchEnd, missing, problem, sticky } from "./diagnose.js";
-import { diagnoseJsonPointer, jsonPointerRules } from "./rfc6901.js";
+import { FormatError, invalidCharacter, matchEnd, missing, problem } from "./diagnose.js";
+import { digits, relativeJsonPointer } from "./patterns.js";
+import { diagnoseJsonPointer } from "./rfc6901.js";
 
 /**
  * @import * as API from "./index.d.ts"
@@ -11,13 +11,7 @@ import { diagnoseJsonPointer, jsonPointerRules } from "./rfc6901.js";
  * @type API.isRelativeJsonPointer
  * @function
  */
-export const isRelativeJsonPointer = RegExp.prototype.test.bind(abnf()`
-  relative-json-pointer = non-negative-integer [index-manipulation] json-pointer
-                        / non-negative-integer "#"
-  index-manipulation    = ("+" / "-") non-negative-integer
-  non-negative-integer  = %x30 / %x31-39 *%x30-39
-  ${jsonPointerRules}
-`);
+export const isRelativeJsonPointer = RegExp.prototype.test.bind(relativeJsonPointer);
 
 /** @type API.assertRelativeJsonPointer */
 export const assertRelativeJsonPointer = (pointer) => {
@@ -43,8 +37,6 @@ export class InvalidRelativeJsonPointerError extends FormatError {
 }
 
 // Diagnosing
-
-const digits = sticky(abnf({ anchored: false })`*DIGIT`);
 
 /**
  * A non-negative-integer at `start`: where it ends, or what's wrong.
