@@ -1,12 +1,22 @@
+import { abnf } from "@hyperjump/abnf";
+
 /**
  * @import * as API from "./index.d.ts"
  */
 
-const decOctet = `(?:\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])`;
-const ipV4Address = `${decOctet}\\.${decOctet}\\.${decOctet}\\.${decOctet}`;
+// RFC 3986, section 3.2.2
+export const ipv4Rules = `
+  IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+  dec-octet   = DIGIT                 ; 0-9
+              / %x31-39 DIGIT         ; 10-99
+              / "1" 2DIGIT            ; 100-199
+              / "2" %x30-34 DIGIT     ; 200-249
+              / "25" %x30-35          ; 250-255
+`;
 
 /**
  * @type API.isIPv4
  * @function
  */
-export const isIPv4 = RegExp.prototype.test.bind(new RegExp(`^${ipV4Address}$`));
+export const isIPv4 = RegExp.prototype.test.bind(abnf()`IPv4address ${ipv4Rules}`);

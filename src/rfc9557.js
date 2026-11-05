@@ -1,35 +1,36 @@
-import { isDateTime } from "./rfc3339.js";
+import { abnf } from "@hyperjump/abnf";
+import { dateTimeRules, isDateTime } from "./rfc3339.js";
 
 /**
  * @import * as API from "./index.d.ts"
  */
 
-const alpha = `[a-zA-Z]`;
-const lcalpha = `[a-z]`;
-const digit = `\\d`;
-const alphanum = `[a-zA-Z\\d]`;
-const criticalFlag = `!?`;
+const suffixPattern = abnf({ rules: dateTimeRules })`
+  suffix            = [time-zone] *suffix-tag
 
-const timeHour = `(?:[01]\\d|2[0-3])`; // 00-23
-const timeMinute = `[0-5]\\d`; // 00-59
-const timeNumoffset = `[+-]${timeHour}:${timeMinute}`;
+  time-zone-initial = ALPHA / "." / "_"
+  time-zone-char    = time-zone-initial / DIGIT / "-" / "+"
+  time-zone-part    = (ALPHA / "_") *13time-zone-char
+                    / "." (ALPHA / "_" / DIGIT / "-" / "+") *12time-zone-char
+                    / ".." 1*12time-zone-char
+                      ; time-zone-initial *13time-zone-char,
+                      ; but not "." or ".."
+  time-zone-name    = time-zone-part *("/" time-zone-part)
+  time-zone         = "[" critical-flag
+                          ( time-zone-name / time-numoffset ) "]"
 
-const timeZoneInitial = `(?:${alpha}|[._])`;
-const timeZoneChar = `(?:${timeZoneInitial}|${digit}|[+-])`;
-const timeZonePart = `(?!\\.\\.?[/\\]])${timeZoneInitial}${timeZoneChar}{0,13}`; // but not "." or ".."
-const timeZoneName = `${timeZonePart}(?:/${timeZonePart})*`;
-const timeZone = `\\[${criticalFlag}(?:${timeZoneName}|${timeNumoffset})\\]`;
+  key-initial       = lcalpha / "_"
+  key-char          = key-initial / DIGIT / "-"
+  suffix-key        = key-initial *key-char
+  suffix-value      = 1*alphanum
+  suffix-values     = suffix-value *("-" suffix-value)
+  suffix-tag        = "[" critical-flag
+                          suffix-key "=" suffix-values "]"
 
-const keyInitial = `(?:${lcalpha}|_)`;
-const keyChar = `(?:${keyInitial}|${digit}|-)`;
-const suffixKey = `${keyInitial}${keyChar}*`;
-const suffixValue = `${alphanum}+`;
-const suffixValues = `${suffixValue}(?:-${suffixValue})*`;
-const suffixTag = `\\[${criticalFlag}${suffixKey}=${suffixValues}\\]`;
-
-const suffix = `(?:${timeZone})?(?:${suffixTag})*`;
-
-const suffixPattern = new RegExp(`^${suffix}$`);
+  critical-flag     = [ "!" ]
+  lcalpha           = %x61-7A
+  alphanum          = ALPHA / DIGIT
+`;
 
 /** @type API.isDateTimeExt */
 export const isDateTimeExt = (dateTimeExt) => {

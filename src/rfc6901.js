@@ -1,14 +1,20 @@
+import { abnf } from "@hyperjump/abnf";
+
 /**
  * @import * as API from "./index.d.ts"
  */
 
-const unescaped = `[\\u{00}-\\u{2E}\\u{30}-\\u{7D}\\u{7F}-\\u{10FFFF}]`; // %x2F ('/') and %x7E ('~') are excluded from 'unescaped'
-const escaped = `~[01]`; // representing '~' and '/', respectively
-const referenceToken = `(?:${unescaped}|${escaped})*`;
-const jsonPointer = `(?:/${referenceToken})*`;
+export const jsonPointerRules = `
+  json-pointer    = *( "/" reference-token )
+  reference-token = *( unescaped / escaped )
+  unescaped       = %x00-2E / %x30-7D / %x7F-10FFFF
+     ; %x2F ('/') and %x7E ('~') are excluded from 'unescaped'
+  escaped         = "~" ( "0" / "1" )
+    ; representing '~' and '/', respectively
+`;
 
 /**
  * @type API.isJsonPointer
  * @function
  */
-export const isJsonPointer = RegExp.prototype.test.bind(new RegExp(`^${jsonPointer}$`, "u"));
+export const isJsonPointer = RegExp.prototype.test.bind(abnf()`json-pointer ${jsonPointerRules}`);

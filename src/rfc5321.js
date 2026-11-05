@@ -1,56 +1,79 @@
+import { abnf } from "@hyperjump/abnf";
+import { ipv4Rules } from "./rfc2673.js";
+import { ipv6Rules } from "./rfc4291.js";
+
 /**
  * @import * as API from "./index.d.ts"
  */
 
-const alpha = `[a-zA-Z]`;
-const hexdig = `[\\da-fA-F]`;
+// RFC 5321, section 4.1.2 and 4.1.3, with atext from RFC 5322. The address
+// literals use the IP address rules from RFC 3986.
+export const mailboxRules = `
+  Mailbox                 = Local-part "@" ( Domain / address-literal )
+  Local-part              = Dot-string / Quoted-string
+                            ; MAY be case-sensitive
+  Dot-string              = Atom *("."  Atom)
+  Atom                    = 1*atext
+  Quoted-string           = DQUOTE *QcontentSMTP DQUOTE
+  QcontentSMTP            = qtextSMTP / quoted-pairSMTP
+  quoted-pairSMTP         = %d92 %d32-126
+                            ; i.e., backslash followed by any ASCII
+                            ; graphic (including itself) or SPace
+  qtextSMTP               = %d32-33 / %d35-91 / %d93-126
+                            ; i.e., within a quoted string, any
+                            ; ASCII graphic or space is permitted
+                            ; without blackslash-quoting except
+                            ; double-quote and the backslash itself.
 
-// Printable US-ASCII characters not including specials.
-const atext = `[\\w!#$%&'*+\\-/=?^\`{|}~]`;
-const atom = `${atext}+`;
-const dotString = `${atom}(?:\\.${atom})*`;
+  Domain                  = sub-domain *("." sub-domain)
+  sub-domain              = Let-dig [Ldh-str]
+  Let-dig                 = ALPHA / DIGIT
+  Ldh-str                 = *( ALPHA / DIGIT / "-" ) Let-dig
 
-// Any ASCII graphic or space without blackslash-quoting except double-quote and the backslash itself.
-const qtextSMTP = `[\\x20-\\x21\\x23-\\x5B\\x5D-\\x7E]`;
-// backslash followed by any ASCII graphic or space
-const quotedPairSMTP = `\\\\[\\x20-\\x7E]`;
-const qcontentSMTP = `(?:${qtextSMTP}|${quotedPairSMTP})`;
-const quotedString = `"${qcontentSMTP}*"`;
+  address-literal         = "[" ( IPv4-address-literal /
+                            IPv6-address-literal /
+                            General-address-literal ) "]"
+  IPv4-address-literal    = IPv4address
+  IPv6-address-literal    = "IPv6:" IPv6address
+  General-address-literal = Standardized-tag ":" 1*dcontent
+  Standardized-tag        = Ldh-str
+                            ; Standardized-tag MUST be specified in a
+                            ; Standards-Track RFC and registered with IANA
+  dcontent                = %d33-90 / ; Printable US-ASCII
+                            %d94-126  ; excl. "[", "\\", "]"
 
-const localPart = `(?:${dotString}|${quotedString})`; // MAY be case-sensitive
+  atext                   = ALPHA / DIGIT /    ; Printable US-ASCII
+                            "!" / "#" /        ;  characters not including
+                            "$" / "%" /        ;  specials.  Used for atoms.
+                            "&" / "'" /
+                            "*" / "+" /
+                            "-" / "/" /
+                            "=" / "?" /
+                            "^" / "_" /
+                            "\`" / "{" /
+                            "|" / "}" /
+                            "~"
 
-const letDig = `(?:${alpha}|\\d)`;
-const ldhStr = `(?:${letDig}|-)*${letDig}`;
-const subDomain = `${letDig}(?:${ldhStr})?`;
-const domain = `${subDomain}(?:\\.${subDomain})*`;
+  ${ipv4Rules}
+  ${ipv6Rules}
+`;
 
-const decOctet = `(?:\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])`;
-const ipv4Address = `${decOctet}\\.${decOctet}\\.${decOctet}\\.${decOctet}`;
-
-const h16 = `${hexdig}{1,4}`;
-const ls32 = `(?:${h16}:${h16}|${ipv4Address})`;
-const ipv6Address = `(?:(?:${h16}:){6}${ls32}|::(?:${h16}:){5}${ls32}|(?:${h16})?::(?:${h16}:){4}${ls32}|(?:(?:${h16}:){0,1}${h16})?::(?:${h16}:){3}${ls32}|(?:(?:${h16}:){0,2}${h16})?::(?:${h16}:){2}${ls32}|(?:(?:${h16}:){0,3}${h16})?::(?:${h16}:){1}${ls32}|(?:(?:${h16}:){0,4}${h16})?::${ls32}|(?:(?:${h16}:){0,5}${h16})?::${h16}|(?:(?:${h16}:){0,6}${h16})?::)`;
-const ipv6AddressLiteral = `[Ii][Pp][Vv]6:${ipv6Address}`;
-
-const dcontent = `[\\x21-\\x5A\\x5E-\\x7E]`; // Printable US-ASCII excluding "[", "\", "]"
-const generalAddressLiteral = `(?<addressLiteralTag>${ldhStr}):${dcontent}+`;
-
-const addressLiteral = `\\[(?:${ipv4Address}|${ipv6AddressLiteral}|${generalAddressLiteral})]`;
-
-const mailbox = `${localPart}@(?:${domain}|${addressLiteral})`;
-
-const mailboxPattern = new RegExp(`^${mailbox}$`);
+const mailboxPattern = abnf()`Mailbox ${mailboxRules}`;
+const knownAddressLiteralPattern = abnf()`IPv4-address-literal / IPv6-address-literal ${mailboxRules}`;
 
 /** @type API.isEmail */
 export const isEmail = (email) => {
-  const result = mailboxPattern.exec(email);
-
-  if (result === null) {
+  if (!mailboxPattern.test(email)) {
     return false;
   }
 
-  if (result.groups?.addressLiteralTag) {
-    throw Error(`Encountered unknown Address Literal Tag: ${result.groups?.addressLiteralTag}`);
+  // A domain can't end with "]", and an address literal can't have a "[".
+  if (email.endsWith("]")) {
+    const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
+    if (!knownAddressLiteralPattern.test(addressLiteral)) {
+      const tag = addressLiteral.substring(0, addressLiteral.indexOf(":"));
+      throw Error(`Encountered unknown Address Literal Tag: ${tag}`);
+    }
   }
 
   return true;

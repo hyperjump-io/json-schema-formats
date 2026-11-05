@@ -1,78 +1,92 @@
+import { abnf } from "@hyperjump/abnf";
 import { daysInMonth, hasLeapSecond } from "./date-math.js";
 
 /**
  * @import * as API from "./index.d.ts"
  */
 
-const dateFullyear = `\\d{4}`;
-const dateMonth = `(?:0[1-9]|1[0-2])`; // 01-12
-const dateMday = `(?:0[1-9]|[12][0-9]|3[01])`; // 01-28, 01-29, 01-30, 01-31 based on month/year
-const fullDate = `(?<year>${dateFullyear})-(?<month>${dateMonth})-(?<day>${dateMday})`;
+// RFC 3339, section 5.6. The ranges in the comments are written out as ABNF.
+export const dateTimeRules = `
+  date-fullyear   = 4DIGIT
+  date-month      = "0" %x31-39 / "1" %x30-32 ; 01-12
+  date-mday       = "0" %x31-39 / %x31-32 DIGIT / "3" %x30-31
+                    ; 01-28, 01-29, 01-30, 01-31 based on
+                    ; month/year
+  time-hour       = %x30-31 DIGIT / "2" %x30-33 ; 00-23
+  time-minute     = %x30-35 DIGIT ; 00-59
+  time-second     = %x30-35 DIGIT / "60" ; 00-58, 00-59, 00-60 based on leap second
+                    ; rules
+  time-secfrac    = "." 1*DIGIT
+  time-numoffset  = ("+" / "-") time-hour ":" time-minute
+  time-offset     = "Z" / time-numoffset
 
-const datePattern = new RegExp(`^${fullDate}$`);
+  partial-time    = time-hour ":" time-minute ":" time-second
+                    [time-secfrac]
+  full-date       = date-fullyear "-" date-month "-" date-mday
+  full-time       = partial-time time-offset
+
+  date-time       = full-date "T" full-time
+`;
+
+const tag = abnf({ rules: dateTimeRules });
+
+const datePattern = tag`full-date`;
+
+/** @type (date: string) => boolean */
+const isDayInMonth = (date) => {
+  const year = Number.parseInt(date.substring(0, 4), 10);
+  const month = date.substring(5, 7);
+  const day = Number.parseInt(date.substring(8, 10), 10);
+
+  return day <= daysInMonth(month, year);
+};
 
 /** @type API.isDate */
 export const isDate = (date) => {
-  const parsedDate = datePattern.exec(date)?.groups;
-  if (!parsedDate) {
-    return false;
-  }
-
-  const day = Number.parseInt(parsedDate.day, 10);
-  const year = Number.parseInt(parsedDate.year, 10);
-
-  return day <= daysInMonth(parsedDate.month, year);
+  return datePattern.test(date) && isDayInMonth(date);
 };
-
-const timeHour = `(?:[01]\\d|2[0-3])`; // 00-23
-const timeMinute = `[0-5]\\d`; // 00-59
-const timeSecond = `[0-5]\\d`; // 00-59
-const timeSecondAllowLeapSeconds = `(?<seconds>[0-5]\\d|60)`; // 00-58, 00-59, 00-60 based on leap second rules
-const timeSecfrac = `\\.\\d+`;
-const timeNumoffset = `[+-]${timeHour}:${timeMinute}`;
-const timeOffset = `(?:[zZ]|${timeNumoffset})`;
-const partialTime = `${timeHour}:${timeMinute}:${timeSecond}(?:${timeSecfrac})?`;
-const fullTime = `${partialTime}${timeOffset}`;
 
 /**
  * @type API.isTime
  * @function
  */
-export const isTime = RegExp.prototype.test.bind(new RegExp(`^${fullTime}$`));
+export const isTime = RegExp.prototype.test.bind(tag`
+  time-hour ":" time-minute ":" time-second [time-secfrac] time-offset
 
-const timePattern = new RegExp(`^${timeHour}:${timeMinute}:${timeSecondAllowLeapSeconds}(?:${timeSecfrac})?${timeOffset}$`);
+  ; Without a date, a leap second can't be valid.
+  time-second = %x30-35 DIGIT
+`);
 
-/** @type (time: string) => { seconds: string } | undefined */
-const parseTime = (time) => {
-  return /** @type {{ seconds: string } | undefined} */ (timePattern.exec(time)?.groups);
-};
+const dateTimePattern = tag`date-time`;
 
 /** @type API.isDateTime */
 export const isDateTime = (dateTime) => {
+  if (!dateTimePattern.test(dateTime) || !isDayInMonth(dateTime)) {
+    return false;
+  }
+
   const date = dateTime.substring(0, 10);
-  const t = dateTime[10];
   const time = dateTime.substring(11);
-  const seconds = parseTime(time)?.seconds;
 
-  return isDate(date)
-    && /^t$/i.test(t)
-    && !!seconds
-    && (seconds !== "60" || hasLeapSecond(new Date(`${date}T${time.replace("60", "59")}`)));
+  return !time.startsWith("60", 6)
+    || hasLeapSecond(new Date(`${date}T${time.substring(0, 6)}59${time.substring(8)}`));
 };
-
-const durSecond = `\\d+S`;
-const durMinute = `\\d+M(?:${durSecond})?`;
-const durHour = `\\d+H(?:${durMinute})?`;
-const durTime = `T(?:${durHour}|${durMinute}|${durSecond})`;
-const durDay = `\\d+D`;
-const durWeek = `\\d+W`;
-const durMonth = `\\d+M(?:${durDay})?`;
-const durYear = `\\d+Y(?:${durMonth})?`;
-const durDate = `(?:${durDay}|${durMonth}|${durYear})(?:${durTime})?`;
-const duration = `P(?:${durDate}|${durTime}|${durWeek})`;
 
 /**
  * @type API.isDuration
  * @function
  */
-export const isDuration = RegExp.prototype.test.bind(new RegExp(`^${duration}$`));
+export const isDuration = RegExp.prototype.test.bind(abnf()`
+  ; RFC 3339, appendix A, with the designators in upper case only
+  duration   = %s"P" (dur-date / dur-time / dur-week)
+
+  dur-second = 1*DIGIT %s"S"
+  dur-minute = 1*DIGIT %s"M" [dur-second]
+  dur-hour   = 1*DIGIT %s"H" [dur-minute]
+  dur-time   = %s"T" (dur-hour / dur-minute / dur-second)
+  dur-day    = 1*DIGIT %s"D"
+  dur-week   = 1*DIGIT %s"W"
+  dur-month  = 1*DIGIT %s"M" [dur-day]
+  dur-year   = 1*DIGIT %s"Y" [dur-month]
+  dur-date   = (dur-day / dur-month / dur-year) [dur-time]
+`);

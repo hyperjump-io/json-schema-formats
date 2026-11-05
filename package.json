@@ -56,6 +56,7 @@
     "vitest": "*"
   },
   "dependencies": {
+    "@hyperjump/abnf": "file:../abnf",
     "@hyperjump/uri": "^1.3.2",
     "idn-hostname": "^15.1.2"
   }
