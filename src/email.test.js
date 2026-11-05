@@ -16,7 +16,14 @@ describe("An address literal with the IPv6 tag", () => {
   });
 
   test("isn't an unknown tag", () => {
+    expect(isEmail("a@[IPv6:zz]")).to.equal(false);
+    expect(isIdnEmail("a@[IPv6:zz]")).to.equal(false);
+  });
+});
+
+describe("An address literal with an unknown tag", () => {
+  test("throws, since whether it's valid can't be known", () => {
     expect(() => isEmail("a@[x-y:abc]")).to.throw("Encountered unknown Address Literal Tag: x-y");
-    expect(isIdnEmail("a@[x-y:abc]")).to.equal(true);
+    expect(() => isIdnEmail("a@[x-y:abc]")).to.throw("Encountered unknown Address Literal Tag: x-y");
   });
 });

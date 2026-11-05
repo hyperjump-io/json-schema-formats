@@ -12,15 +12,25 @@ import { diagnoseIPv6 } from "./rfc4291.js";
  */
 
 /**
- * Whether the address literal that a mailbox ends with, like `[IPv6:::1]`, is an IPv6 address if its tag says it is.
- * "IPv6" is a known tag, so a literal with it that isn't an IPv6 address isn't valid, though it matches
- * General-address-literal.
+ * Whether the address literal that a mailbox ends with, like `[IPv6:::1]`, is valid. "IPv6" is a known tag, so a
+ * literal with it that isn't an IPv6 address isn't valid, though it matches General-address-literal. Any other tag
+ * isn't known, so whether what follows it is valid can't be known.
  *
  * @type (email: string) => boolean
+ * @throws {Error} If the literal has a tag that isn't known.
  */
-export const isIPv6LiteralIfTagged = (email) => {
+export const checkAddressLiteral = (email) => {
+  // A domain can't end with "]", and an address literal can't have a "[".
   const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
-  return !/^ipv6:/iu.test(addressLiteral) || knownAddressLiteral.test(addressLiteral);
+  if (knownAddressLiteral.test(addressLiteral)) {
+    return true;
+  }
+
+  const tag = addressLiteral.substring(0, addressLiteral.indexOf(":"));
+  if (tag.toLowerCase() === "ipv6") {
+    return false;
+  }
+  throw Error(`Encountered unknown Address Literal Tag: ${tag}`);
 };
 
 /** @type API.isEmail */
@@ -29,20 +39,7 @@ export const isEmail = (email) => {
     return false;
   }
 
-  // A domain can't end with "]", and an address literal can't have a "[".
-  if (email.endsWith("]")) {
-    if (!isIPv6LiteralIfTagged(email)) {
-      return false;
-    }
-
-    const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
-    if (!knownAddressLiteral.test(addressLiteral)) {
-      const tag = addressLiteral.substring(0, addressLiteral.indexOf(":"));
-      throw Error(`Encountered unknown Address Literal Tag: ${tag}`);
-    }
-  }
-
-  return true;
+  return !email.endsWith("]") || checkAddressLiteral(email);
 };
 
 /** @type API.assertEmail */

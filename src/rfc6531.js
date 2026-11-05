@@ -1,6 +1,6 @@
 import { FormatError, nest } from "./diagnose.js";
 import { idnAddressLiteral, idnDotString, idnLabelChars, idnMailbox, idnQuotedContent } from "./patterns.js";
-import { diagnoseMailbox, isIPv6LiteralIfTagged } from "./rfc5321.js";
+import { checkAddressLiteral, diagnoseMailbox } from "./rfc5321.js";
 import { diagnoseIdn, isIdn } from "./uts46.js";
 
 /**
@@ -12,7 +12,7 @@ import { diagnoseIdn, isIdn } from "./uts46.js";
 export const isIdnEmail = (email) => {
   // A domain can't end with "]" or have an "@".
   return idnMailbox.test(email)
-    && (email.endsWith("]") ? isIPv6LiteralIfTagged(email) : isIdn(email.substring(email.lastIndexOf("@") + 1)));
+    && (email.endsWith("]") ? checkAddressLiteral(email) : isIdn(email.substring(email.lastIndexOf("@") + 1)));
 };
 
 /** @type API.assertIdnEmail */

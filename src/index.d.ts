@@ -99,6 +99,9 @@ export const assertDuration: (duration: string) => void;
  * The 'email' format. Validates that a string represents an email as defined by
  * the "Mailbox" ABNF rule in [RFC 5321, section 4.1.2](https://www.rfc-editor.org/rfc/rfc5321.html#section-4.1.2).
  *
+ * @throws {Error} If the address literal has a tag that isn't known, like
+ *   `[x-example:abc]`. `IPv6` is the only tag that's registered, so whether
+ *   what follows another one is valid can't be known.
  * @see [JSON Schema Core, section 7.3.2](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.2)
  */
 export const isEmail: (email: string) => boolean;
@@ -108,7 +111,6 @@ export const isEmail: (email: string) => boolean;
  * that says what's wrong and where if it isn't.
  *
  * @throws {InvalidEmailError} If `email` isn't an email address.
- *
  * @throws {Error} If the address literal has a tag that isn't known, like {@link isEmail}.
  */
 export const assertEmail: (email: string) => void;
@@ -117,6 +119,8 @@ export const assertEmail: (email: string) => void;
  * The 'idn-email' format. Validates that a string represents an email as
  * defined by the "Mailbox" ABNF rule in [RFC 6531, section 3.3](https://www.rfc-editor.org/rfc/rfc6531.html#section-3.3).
  *
+ * @throws {Error} If the address literal has a tag that isn't known, like
+ *   {@link isEmail}.
  * @see [JSON Schema Core, section 7.3.2](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.2)
  */
 export const isIdnEmail: (email: string) => boolean;
@@ -126,6 +130,7 @@ export const isIdnEmail: (email: string) => boolean;
  * that says what's wrong and where if it isn't.
  *
  * @throws {InvalidIdnEmailError} If `email` isn't an internationalized email address.
+ * @throws {Error} If the address literal has a tag that isn't known, like {@link isEmail}.
  */
 export const assertIdnEmail: (email: string) => void;
 
