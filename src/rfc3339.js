@@ -12,13 +12,19 @@ import {
  * @import { Problem, Step } from "./diagnose.js"
  */
 
+// The number that two digits at `index` are. It's for values that a pattern matched, and is faster than making a
+// substring to parse.
+/** @type (value: string, index: number) => number */
+const twoDigits = (value, index) => (value.charCodeAt(index) - 0x30) * 10 + value.charCodeAt(index + 1) - 0x30;
+
 /** @type (date: string) => Problem | undefined */
 const checkDayInMonth = (date) => {
-  const year = Number.parseInt(date.substring(0, 4), 10);
-  const month = date.substring(5, 7);
-  const day = Number.parseInt(date.substring(8, 10), 10);
-  const days = daysInMonth(month, year);
+  const day = twoDigits(date, 8);
+  if (day <= 28) {
+    return undefined;
+  }
 
+  const days = daysInMonth(twoDigits(date, 5), twoDigits(date, 0) * 100 + twoDigits(date, 2));
   return day <= days
     ? undefined
     : problem("nonexistent-date", "day", 8, 10, `${date.substring(0, 7)} has ${days} days`);
@@ -161,10 +167,14 @@ export class InvalidTimeError extends FormatError {
 
 /** @type (dateTime: string) => Problem | undefined */
 const checkLeapSecond = (dateTime) => {
+  // The only second that starts with "6" is 60
+  if (dateTime[17] !== "6") {
+    return undefined;
+  }
+
   const date = dateTime.substring(0, 10);
   const time = dateTime.substring(11);
-
-  return !time.startsWith("60", 6) || hasLeapSecond(new Date(`${date}T${time.substring(0, 6)}59${time.substring(8)}`))
+  return hasLeapSecond(new Date(`${date}T${time.substring(0, 6)}59${time.substring(8)}`))
     ? undefined
     : problem("nonexistent-leap-second", "second", 17, 19, "there was no leap second then", "a leap second is at 23:59:60 UTC, on a day that had one");
 };

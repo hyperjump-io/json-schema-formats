@@ -1,36 +1,9 @@
-/** @type (month: string, year: number) => number */
+// The days in each month, by its number. February is 28 here, and 29 in a leap year.
+const monthLengths = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+/** @type (month: number, year: number) => number */
 export const daysInMonth = (month, year) => {
-  switch (month) {
-    case "01":
-    case "Jan":
-    case "03":
-    case "Mar":
-    case "05":
-    case "May":
-    case "07":
-    case "Jul":
-    case "08":
-    case "Aug":
-    case "10":
-    case "Oct":
-    case "12":
-    case "Dec":
-      return 31;
-    case "04":
-    case "Apr":
-    case "06":
-    case "Jun":
-    case "09":
-    case "Sep":
-    case "11":
-    case "Nov":
-      return 30;
-    case "02":
-    case "Feb":
-      return isLeapYear(year) ? 29 : 28;
-    default:
-      return 0;
-  }
+  return month === 2 && isLeapYear(year) ? 29 : monthLengths[month];
 };
 
 /** @type (year: number) => boolean */
@@ -91,32 +64,3 @@ const leapSecondDates = new Set([
   "2015-06-30",
   "2016-12-31"
 ]);
-
-/** @type (dayName: string) => number */
-export const dayOfWeekId = (dayName) => {
-  switch (dayName) {
-    case "Sun":
-    case "Sunday":
-      return 0;
-    case "Mon":
-    case "Monday":
-      return 1;
-    case "Tue":
-    case "Tuesday":
-      return 2;
-    case "Wed":
-    case "Wednesday":
-      return 3;
-    case "Thu":
-    case "Thursday":
-      return 4;
-    case "Fri":
-    case "Friday":
-      return 5;
-    case "Sat":
-    case "Saturday":
-      return 6;
-    default:
-      return -1;
-  }
-};
