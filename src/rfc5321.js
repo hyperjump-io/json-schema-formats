@@ -61,6 +61,18 @@ export const mailboxRules = `
 const mailboxPattern = abnf()`Mailbox ${mailboxRules}`;
 const knownAddressLiteralPattern = abnf()`IPv4-address-literal / IPv6-address-literal ${mailboxRules}`;
 
+/**
+ * Whether the address literal that a mailbox ends with, like `[IPv6:::1]`, is an IPv6 address if its tag says it is.
+ * "IPv6" is a known tag, so a literal with it that isn't an IPv6 address isn't valid, though it matches
+ * General-address-literal.
+ *
+ * @type (email: string) => boolean
+ */
+export const isIPv6LiteralIfTagged = (email) => {
+  const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
+  return !/^ipv6:/iu.test(addressLiteral) || knownAddressLiteralPattern.test(addressLiteral);
+};
+
 /** @type API.isEmail */
 export const isEmail = (email) => {
   if (!mailboxPattern.test(email)) {
@@ -69,6 +81,10 @@ export const isEmail = (email) => {
 
   // A domain can't end with "]", and an address literal can't have a "[".
   if (email.endsWith("]")) {
+    if (!isIPv6LiteralIfTagged(email)) {
+      return false;
+    }
+
     const addressLiteral = email.substring(email.lastIndexOf("[") + 1, email.length - 1);
     if (!knownAddressLiteralPattern.test(addressLiteral)) {
       const tag = addressLiteral.substring(0, addressLiteral.indexOf(":"));

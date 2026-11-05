@@ -1,5 +1,5 @@
 import { abnf } from "@hyperjump/abnf";
-import { mailboxRules } from "./rfc5321.js";
+import { isIPv6LiteralIfTagged, mailboxRules } from "./rfc5321.js";
 import { isIdn } from "./uts46.js";
 
 /**
@@ -35,5 +35,5 @@ const mailboxPattern = abnf()`
 export const isIdnEmail = (email) => {
   // A domain can't end with "]" or have an "@".
   return mailboxPattern.test(email)
-    && (email.endsWith("]") || isIdn(email.substring(email.lastIndexOf("@") + 1)));
+    && (email.endsWith("]") ? isIPv6LiteralIfTagged(email) : isIdn(email.substring(email.lastIndexOf("@") + 1)));
 };
