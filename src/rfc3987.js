@@ -15,3 +15,15 @@ export const isIri = Hyperjump.isIri;
  * @function
  */
 export const isIriReference = Hyperjump.isIriReference;
+
+/**
+ * @type API.assertIri
+ * @function
+ */
+export const assertIri = Hyperjump.assertIri;
+
+/**
+ * @type API.assertIriReference
+ * @function
+ */
+export const assertIriReference = Hyperjump.assertIriReference;

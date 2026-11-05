@@ -23,8 +23,11 @@ export { isIPv4, assertIPv4, InvalidIPv4Error } from "./rfc2673.js";
 export { isIPv6, assertIPv6, InvalidIPv6Error } from "./rfc4291.js";
 
 // JSON Schema Validation - Resource Identifiers
-export { isUri, isUriReference } from "./rfc3986.js";
-export { isIri, isIriReference } from "./rfc3987.js";
+export { isUri, isUriReference, assertUri, assertUriReference } from "./rfc3986.js";
+export { isIri, isIriReference, assertIri, assertIriReference } from "./rfc3987.js";
+export {
+  InvalidUriError, InvalidIriError, UnknownSchemeError, UnknownUrnNamespaceError, UnsupportedIpVersionError
+} from "@hyperjump/uri";
 export { isUuid, assertUuid, InvalidUuidError } from "./rfc4122.js";
 
 // JSON Schema Validation - URI Template

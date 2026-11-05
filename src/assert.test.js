@@ -318,3 +318,19 @@ describe("What's wrong and where", () => {
     });
   });
 });
+
+describe("URIs and IRIs, from @hyperjump/uri", () => {
+  test("assert* throws its errors", () => {
+    expect(thrown(() => Formats.assertUri("http://exa mple.com"))).to.be.instanceOf(Formats.InvalidUriError);
+    expect(thrown(() => Formats.assertUriReference("1a:b"))).to.be.instanceOf(Formats.InvalidUriError);
+    expect(thrown(() => Formats.assertIri("http://exa mple.com"))).to.be.instanceOf(Formats.InvalidIriError);
+    expect(thrown(() => Formats.assertIriReference("http://exa mple.com"))).to.be.instanceOf(Formats.InvalidIriError);
+    expect(Formats.assertIri("http://examplé.com")).to.equal(undefined);
+  });
+
+  test("a scheme or URN namespace that isn't known throws", () => {
+    expect(thrown(() => Formats.isUri("ftp://example.com"))).to.be.instanceOf(Formats.UnknownSchemeError);
+    expect(thrown(() => Formats.isUri("urn:isbn:0451450523"))).to.be.instanceOf(Formats.UnknownUrnNamespaceError);
+    expect(thrown(() => Formats.isUri("http://[v7.future]/"))).to.be.instanceOf(Formats.UnsupportedIpVersionError);
+  });
+});

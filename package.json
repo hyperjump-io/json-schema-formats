@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@hyperjump/abnf": "file:../abnf",
-    "@hyperjump/uri": "^1.3.2",
+    "@hyperjump/uri": "file:../uri",
     "idn-hostname": "^15.1.2"
   }
 }

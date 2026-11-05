@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { defineScheme, urnScheme } from "@hyperjump/uri";
 import { describe, test, expect } from "vitest";
 import {
   isAsciiIdn,
@@ -23,6 +24,14 @@ import {
   isUriTemplate,
   isUuid
 } from "./index.js";
+
+// The schemes and URN namespaces that the test suite's URIs use, besides the ones @hyperjump/uri knows
+const uriOptions = {
+  customSchemes: [
+    ...["ftp", "ldap", "mailto", "news", "tel"].map((name) => defineScheme({ name, rule: `${name}-URI` })),
+    urnScheme({ example: {}, oasis: {} })
+  ]
+};
 
 /**
  * @typedef {{
@@ -116,13 +125,13 @@ await testSuite("format-idn-email", 2020, (email) => typeof email !== "string" |
 await testSuite("format-idn-hostname", 2020, (hostname) => typeof hostname !== "string" || isIdn(hostname));
 await testSuite("format-ipv4", 2020, (ip) => typeof ip !== "string" || isIPv4(ip));
 await testSuite("format-ipv6", 2020, (ip) => typeof ip !== "string" || isIPv6(ip));
-await testSuite("format-iri-reference", 2020, (iri) => typeof iri !== "string" || isIriReference(iri));
-await testSuite("format-iri", 2020, (iri) => typeof iri !== "string" || isIri(iri));
+await testSuite("format-iri-reference", 2020, (iri) => typeof iri !== "string" || isIriReference(iri, uriOptions));
+await testSuite("format-iri", 2020, (iri) => typeof iri !== "string" || isIri(iri, uriOptions));
 await testSuite("format-json-pointer", 2020, (pointer) => typeof pointer !== "string" || isJsonPointer(pointer));
 await testSuite("format-regex", 2020, (pattern) => typeof pattern !== "string" || isRegex(pattern));
 await testSuite("format-relative-json-pointer", 2020, (pointer) => typeof pointer !== "string" || isRelativeJsonPointer(pointer));
 await testSuite("format-time", 9999, (time) => typeof time !== "string" || isTime(time));
-await testSuite("format-uri-reference", 2020, (uri) => typeof uri !== "string" || isUriReference(uri));
+await testSuite("format-uri-reference", 2020, (uri) => typeof uri !== "string" || isUriReference(uri, uriOptions));
 await testSuite("format-uri-template", 2020, (uri) => typeof uri !== "string" || isUriTemplate(uri));
-await testSuite("format-uri", 2020, (uri) => typeof uri !== "string" || isUri(uri));
+await testSuite("format-uri", 2020, (uri) => typeof uri !== "string" || isUri(uri, uriOptions));
 await testSuite("format-uuid", 2020, (uuid) => typeof uuid !== "string" || isUuid(uuid));
