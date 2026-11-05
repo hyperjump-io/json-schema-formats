@@ -1,0 +1,118 @@
+# Validate formats
+
+Each format has an `is` function, which returns whether a string is valid
+for the format:
+
+```typescript
+import { isEmail, isIPv4 } from "@hyperjump/json-schema-formats";
+
+isEmail("ada@example.com"); // true
+isIPv4("256.0.0.1"); // false
+```
+
+The functions take only strings. JSON Schema says that a format applies
+only to strings, so check that a value is a string before you call one:
+
+```typescript
+const validateEmail = (value: unknown) =>
+  typeof value !== "string" || isEmail(value);
+```
+
+## Functions
+
+The following table shows the function for each format, and the
+specification that defines what's valid:
+
+| Format | Function | Specification |
+| --- | --- | --- |
+| `date` | `isDate` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date` |
+| `time` | `isTime` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-time` |
+| `date-time` | `isDateTime`, or `isDateTimeExt` from v1 of JSON Schema | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `date-time`, or [RFC 9557](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1) `date-time-ext` |
+| `duration` | `isDuration` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#appendix-A) `duration` |
+| `email` | `isEmail` | [RFC 5321](https://www.rfc-editor.org/rfc/rfc5321.html#section-4.1.2) `Mailbox` |
+| `idn-email` | `isIdnEmail` | [RFC 6531](https://www.rfc-editor.org/rfc/rfc6531.html#section-3.3) `Mailbox` |
+| `hostname` | `isAsciiIdn`, or `isHostname` in draft-04 to draft-06 | [RFC 5890](https://www.rfc-editor.org/rfc/rfc5890.html#section-2.3.2.1) A-labels and NR-LDH labels, or [RFC 1123](https://www.rfc-editor.org/rfc/rfc1123.html#section-2.1) |
+| `idn-hostname` | `isIdn` | [RFC 5890](https://www.rfc-editor.org/rfc/rfc5890.html#section-2.3.2.1) and [UTS #46](https://www.unicode.org/reports/tr46/) |
+| `ipv4` | `isIPv4` | [RFC 2673](https://www.rfc-editor.org/rfc/rfc2673.html#section-3.2) dotted quad |
+| `ipv6` | `isIPv6` | [RFC 4291](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.2) |
+| `uri` | `isUri` | [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html) `URI` |
+| `uri-reference` | `isUriReference` | [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html) `URI-reference` |
+| `iri` | `isIri` | [RFC 3987](https://www.rfc-editor.org/rfc/rfc3987.html) `IRI` |
+| `iri-reference` | `isIriReference` | [RFC 3987](https://www.rfc-editor.org/rfc/rfc3987.html) `IRI-reference` |
+| `uuid` | `isUuid` | [RFC 4122](https://www.rfc-editor.org/rfc/rfc4122.html#section-3) `UUID` |
+| `uri-template` | `isUriTemplate` | [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.html) `URI-Template` |
+| `json-pointer` | `isJsonPointer` | [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901.html) `json-pointer` |
+| `relative-json-pointer` | `isRelativeJsonPointer` | [`draft-bhutton-relative-json-pointer-00`](https://datatracker.ietf.org/doc/html/draft-bhutton-relative-json-pointer-00) |
+| `regex` | `isRegex` | [ECMA-262](https://tc39.es/ecma262/#sec-regexp-regular-expression-objects) |
+
+The functions for URIs and IRIs check a value with the rules of its
+scheme, and they can throw. For more information, see
+[URIs and IRIs](uris-and-iris.md).
+
+## Formats that changed
+
+Two formats mean something different in different versions of JSON
+Schema, so each has two functions:
+
+- **`hostname`**: in draft-04 to draft-06, `hostname` is an RFC 1123
+  hostname, which is `isHostname`. From draft-07, it's an
+  internationalized hostname that has only ASCII characters, which is
+  `isAsciiIdn`. `isAsciiIdn` rejects some hostnames that `isHostname`
+  accepts, like `ab--c.example.com`, because IDNA2008 reserves labels with
+  `--` as their third and fourth characters.
+- **`date-time`**: in draft 2020-12 and earlier, `date-time` is an
+  RFC 3339 date-time, which is `isDateTime`. From v1, it can have a time
+  zone and tags after it, as RFC 9557 defines, which is `isDateTimeExt`:
+
+```typescript
+isDateTime("2024-03-10T09:30:00-05:00[America/New_York]"); // false
+isDateTimeExt("2024-03-10T09:30:00-05:00[America/New_York]"); // true
+```
+
+`isDateTimeExt` checks the syntax only. It doesn't check that a time zone
+name is in the IANA Time Zone Database, or that the offset is right for
+the time zone.
+
+## Dates and times
+
+`isDate` and `isDateTime` check that the day is in the month, including
+February 29 in a leap year:
+
+```typescript
+isDate("2024-02-29"); // true
+isDate("2023-02-29"); // false
+```
+
+A second of `60` is a leap second. `isDateTime` accepts it only at the end
+of a day that had a leap second, at 23:59:60 UTC. `isTime` has no date to
+check, so it never accepts a leap second:
+
+```typescript
+isDateTime("2016-12-31T23:59:60Z"); // true
+isDateTime("2017-12-31T23:59:60Z"); // false
+isTime("23:59:60Z"); // false
+```
+
+RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
+`2024-03-10t09:30:00z`. A duration's letters have to be uppercase, so
+`isDuration` rejects `p1d`.
+
+## The `email` and `idn-email` formats
+
+An email address's domain can be an address literal in brackets, like
+`ada@[192.0.2.1]` or `ada@[IPv6:2001:db8::1]`. RFC 5321 allows other kinds
+of address literal too, which start with a tag that names the kind, like
+`ada@[x-example:abc]`. IANA registers the tags, and `IPv6` is the only one
+in its registry, so `isEmail` can't know whether another kind is valid. It
+throws an `Error` for a tag other than `IPv6`. `isIdnEmail` does the
+same.
+
+`isIdnEmail` checks the domain as an internationalized hostname, like
+`isIdn` does.
+
+## Regular expressions
+
+`isRegex` returns whether JavaScript can compile a string as a regular
+expression with the `u` flag. JSON Schema says that a regular expression
+uses ECMA-262's syntax, and the `u` flag makes the syntax strict, so that
+a typo like `\a` isn't valid.

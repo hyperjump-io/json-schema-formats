@@ -1,42 +1,74 @@
-# Hyperjump - JSON Schema Formats 
+# Hyperjump - JSON Schema Formats
 
-A collection of validation functions for the JSON Schema `format` keyword.
+Validation functions for the formats that the JSON Schema `format`
+keyword names, like `date-time`, `email`, and `uri`. Each format has a
+function that returns whether a value is valid, and a function that
+throws an error that says what's wrong and where.
 
-## Install
-
-This module is designed for Node.js (ES Modules, TypeScript) and browsers. It
-should work in Bun and Deno as well, but the test runner doesn't work in these
-environments, so this module may be less stable in those environments.
-
-### Node.js
+**[Read the documentation at hyperjump.io](https://hyperjump.io/json-schema-formats/)**
 
 ```bash
 npm install @hyperjump/json-schema-formats
 ```
 
-### TypeScript
+```typescript
+import { assertDate, isDate } from "@hyperjump/json-schema-formats";
 
-This package uses the package.json "exports" field. [TypeScript understands
-"exports"](https://devblogs.microsoft.com/typescript/announcing-typescript-4-5-beta/#packagejson-exports-imports-and-self-referencing),
-but you need to change a couple settings in your `tsconfig.json` for it to work.
+isDate("2024-02-29"); // true
+isDate("2023-02-29"); // false
 
-```jsonc
-    "module": "Node16", // or "NodeNext"
-    "moduleResolution": "Node16", // or "NodeNext"
+assertDate("2023-02-29");
+// InvalidDateError: Invalid date: 2023-02-29 — 2023-02 has 28 days, at 8
 ```
 
-## API
+- **Every format JSON Schema defines.** Dates and times, email addresses,
+  hostnames, IP addresses, URIs and IRIs, UUIDs, URI templates, JSON
+  Pointers, and regular expressions.
+- **The specifications' grammars.** Each format is checked with the ABNF
+  from the RFC that defines it.
+- **Errors that say what's wrong and where.** Each error has a reason,
+  the part of the value that's wrong, and its position.
+- **Fast.** TypeScript types included. Works in Node.js and browsers.
 
-<https://json-schema-formats.hyperjump.io/modules.html>
+## Documentation
+
+- [Install](https://hyperjump.io/json-schema-formats/install/)
+- [Validate formats](https://hyperjump.io/json-schema-formats/validate-formats/)
+- [Find what's wrong](https://hyperjump.io/json-schema-formats/find-whats-wrong/)
+- [URIs and IRIs](https://hyperjump.io/json-schema-formats/uris-and-iris/)
 
 ## Contributing
 
-Contributions are welcome! Please create an issue to propose and discuss any
-changes you'd like to make before implementing it. If it's an obvious bug with
-an obvious solution or something simple like a fixing a typo, creating an issue
-isn't required. You can just send a PR without creating an issue. Before
-submitting any code, please remember to first run the following tests.
+### Tests
 
-- `npm test` (Tests can also be run continuously using `npm test -- --watch`)
-- `npm run lint`
-- `npm run type-check`
+Run the tests
+
+```bash
+npm test
+```
+
+Run the tests with a continuous test runner
+
+```bash
+npm test -- --watch
+```
+
+Lint and type-check
+
+```bash
+npm run lint
+npm run type-check
+```
+
+The patterns are generated from the ABNF in `scripts/generate-patterns.js`.
+After changing it, run
+
+```bash
+npm run generate
+```
+
+### Docs
+
+The user documentation is in [`website/`](website/README.md), and it's
+published to [hyperjump.io](https://hyperjump.io/json-schema-formats/). The
+design docs, principles, and style guide are in [`design/`](design/README.md).
