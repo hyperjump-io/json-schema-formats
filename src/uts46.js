@@ -7,9 +7,15 @@ import { diagnoseHostname, isHostname } from "./rfc1123.js";
  * @import { Problem } from "./diagnose.js"
  */
 
+// A label with "--" as its 3rd and 4th characters is reserved (R-LDH, RFC 5890 §2.3.1), like an A-label. A hostname
+// with none, and with no more than 253 characters, is all NR-LDH labels, which IDNA2008 allows without checking them.
+// Only the others need idn-hostname, which is slower.
+const reservedLabel = /(?:^|\.)[\dA-Za-z-]{2}--/u;
+
 /** @type API.isAsciiIdn */
 export const isAsciiIdn = (hostname) => {
-  return isHostname(hostname) && isIdn(hostname);
+  return isHostname(hostname)
+    && ((hostname.length <= 253 && !reservedLabel.test(hostname)) || isIdn(hostname));
 };
 
 /** @type API.assertAsciiIdn */
