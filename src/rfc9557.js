@@ -1,6 +1,6 @@
 import { FormatError, invalidCharacter, isProblem, matchEnd, missing, problem, sequence } from "./diagnose.js";
-import { suffix as suffixPattern, suffixKey, suffixValues, timeZoneChars, timeZoneInitial } from "./patterns.js";
-import { diagnoseDateTime, isDateTime, numericOffsetSteps } from "./rfc3339.js";
+import { dateTimeExt as dateTimeExtPattern, suffixKey, suffixValues, timeZoneChars, timeZoneInitial } from "./patterns.js";
+import { checkDateTime, diagnoseDateTime, numericOffsetSteps } from "./rfc3339.js";
 
 /**
  * @import * as API from "./index.d.ts"
@@ -9,13 +9,7 @@ import { diagnoseDateTime, isDateTime, numericOffsetSteps } from "./rfc3339.js";
 
 /** @type API.isDateTimeExt */
 export const isDateTimeExt = (dateTimeExt) => {
-  const suffixStart = dateTimeExt.indexOf("[");
-  if (suffixStart === -1) {
-    return isDateTime(dateTimeExt);
-  }
-
-  return isDateTime(dateTimeExt.substring(0, suffixStart))
-    && suffixPattern.test(dateTimeExt.substring(suffixStart));
+  return dateTimeExtPattern.test(dateTimeExt) && checkDateTime(dateTimeExt);
 };
 
 /** @type API.assertDateTimeExt */

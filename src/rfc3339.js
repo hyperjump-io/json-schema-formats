@@ -165,15 +165,21 @@ export class InvalidTimeError extends FormatError {
   }
 }
 
-/** @type (dateTime: string) => Problem | undefined */
+/**
+ * Whether a date-time's 60th second, if it has one, was a leap second. The date-time can be followed by RFC 9557's
+ * suffix.
+ *
+ * @type (dateTime: string) => Problem | undefined
+ */
 const checkLeapSecond = (dateTime) => {
   // The only second that starts with "6" is 60
   if (dateTime[17] !== "6") {
     return undefined;
   }
 
+  const suffixStart = dateTime.indexOf("[", 20);
   const date = dateTime.substring(0, 10);
-  const time = dateTime.substring(11);
+  const time = dateTime.substring(11, suffixStart === -1 ? dateTime.length : suffixStart);
   return hasLeapSecond(new Date(`${date}T${time.substring(0, 6)}59${time.substring(8)}`))
     ? undefined
     : problem("nonexistent-leap-second", "second", 17, 19, "there was no leap second then", "a leap second is at 23:59:60 UTC, on a day that had one");
@@ -181,9 +187,17 @@ const checkLeapSecond = (dateTime) => {
 
 /** @type API.isDateTime */
 export const isDateTime = (dateTime) => {
-  return dateTimePattern.test(dateTime)
-    && checkDayInMonth(dateTime) === undefined
-    && checkLeapSecond(dateTime) === undefined;
+  return dateTimePattern.test(dateTime) && checkDateTime(dateTime);
+};
+
+/**
+ * Whether a value that a date-time pattern matched has a day that's in its month, and a leap second only when there
+ * was one. The positions are fixed, so it can be followed by RFC 9557's suffix.
+ *
+ * @type (dateTime: string) => boolean
+ */
+export const checkDateTime = (dateTime) => {
+  return checkDayInMonth(dateTime) === undefined && checkLeapSecond(dateTime) === undefined;
 };
 
 /** @type API.assertDateTime */

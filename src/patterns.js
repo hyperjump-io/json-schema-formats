@@ -44,8 +44,8 @@ export const timeSecond = /^(?:[0-5][0-9]|60)$/u;
 // RFC 3339 time-second, without leap seconds
 export const timeSecondWithoutLeapSecond = /^(?:[0-5][0-9])$/u;
 
-// RFC 9557 suffix
-export const suffix = /^(?:(?:\u{5B}\u{21}?(?:(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12})(?:\u{2F}(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12}))*|[\u{2B}\u{2D}](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9])\u{5D})?(?:\u{5B}\u{21}?[\u{5F}a-z][\u{2D}0-9\u{5F}a-z]*\u{3D}[0-9A-Za-z]+(?:\u{2D}[0-9A-Za-z]+)*\u{5D})*)$/u;
+// RFC 9557 date-time-ext
+export const dateTimeExt = /^(?:[0-9]{4}\u{2D}(?:0[1-9]|1[0-2])\u{2D}(?:0[1-9]|[12][0-9]|3[01])[Tt](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}(?:[0-5][0-9]|60)(?:\u{2E}[0-9]+)?(?:[Zz]|[\u{2B}\u{2D}](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9])(?:\u{5B}\u{21}?(?:(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12})(?:\u{2F}(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12}))*|[\u{2B}\u{2D}](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9])\u{5D})?(?:\u{5B}\u{21}?[\u{5F}a-z][\u{2D}0-9\u{5F}a-z]*\u{3D}[0-9A-Za-z]+(?:\u{2D}[0-9A-Za-z]+)*\u{5D})*)$/u;
 
 // RFC 9557 time-zone-initial
 export const timeZoneInitial = /[\u{2E}A-Z\u{5F}a-z]/uy;

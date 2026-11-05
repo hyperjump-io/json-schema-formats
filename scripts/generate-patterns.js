@@ -294,7 +294,7 @@ literal's tag`, sticky(fragment`*( ALPHA / DIGIT / "-" )`)],
   ["timeSecondWithoutLeapSecond", "RFC 3339 time-second, without leap seconds", dateTime`${timeSecondWithoutLeapSecond}`],
 
   // RFC 9557
-  ["suffix", "RFC 9557 suffix", abnf({ rules: dateTimeRules })`suffix ${suffixRules}`],
+  ["dateTimeExt", "RFC 9557 date-time-ext", abnf({ rules: dateTimeRules })`date-time suffix ${suffixRules}`],
   ["timeZoneInitial", "RFC 9557 time-zone-initial", sticky(abnf({ rules: suffixRules, anchored: false })`time-zone-initial`)],
   ["timeZoneChars", "RFC 9557 *time-zone-char", sticky(abnf({ rules: suffixRules, anchored: false })`*time-zone-char`)],
   ["suffixKey", "RFC 9557 suffix-key", sticky(abnf({ rules: suffixRules, anchored: false })`suffix-key`)],
