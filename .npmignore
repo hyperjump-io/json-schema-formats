@@ -1,9 +1,0 @@
-.github/
-.gitattributes
-eslint.config.js
-docs/
-**/*.test.js
-tsconfig.json
-scratch/
-TODO*
-scripts/

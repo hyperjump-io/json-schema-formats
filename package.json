@@ -36,25 +36,34 @@
   },
   "type": "module",
   "sideEffects": false,
+  "files": [
+    "src/**/*.js",
+    "src/**/*.d.ts",
+    "!src/**/*.test.js"
+  ],
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
   },
   "scripts": {
     "lint": "oxlint",
     "test": "vitest run",
     "type-check": "tsc --noEmit",
-    "docs": "typedoc --excludeExternals",
-    "generate": "node scripts/generate-patterns.js"
+    "generate": "node scripts/generate-patterns.js",
+    "version": "node scripts/version-docs.js && git add website"
   },
   "devDependencies": {
     "@hyperjump/abnf": "file:../abnf",
     "@stylistic/eslint-plugin": "*",
     "@types/node": "*",
+    "@types/punycode": "*",
+    "@vitest/coverage-v8": "*",
     "json-schema-test-suite": "github:json-schema-org/json-schema-test-suite",
     "oxlint": "*",
     "oxlint-tsgolint": "*",
-    "typedoc": "*",
-    "typescript-eslint": "*",
+    "typescript": "*",
     "vitest": "*"
   },
   "dependencies": {

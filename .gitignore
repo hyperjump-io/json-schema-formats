@@ -1,5 +1,8 @@
 node_modules/
-docs/
+coverage/
 scratch/
+benchmark/
 TODO*
-.DS_Store
+
+# Downloaded by `vale sync`
+.vale/
