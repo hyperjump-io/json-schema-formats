@@ -1,0 +1,45 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "idn-email validation, for cases that the test suite doesn't have",
+    "tests": [
+        {
+            "description": "validation of address literals with the IPv6 tag",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "idn-email"
+            },
+            "specification": [
+                {
+                    "rfc6531": "3.3"
+                },
+                {
+                    "rfc5321": "4.1.3"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "an IPv6 address",
+                    "data": "a@[IPv6:::1]",
+                    "valid": true
+                },
+                {
+                    "description": "an invalid IPv6 address",
+                    "data": "a@[IPv6:1::2::3]",
+                    "valid": false
+                },
+                {
+                    "description": "something that isn't an IPv6 address",
+                    "data": "a@[ipv6:zz]",
+                    "valid": false
+                },
+                {
+                    "description": "something that isn't an IPv6 address, with an uppercase tag",
+                    "data": "a@[IPv6:zz]",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

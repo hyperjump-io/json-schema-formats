@@ -1,0 +1,315 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "http-date validation",
+    "tests": [
+        {
+            "description": "validation of non-string http-date values",
+            "schema": {
+                "format": "http-date"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of HTTP dates in each form",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "an IMF-fixdate",
+                    "data": "Sun, 06 Nov 1994 08:49:37 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "an obsolete RFC 850 date",
+                    "data": "Sunday, 06-Nov-94 08:49:37 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "an obsolete asctime date with a 1-digit day",
+                    "data": "Sun Nov  6 08:49:37 1994",
+                    "valid": true
+                },
+                {
+                    "description": "an obsolete asctime date with a 2-digit day",
+                    "data": "Sun Nov 06 08:49:37 1994",
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of the day in its month",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "February 29 in a leap year",
+                    "data": "Thu, 29 Feb 2024 00:00:00 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "February 29 in a year that isn't a leap year",
+                    "data": "Thu, 29 Feb 2001 00:00:00 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "February 29 in a year divisible by 400",
+                    "data": "Tue, 29 Feb 2000 00:00:00 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "February 29 in a year divisible by 100 but not 400",
+                    "data": "Mon, 29 Feb 1900 00:00:00 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "November 31",
+                    "data": "Sun, 31 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "a day of 00",
+                    "data": "Sun, 00 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                }
+            ]
+        },
+        {
+            "description": "validation of February 29 in an RFC 850 date",
+            "comment": "An RFC 850 date's year has 2 digits, so its century isn't known. February 29 is valid in a year that's a leap year in some century.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a year that's a leap year in any century",
+                    "data": "Thursday, 29-Feb-24 00:00:00 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "a year of 00, which is a leap year in 2000",
+                    "data": "Tuesday, 29-Feb-00 00:00:00 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "a year that isn't a leap year in any century",
+                    "data": "Monday, 29-Feb-21 00:00:00 GMT",
+                    "valid": false
+                }
+            ]
+        },
+        {
+            "description": "validation of day names",
+            "comment": "RFC 9110 gives a date's parts the meaning they have in RFC 5322, which says that the day of the week must be the day of the date.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                },
+                {
+                    "rfc5322": "3.3"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "an IMF-fixdate with the wrong day name",
+                    "data": "Mon, 06 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "an asctime date with the wrong day name",
+                    "data": "Mon Nov  6 08:49:37 1994",
+                    "valid": false
+                },
+                {
+                    "description": "an IMF-fixdate with the right day name",
+                    "data": "Sun, 06 Nov 1994 08:49:37 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "a lowercase day name",
+                    "data": "sun, 06 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "a lowercase month name",
+                    "data": "Sun, 06 nov 1994 08:49:37 GMT",
+                    "valid": false
+                }
+            ]
+        },
+        {
+            "description": "validation of leap seconds",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "an IMF-fixdate with a leap second",
+                    "data": "Sat, 31 Dec 2016 23:59:60 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "an IMF-fixdate on a day without a leap second",
+                    "data": "Sun, 31 Dec 2017 23:59:60 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "a second of 60 that isn't at 23:59",
+                    "data": "Sun, 06 Nov 1994 08:49:60 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "an asctime date with a leap second",
+                    "data": "Tue Jun 30 23:59:60 2015",
+                    "valid": true
+                },
+                {
+                    "description": "an RFC 850 date with a leap second at 23:59:60",
+                    "data": "Saturday, 31-Dec-16 23:59:60 GMT",
+                    "valid": true
+                },
+                {
+                    "description": "an RFC 850 date with a second of 60 that isn't at 23:59",
+                    "data": "Sunday, 06-Nov-94 08:49:60 GMT",
+                    "valid": false
+                }
+            ]
+        },
+        {
+            "description": "validation of the HTTP-date grammar",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "http-date"
+            },
+            "specification": [
+                {
+                    "rfc9110": "5.6.7"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a time zone other than GMT",
+                    "data": "Sun, 06 Nov 1994 08:49:37 UTC",
+                    "valid": false
+                },
+                {
+                    "description": "a lowercase GMT",
+                    "data": "Sun, 06 Nov 1994 08:49:37 gmt",
+                    "valid": false
+                },
+                {
+                    "description": "no time zone",
+                    "data": "Sun, 06 Nov 1994 08:49:37",
+                    "valid": false
+                },
+                {
+                    "description": "an IMF-fixdate with a 1-digit day",
+                    "data": "Sun, 6 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "an asctime date with a 1-digit day and no space before it",
+                    "data": "Sun Nov 6 08:49:37 1994",
+                    "valid": false
+                },
+                {
+                    "description": "an hour of 24",
+                    "data": "Sun, 06 Nov 1994 24:00:00 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "two spaces after the comma",
+                    "data": "Sun,  06 Nov 1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "an RFC 850 date with a 4-digit year",
+                    "data": "Sunday, 06-Nov-1994 08:49:37 GMT",
+                    "valid": false
+                },
+                {
+                    "description": "an RFC 3339 date-time",
+                    "data": "1994-11-06T08:49:37Z",
+                    "valid": false
+                },
+                {
+                    "description": "an empty string",
+                    "data": "",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

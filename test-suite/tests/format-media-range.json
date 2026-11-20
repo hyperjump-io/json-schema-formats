@@ -1,0 +1,165 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "media-range validation",
+    "tests": [
+        {
+            "description": "validation of non-string media-range values",
+            "schema": {
+                "format": "media-range"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of media ranges",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "media-range"
+            },
+            "specification": [
+                {
+                    "rfc9110": "12.5.1"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "any type",
+                    "data": "*/*",
+                    "valid": true
+                },
+                {
+                    "description": "any subtype",
+                    "data": "text/*",
+                    "valid": true
+                },
+                {
+                    "description": "a type and subtype",
+                    "data": "text/html",
+                    "valid": true
+                },
+                {
+                    "description": "a parameter",
+                    "data": "text/html;charset=utf-8",
+                    "valid": true
+                },
+                {
+                    "description": "whitespace around ; and a quoted parameter value",
+                    "data": "text/html ; charset=\"utf-8\"",
+                    "valid": true
+                },
+                {
+                    "description": "two parameters",
+                    "data": "text/html;level=1;q=0.7",
+                    "valid": true
+                },
+                {
+                    "description": "a ; without a parameter",
+                    "data": "text/html;",
+                    "valid": true
+                },
+                {
+                    "description": "an empty parameter between two ;",
+                    "data": "text/html;;a=b",
+                    "valid": true
+                },
+                {
+                    "description": "a quoted-pair in a quoted parameter value",
+                    "data": "a/b;c=\"d\\\"e\"",
+                    "valid": true
+                },
+                {
+                    "description": "obs-text in a quoted parameter value",
+                    "data": "a/b;c=\"é\"",
+                    "valid": true
+                },
+                {
+                    "description": "a character past obs-text in a quoted parameter value",
+                    "data": "a/b;c=\"ā\"",
+                    "valid": false
+                },
+                {
+                    "description": "no subtype",
+                    "data": "text",
+                    "valid": false
+                },
+                {
+                    "description": "an empty subtype",
+                    "data": "text/",
+                    "valid": false
+                },
+                {
+                    "description": "an empty type",
+                    "data": "/html",
+                    "valid": false
+                },
+                {
+                    "description": "whitespace at the end",
+                    "data": "text/html ",
+                    "valid": false
+                },
+                {
+                    "description": "a list of media ranges",
+                    "data": "text/html,text/plain",
+                    "valid": false
+                },
+                {
+                    "description": "a parameter without a value",
+                    "data": "text/html;charset",
+                    "valid": false
+                },
+                {
+                    "description": "whitespace around =",
+                    "data": "text/html;charset = utf-8",
+                    "valid": false
+                },
+                {
+                    "description": "an unclosed quoted parameter value",
+                    "data": "text/html;charset=\"utf-8",
+                    "valid": false
+                },
+                {
+                    "description": "a space in a token parameter value",
+                    "data": "text/html;charset=utf 8",
+                    "valid": false
+                },
+                {
+                    "description": "a delimiter in the subtype",
+                    "data": "text/(html)",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

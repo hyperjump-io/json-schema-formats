@@ -1,0 +1,105 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "date-time-local validation",
+    "tests": [
+        {
+            "description": "validation of non-string date-time-local values",
+            "schema": {
+                "format": "date-time-local"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of date-time-local strings",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "date-time-local"
+            },
+            "specification": [
+                {
+                    "rfc3339": "5.6"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a valid date-time-local with a fraction",
+                    "data": "1985-04-12T23:20:50.52",
+                    "valid": true
+                },
+                {
+                    "description": "February 29 in a leap year",
+                    "data": "2020-02-29T00:00:00",
+                    "valid": true
+                },
+                {
+                    "description": "a lowercase t",
+                    "data": "2020-01-01t00:00:00",
+                    "valid": true
+                },
+                {
+                    "description": "February 29 in a year that isn't a leap year",
+                    "data": "2021-02-29T00:00:00",
+                    "valid": false
+                },
+                {
+                    "description": "a leap second, which can't be checked without an offset",
+                    "data": "1990-12-31T23:59:60",
+                    "valid": false
+                },
+                {
+                    "description": "an offset of Z",
+                    "data": "1985-04-12T23:20:50Z",
+                    "valid": false
+                },
+                {
+                    "description": "a numeric offset",
+                    "data": "1985-04-12T23:20:50+01:00",
+                    "valid": false
+                },
+                {
+                    "description": "a space instead of T",
+                    "data": "1985-04-12 23:20:50",
+                    "valid": false
+                },
+                {
+                    "description": "a date without a time",
+                    "data": "1985-04-12",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

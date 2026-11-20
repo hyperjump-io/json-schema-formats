@@ -1,0 +1,110 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-string validation",
+    "tests": [
+        {
+            "description": "validation of non-string sf-string values",
+            "schema": {
+                "format": "sf-string"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field strings",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-string"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.3"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "printable ASCII in quotes",
+                    "data": "\"hello world\"",
+                    "valid": true
+                },
+                {
+                    "description": "an empty string",
+                    "data": "\"\"",
+                    "valid": true
+                },
+                {
+                    "description": "escaped quotes and backslashes",
+                    "data": "\"a \\\"b\\\" \\\\\"",
+                    "valid": true
+                },
+                {
+                    "description": "a backslash before a character other than a quote or backslash",
+                    "data": "\"a\\nb\"",
+                    "valid": false
+                },
+                {
+                    "description": "a tab",
+                    "data": "\"a\tb\"",
+                    "valid": false
+                },
+                {
+                    "description": "a character that isn't ASCII",
+                    "data": "\"é\"",
+                    "valid": false
+                },
+                {
+                    "description": "no closing quote",
+                    "data": "\"a",
+                    "valid": false
+                },
+                {
+                    "description": "no opening quote",
+                    "data": "a\"",
+                    "valid": false
+                },
+                {
+                    "description": "something after the closing quote",
+                    "data": "\"a\"b",
+                    "valid": false
+                },
+                {
+                    "description": "no quotes",
+                    "data": "hello",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

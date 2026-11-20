@@ -17,8 +17,9 @@ exported from the main entry, after JSON Schema's, and each has `is` and
 | `media-range` | `rfc9110.js` | `media-range` |
 | `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc9651.js` | RFC 9651's rules of the same names |
 
-`src/openapi.test.js` has their examples, since there's no test suite for
-them, and `src/assert.test.js` tests their diagnoses like the others'.
+The JSON Schema Test Suite doesn't have them, so their tests are in its
+format in `test-suite/tests/` (see [Files](../style/files.md)), and
+`src/assert.test.js` tests their diagnoses like the others'.
 
 ## What's not here yet
 

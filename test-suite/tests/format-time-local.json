@@ -1,0 +1,95 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "time-local validation",
+    "tests": [
+        {
+            "description": "validation of non-string time-local values",
+            "schema": {
+                "format": "time-local"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of time-local strings",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "time-local"
+            },
+            "specification": [
+                {
+                    "rfc3339": "5.6"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a valid time-local with a fraction",
+                    "data": "23:20:50.52",
+                    "valid": true
+                },
+                {
+                    "description": "midnight",
+                    "data": "00:00:00",
+                    "valid": true
+                },
+                {
+                    "description": "a leap second, which can't be checked without a date or offset",
+                    "data": "23:59:60",
+                    "valid": false
+                },
+                {
+                    "description": "an hour of 24",
+                    "data": "24:00:00",
+                    "valid": false
+                },
+                {
+                    "description": "an offset of Z",
+                    "data": "23:20:50Z",
+                    "valid": false
+                },
+                {
+                    "description": "no seconds",
+                    "data": "23:20",
+                    "valid": false
+                },
+                {
+                    "description": "a fraction without digits",
+                    "data": "23:20:50.",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

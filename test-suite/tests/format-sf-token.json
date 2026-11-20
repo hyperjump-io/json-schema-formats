@@ -1,0 +1,105 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-token validation",
+    "tests": [
+        {
+            "description": "validation of non-string sf-token values",
+            "schema": {
+                "format": "sf-token"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field tokens",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-token"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.4"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "the example from RFC 9651",
+                    "data": "foo123/456",
+                    "valid": true
+                },
+                {
+                    "description": "an asterisk",
+                    "data": "*",
+                    "valid": true
+                },
+                {
+                    "description": "every character that a token can have after the first",
+                    "data": "a:b/c!#$%&'*+-.^_`|~",
+                    "valid": true
+                },
+                {
+                    "description": "a digit first",
+                    "data": "1a",
+                    "valid": false
+                },
+                {
+                    "description": "a hyphen first",
+                    "data": "-a",
+                    "valid": false
+                },
+                {
+                    "description": "a space",
+                    "data": "a b",
+                    "valid": false
+                },
+                {
+                    "description": "a comma",
+                    "data": "a,b",
+                    "valid": false
+                },
+                {
+                    "description": "quotes",
+                    "data": "\"a\"",
+                    "valid": false
+                },
+                {
+                    "description": "an empty string",
+                    "data": "",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

@@ -14,7 +14,12 @@
   [Diagnosing](../components/diagnosing.md)).
 - `src/date-math.js` is the calendar: days in a month, leap years, and
   leap seconds.
-- Tests are next to the code they test. `src/json-schema-test-suite.test.js`
-  runs the JSON Schema Test Suite's format tests, and
-  `src/assert.test.js` tests the `assert` functions against the `is`
-  functions.
+- Tests of whether values are valid are in the JSON Schema Test Suite's
+  format, so they can be given to the suite. The ones the suite doesn't
+  have are in `test-suite/tests/`, laid out like the suite's
+  `validation/tests/`, with a file for each format named like the suite's.
+  `src/json-schema-test-suite.test.js` runs the suite's and these.
+- Other tests are next to the code they test. `src/assert.test.js` tests
+  the `assert` functions against the `is` functions, and their errors,
+  which the suite's format can't say. `src/email.test.js` tests that
+  `isEmail` throws for an unknown address literal tag.

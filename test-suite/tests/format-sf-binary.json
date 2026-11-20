@@ -1,0 +1,115 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-binary validation",
+    "tests": [
+        {
+            "description": "validation of non-string sf-binary values",
+            "schema": {
+                "format": "sf-binary"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field byte sequences",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-binary"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.5"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "the example from RFC 9651",
+                    "data": ":cHJldGVuZCB0aGlzIGlzIGJpbmFyeSBjb250ZW50Lg==:",
+                    "valid": true
+                },
+                {
+                    "description": "an empty byte sequence",
+                    "data": "::",
+                    "valid": true
+                },
+                {
+                    "description": "base64 without padding",
+                    "data": ":YQ:",
+                    "valid": true
+                },
+                {
+                    "description": "base64 with padding",
+                    "data": ":YQ==:",
+                    "valid": true
+                },
+                {
+                    "description": "= before the end of the base64",
+                    "data": ":a=b:",
+                    "valid": false
+                },
+                {
+                    "description": "= at the start of the base64",
+                    "data": ":=a:",
+                    "valid": false
+                },
+                {
+                    "description": "no closing colon",
+                    "data": ":cHJldGVuZA==",
+                    "valid": false
+                },
+                {
+                    "description": "no colons",
+                    "data": "cHJldGVuZA==",
+                    "valid": false
+                },
+                {
+                    "description": "a space in the base64",
+                    "data": ":cHJl dGVuZA==:",
+                    "valid": false
+                },
+                {
+                    "description": "a base64url character",
+                    "data": ":cHJl-GVuZA==:",
+                    "valid": false
+                },
+                {
+                    "description": "something after the closing colon",
+                    "data": ":a::",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

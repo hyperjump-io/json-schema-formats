@@ -1,0 +1,95 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-boolean validation",
+    "tests": [
+        {
+            "description": "validation of non-string sf-boolean values",
+            "schema": {
+                "format": "sf-boolean"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field booleans",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-boolean"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.6"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "true",
+                    "data": "?1",
+                    "valid": true
+                },
+                {
+                    "description": "false",
+                    "data": "?0",
+                    "valid": true
+                },
+                {
+                    "description": "a digit other than 0 or 1",
+                    "data": "?2",
+                    "valid": false
+                },
+                {
+                    "description": "no digit",
+                    "data": "?",
+                    "valid": false
+                },
+                {
+                    "description": "no question mark",
+                    "data": "1",
+                    "valid": false
+                },
+                {
+                    "description": "two digits",
+                    "data": "?10",
+                    "valid": false
+                },
+                {
+                    "description": "the word true",
+                    "data": "true",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}
