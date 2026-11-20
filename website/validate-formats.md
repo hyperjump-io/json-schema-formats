@@ -101,7 +101,7 @@ the time zone.
 
 ## Registry formats
 
-*Coming soon*
+*Added in v1.2.0*
 
 The package also has functions for some of the formats in the
 [JSON Schema Format Registry](https://github.com/json-schema-org/json-schema-spec/blob/main/specs/registries/format.json)

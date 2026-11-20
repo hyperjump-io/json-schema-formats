@@ -1,6 +1,6 @@
 # Find what's wrong
 
-*Coming soon*
+*Added in v1.2.0*
 
 Each format has an `assert` function too. It checks a value like the `is`
 function does, and returns nothing if the value is valid. If it isn't, the
