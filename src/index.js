@@ -8,7 +8,6 @@ export {
   assertDate, assertTime, assertDateTime, assertDuration,
   InvalidDateError, InvalidTimeError, InvalidDateTimeError, InvalidDurationError
 } from "./rfc3339.js";
-export { isDateTimeExt, assertDateTimeExt, InvalidDateTimeExtError } from "./rfc9557.js";
 
 // JSON Schema Validation - Email Addresses
 export { isEmail, assertEmail, InvalidEmailError } from "./rfc5321.js";
@@ -60,3 +59,6 @@ export {
   InvalidSfBinaryError, InvalidSfBooleanError, InvalidSfDecimalError, InvalidSfIntegerError, InvalidSfStringError,
   InvalidSfTokenError
 } from "./rfc9651.js";
+
+// RFC 9557, which isn't a format in JSON Schema or a registry
+export { isDateTimeExt, assertDateTimeExt, InvalidDateTimeExtError } from "./rfc9557.js";

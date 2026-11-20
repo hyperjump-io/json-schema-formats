@@ -58,14 +58,17 @@ export const isDateTime: (dateTime: string) => boolean;
 export const assertDateTime: (dateTime: string) => void;
 
 /**
- * The 'date-time' format since v1. Validates that a string represents a
- * date-time with an optional time zone and suffix tags according to the
- * "date-time-ext" rule in [RFC 9557, section 4.1](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1).
+ * Validates that a string represents a date-time with an optional time zone
+ * and suffix tags according to the "date-time-ext" rule in
+ * [RFC 9557, section 4.1](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1).
+ * It isn't a JSON Schema format. JSON Schema's 'date-time' is
+ * {@link isDateTime}.
  *
  * **NOTE**: Validation is syntactic only. Time zone names are not checked
  * against the IANA Time Zone Database and the offset is not checked for
- * consistency with the time zone. Use {@link isDateTime} for draft2020-12 and
- * earlier.
+ * consistency with the time zone.
+ *
+ * @see [RFC 9557, section 4.1](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1)
  */
 export const isDateTimeExt: (dateTimeExt: string) => boolean;
 

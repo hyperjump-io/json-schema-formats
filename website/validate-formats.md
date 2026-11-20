@@ -27,7 +27,7 @@ specification that defines what's valid:
 | --- | --- | --- |
 | `date` | `isDate` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date` |
 | `time` | `isTime` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-time` |
-| `date-time` | `isDateTime`, or `isDateTimeExt` from v1 of JSON Schema | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `date-time`, or [RFC 9557](https://www.rfc-editor.org/rfc/rfc9557.html#section-4.1) `date-time-ext` |
+| `date-time` | `isDateTime` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `date-time` |
 | `duration` | `isDuration` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#appendix-A) `duration` |
 | `email` | `isEmail` | [RFC 5321](https://www.rfc-editor.org/rfc/rfc5321.html#section-4.1.2) `Mailbox` |
 | `idn-email` | `isIdnEmail` | [RFC 6531](https://www.rfc-editor.org/rfc/rfc6531.html#section-3.3) `Mailbox` |
@@ -51,27 +51,13 @@ scheme, if it's a scheme that they know. For more information, see
 
 ## Formats that changed
 
-Two formats mean something different in different versions of JSON
-Schema, so each has two functions:
-
-- **`hostname`**: in draft-04 to draft-06, `hostname` is an RFC 1123
-  hostname, which is `isHostname`. From draft-07, it's an
-  internationalized hostname that has only ASCII characters, which is
-  `isAsciiIdn`. `isAsciiIdn` rejects some hostnames that `isHostname`
-  accepts, like `ab--c.example.com`, because IDNA2008 reserves labels with
-  `--` as their third and fourth characters.
-- **`date-time`**: in draft 2020-12 and earlier, `date-time` is an
-  RFC 3339 date-time, which is `isDateTime`. From v1, it can have a time
-  zone and tags after it, as RFC 9557 defines, which is `isDateTimeExt`:
-
-```typescript
-isDateTime("2024-03-10T09:30:00-05:00[America/New_York]"); // false
-isDateTimeExt("2024-03-10T09:30:00-05:00[America/New_York]"); // true
-```
-
-`isDateTimeExt` checks the syntax only. It doesn't check that a time zone
-name is in the IANA Time Zone Database, or that the offset is right for
-the time zone.
+`hostname` means something different in different versions of JSON
+Schema, so it has two functions. In draft-04 to draft-06, `hostname` is
+an RFC 1123 hostname, which is `isHostname`. From draft-07, it's an
+internationalized hostname that has only ASCII characters, which is
+`isAsciiIdn`. `isAsciiIdn` rejects some hostnames that `isHostname`
+accepts, like `ab--c.example.com`, because IDNA2008 reserves labels with
+`--` as their third and fourth characters.
 
 ## Dates and times
 
@@ -96,6 +82,22 @@ isTime("23:59:60Z"); // false
 RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
 `2024-03-10t09:30:00z`. A duration's letters have to be uppercase, so
 `isDuration` rejects `p1d`.
+
+### Time zones
+
+`isDateTimeExt` checks an RFC 9557 `date-time-ext`, which is a date-time
+that can have a time zone and tags after it. It isn't a JSON Schema
+format. JSON Schema's `date-time` is `isDateTime`, which rejects a time
+zone:
+
+```typescript
+isDateTime("2024-03-10T09:30:00-05:00[America/New_York]"); // false
+isDateTimeExt("2024-03-10T09:30:00-05:00[America/New_York]"); // true
+```
+
+`isDateTimeExt` checks the syntax only. It doesn't check that a time zone
+name is in the IANA Time Zone Database, or that the offset is right for
+the time zone.
 
 ## Registry formats
 

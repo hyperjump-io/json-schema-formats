@@ -30,7 +30,7 @@ export class InvalidDateTimeExtError extends FormatError {
    * @param {Problem | undefined} problem
    */
   constructor(value, problem) {
-    super("date-time", value, problem);
+    super("date-time-ext", value, problem);
     this.name = "InvalidDateTimeExtError";
   }
 }

@@ -130,7 +130,7 @@ export const testSuite = async (directory, format, release, fn) => {
 };
 
 await testSuite(jsonSchemaTestSuite, "format-date-time", 2020, (dateTime) => typeof dateTime !== "string" || isDateTime(dateTime));
-await testSuite(jsonSchemaTestSuite, "format-date-time", 9999, (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
+await testSuite(jsonSchemaTestSuite, "format-date-time", 2020, (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
 await testSuite(jsonSchemaTestSuite, "format-date", 2020, (date) => typeof date !== "string" || isDate(date));
 await testSuite(jsonSchemaTestSuite, "format-duration", 2020, (duration) => typeof duration !== "string" || isDuration(duration));
 await testSuite(jsonSchemaTestSuite, "optional/format-regex", 2020, (pattern) => typeof pattern !== "string" || isRegex(pattern));
@@ -152,6 +152,7 @@ await testSuite(jsonSchemaTestSuite, "format-uri-template", 2020, (uri) => typeo
 await testSuite(jsonSchemaTestSuite, "format-uri", 2020, (uri) => typeof uri !== "string" || isUri(uri));
 await testSuite(jsonSchemaTestSuite, "format-uuid", 2020, (uuid) => typeof uuid !== "string" || isUuid(uuid));
 
+await testSuite(ours, "format-date-time-ext", 2020, (dateTime) => typeof dateTime !== "string" || isDateTimeExt(dateTime));
 await testSuite(ours, "format-email", 2020, (email) => typeof email !== "string" || isEmail(email));
 await testSuite(ours, "format-idn-email", 2020, (email) => typeof email !== "string" || isIdnEmail(email));
 

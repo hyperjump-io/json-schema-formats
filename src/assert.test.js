@@ -41,7 +41,7 @@ const specs = {
     seeds: ["2016-12-31T23:59:60Z", "2016-12-31t23:59:60z", "2020-01-01T00:00:00.1+01:00", "2020-02-29T00:00:00Z", "2020-01-01"]
   },
   dateTimeExt: {
-    is: Formats.isDateTimeExt, assert: Formats.assertDateTimeExt, error: Formats.InvalidDateTimeExtError, format: "date-time",
+    is: Formats.isDateTimeExt, assert: Formats.assertDateTimeExt, error: Formats.InvalidDateTimeExtError, format: "date-time-ext",
     reasons: ["invalid-character", "invalid-value", "missing", "too-long", "nonexistent-date", "nonexistent-leap-second"],
     parts: [...dateParts, "time", ...timeParts, "time zone", "suffix tag"],
     alphabet: "[]!/._+-=aZz0129:",
@@ -457,7 +457,7 @@ describe("What's wrong and where", () => {
     [Formats.assertTime, "12:00:00.Z", { reason: "missing", part: "fraction", start: 9, end: 9, message: `Invalid time: 12:00:00.Z — it has no digits after ".", at 9` }],
     [Formats.assertDateTime, "2017-12-31T23:59:60Z", { reason: "nonexistent-leap-second", part: "second", start: 17, end: 19, message: "Invalid date-time: 2017-12-31T23:59:60Z — there was no leap second then, at 17; a leap second is at 23:59:60 UTC, on a day that had one" }],
     [Formats.assertDateTime, "2020-01-01 00:00:00Z", { reason: "invalid-character", part: "day", start: 10, end: 11 }],
-    [Formats.assertDateTimeExt, "2020-01-01T00:00:00Z[..]", { reason: "invalid-value", part: "time zone", start: 21, end: 23, message: `Invalid date-time: 2020-01-01T00:00:00Z[..] — a time zone name's part can't be "..", at 21` }],
+    [Formats.assertDateTimeExt, "2020-01-01T00:00:00Z[..]", { reason: "invalid-value", part: "time zone", start: 21, end: 23, message: `Invalid date-time-ext: 2020-01-01T00:00:00Z[..] — a time zone name's part can't be "..", at 21` }],
     [Formats.assertDateTimeExt, "2020-01-01T00:00:00Z[a][b]", { reason: "invalid-value", part: "suffix tag", start: 23, end: 26 }],
     [Formats.assertDateTimeExt, "2020-01-01T00:00:00Z[U-ca=x]", { reason: "invalid-character", part: "suffix tag", start: 21, end: 22 }],
     [Formats.assertDuration, "P1D2H", { reason: "invalid-order", part: "hours", start: 4, end: 5, message: `Invalid duration: P1D2H — hours must come after "T", at 4` }],

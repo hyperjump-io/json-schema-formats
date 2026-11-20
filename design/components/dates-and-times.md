@@ -1,8 +1,23 @@
 # Dates and times (`src/rfc3339.js`, `src/rfc9557.js`)
 
 `date`, `time`, `date-time`, and `duration` are RFC 3339's `full-date`,
-`full-time`, `date-time`, and Appendix A's `duration`. From v1 of JSON
-Schema, `date-time` is RFC 9557's `date-time-ext`, which is `isDateTimeExt`.
+`full-time`, `date-time`, and Appendix A's `duration`. `isDateTimeExt` is
+RFC 9557's `date-time-ext`, which isn't a format in JSON Schema or a
+registry. Its error names it `date-time-ext`.
+
+A draft of JSON Schema v1 made `date-time` RFC 9557's `date-time-ext`,
+and the change was reverted. `isDateTimeExt` was released in 1.1.0 for
+it, so it stays, as RFC 9557's rule and not a JSON Schema format. The
+JSON Schema Test Suite still has v1 `date-time` tests with RFC 9557
+suffixes, so `src/json-schema-test-suite.test.js` doesn't run its v1
+`date-time` tests. The suffix tests are in
+`test-suite/tests/format-date-time-ext.json`, and the suite's 2020-12
+tests run for both functions, since an RFC 3339 `date-time` is a
+`date-time-ext`.
+
+Rejected: deprecating `isDateTimeExt`. Removing it would need a major
+version, and RFC 9557 is still a specification that says exactly what's
+valid.
 
 ## Days in a month
 
