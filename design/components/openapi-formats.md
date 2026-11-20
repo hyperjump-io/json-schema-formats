@@ -28,9 +28,40 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
 
 - **Numbers**: `int8` to `int32`, `uint8` to `uint32`, `double-int`,
   `sf-integer`, and `sf-decimal`. The registry types them as JSON
-  numbers. A number has no span for an error to point at, and one past
-  2^53 is rounded before a validator sees it. How the API takes them is
-  open.
+  numbers. A number has no span for an error to point at, so how the API
+  takes them is open.
+
+The number formats are checked on the value that parsing the JSON gives,
+a JavaScript number, and not on the JSON text, which a validator doesn't
+have. A JSON number is parsed to the nearest double, so a value is only
+as precise as a double.
+
+Every valid value survives that. The integer formats' ranges are inside
+±2^53, where every integer is a double of its own, and an `sf-decimal`
+has at most 15 significant digits, which a double tells apart. A test of
+a million random `sf-decimal` values found none that parsing changed.
+
+Known limitation: a JSON text with more precision than a double has, or
+too small to be one, is checked as the double it's parsed to, which can
+be valid when the text isn't:
+
+| JSON text | Parsed | Checked as |
+| --- | --- | --- |
+| `127.00000000000000001` | `127` | A valid `int8`, though it isn't an integer |
+| `9007199254740991.4` | `9007199254740991` | A valid `double-int` |
+| `0.1230000000000000001` | `0.123` | A valid `sf-decimal`, though it has 19 digits after the point |
+| `1e-400` | `0` | Valid for every one of them |
+
+A text has to have more than about 17 significant digits, or round to
+zero, for this to happen, and JSON Schema's own `integer` type and
+`maximum` have the same limit in a validator that parses JSON to doubles.
+RFC 8259 says that numbers are interoperable within a double's
+precision. A text just past a range is still out of it as a double:
+`9007199254740993` is 2^53, which isn't a `double-int`.
+
+Rejected: checking the JSON text. The functions are given values, by a
+JSON Schema or OpenAPI validator that parsed the JSON, and the text
+isn't there to check.
 
 `sf-decimal` is decided, for when numbers are: it follows RFC 9651's
 ABNF, `["-"] 1*12DIGIT "." 1*3DIGIT`, so a value with more than three
@@ -38,6 +69,10 @@ digits after the point isn't valid. The registry says the same. RFC
 9651's serialization rounds such a value to three digits instead of
 failing, which would make `1.2345` an `sf-decimal`, but that's what an
 implementation does with a value it's given, not what's valid.
+
+An `sf-decimal`'s digits are counted in the shortest string that parses
+back to the number, which is what `String` gives. Arithmetic doesn't
+work for that, since `1.005 * 1000` is `1004.9999999999999`.
 
 ## What's not supported
 
