@@ -2,8 +2,7 @@
 
 - Each module in `src/` is one specification, named after it, like
   `rfc3339.js` for dates and times or `uts46.js` for internationalized
-  hostnames. `openapi.js` is the OpenAPI Format Registry's, for `char`,
-  which the registry defines itself. Each one has its formats' `is` and `assert` functions, their
+  hostnames. Each one has its formats' `is` and `assert` functions, their
   error classes, and their diagnosis.
 - `src/index.js` re-exports the API, grouped like the JSON Schema
   validation specification groups the formats. `src/index.d.ts` declares

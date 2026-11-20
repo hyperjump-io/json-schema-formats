@@ -1,15 +1,16 @@
-# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc9110.js`, `src/rfc9651.js`)
+# OpenAPI formats (`src/rfc3339.js`, `src/rfc9110.js`, `src/rfc9651.js`)
 
 The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
 lists the formats that OpenAPI documents use, JSON Schema's and others.
 This package has the others that are strings with a grammar, so an
-OpenAPI validator can use it the way a JSON Schema validator does. They're
+OpenAPI validator can use it the way a JSON Schema validator does. It
+leaves out the ones whose definitions don't say exactly what's valid (see
+[Support only what's specified](../principles/support-only-whats-specified.md)). They're
 exported from the main entry, after JSON Schema's, and each has `is` and
 `assert` functions, errors, and a diagnosis like every format here.
 
 | Format | Module | Rule |
 | --- | --- | --- |
-| `char` | `openapi.js` | One code point |
 | `date-time-local` | `rfc3339.js` | `full-date "T" partial-time` |
 | `time-local` | `rfc3339.js` | `partial-time` |
 | `http-date` | `rfc9110.js` | `HTTP-date` |
@@ -22,7 +23,7 @@ them, and `src/assert.test.js` tests their diagnoses like the others'.
 ## What's not here yet
 
 - **Numbers**: `int8` to `uint64`, `double-int`, `float`, `double`,
-  `decimal`, `decimal128`, `sf-integer`, `sf-decimal`, and `unixtime`.
+  `decimal128`, `sf-integer`, `sf-decimal`, and `unixtime`.
   The registry types them as JSON numbers, some of them as numbers or
   strings. A number has no span for an error to point at, and one past
   2^53 is rounded before a validator sees it. How the API takes them is
@@ -32,16 +33,10 @@ them, and `src/assert.test.js` tests their diagnoses like the others'.
 - **Deprecated**: `byte`, `base64url`, and `binary`.
 - **No syntax to check**: `password`, `commonmark`, and `html`.
 
-## Characters
-
-The registry says that a `char` is "a single character". Here, a
-character is a code point, so `😀`, which is two UTF-16 code units, is
-one. A string's `length` would reject it, which is what the first
-version of this format did.
-
-Rejected: a grapheme cluster, like `e` with a combining accent. It needs
-`Intl.Segmenter`, and the clusters change with Unicode versions, so two
-engines could disagree about a value.
+Not supported, because they're ambiguous (see
+[Support only what's specified](../principles/support-only-whats-specified.md)):
+`char`, which is "a single character" with no definition of a character,
+and `decimal`, which the registry says isn't interoperable.
 
 ## Local dates and times
 

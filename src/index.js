@@ -41,7 +41,6 @@ export {
 export { isRegex, assertRegex, InvalidRegexError } from "./ecma262.js";
 
 // OpenAPI Format Registry
-export { isChar, assertChar, InvalidCharError } from "./openapi.js";
 export {
   isDateTimeLocal, isTimeLocal, assertDateTimeLocal, assertTimeLocal, InvalidDateTimeLocalError, InvalidTimeLocalError
 } from "./rfc3339.js";

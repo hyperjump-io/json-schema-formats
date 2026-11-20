@@ -6,3 +6,4 @@ where it shows up.
 - [Follow the RFCs](follow-the-rfcs.md)
 - [Answer only what's known](answer-only-whats-known.md)
 - [Pay only for what you ask for](pay-only-for-what-you-ask-for.md)
+- [Support only what's specified](support-only-whats-specified.md)

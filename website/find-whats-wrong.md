@@ -91,7 +91,6 @@ The following table shows the error that each function throws:
 | `assertRegex` | `InvalidRegexError` |
 | `assertUri`, `assertUriReference` | `InvalidUriError` |
 | `assertIri`, `assertIriReference` | `InvalidIriError` |
-| `assertChar` | `InvalidCharError` |
 | `assertDateTimeLocal` | `InvalidDateTimeLocalError` |
 | `assertTimeLocal` | `InvalidTimeLocalError` |
 | `assertHttpDate` | `InvalidHttpDateError` |

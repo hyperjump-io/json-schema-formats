@@ -370,22 +370,6 @@ export const isRegex: (regex: string) => boolean;
 export const assertRegex: (regex: string) => void;
 
 /**
- * The 'char' format from the OpenAPI Format Registry. Validates that a string
- * is one character: one Unicode code point, which can be two UTF-16 code units.
- *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/char.html)
- */
-export const isChar: (char: string) => boolean;
-
-/**
- * Checks that `char` is one character, like {@link isChar}, and throws an
- * error that says what's wrong and where if it isn't.
- *
- * @throws {InvalidCharError} If `char` isn't one character.
- */
-export const assertChar: (char: string) => void;
-
-/**
  * The 'date-time-local' format from the OpenAPI Format Registry. Validates
  * that a string represents a date-time without an offset: RFC 3339's
  * `full-date "T" partial-time`, from [RFC 3339, section 5.6](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6).
@@ -767,16 +751,6 @@ export class InvalidRegexError extends Error implements FormatErrorProperties<"i
   readonly value: string;
   readonly reason: "invalid-syntax";
   readonly part: "regex";
-  readonly start: number;
-  readonly end: number;
-  private constructor();
-}
-
-/** A value isn't one character. {@link assertChar} throws it. */
-export class InvalidCharError extends Error implements FormatErrorProperties<"missing" | "too-long", "character"> {
-  readonly value: string;
-  readonly reason: "missing" | "too-long";
-  readonly part: "character";
   readonly start: number;
   readonly end: number;
   private constructor();

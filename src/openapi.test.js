@@ -4,20 +4,6 @@ import * as Formats from "./index.js";
 // The OpenAPI Format Registry's formats that have no test suite. The values are from the RFCs' examples, and their edge
 // cases.
 
-describe("char", () => {
-  test.each([
-    ["a", true],
-    ["😀", true],
-    ["\uD800", true],
-    ["", false],
-    ["ab", false],
-    ["😀a", false],
-    ["é", false]
-  ])("%o is %o", (value, expected) => {
-    expect(Formats.isChar(value)).to.equal(expected);
-  });
-});
-
 describe("date-time-local", () => {
   test.each([
     ["1985-04-12T23:20:50.52", true],

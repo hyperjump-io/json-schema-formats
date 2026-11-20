@@ -108,7 +108,6 @@ for strings that have a grammar:
 
 | Format | Function | Specification |
 | --- | --- | --- |
-| `char` | `isChar` | [OpenAPI Format Registry](https://spec.openapis.org/registry/format/char.html), one character |
 | `date-time-local` | `isDateTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date "T" partial-time` |
 | `time-local` | `isTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
 | `http-date` | `isHttpDate` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
@@ -120,11 +119,6 @@ for strings that have a grammar:
 
 The registry names RFC 7231 for `http-date`. RFC 9110 replaced it, with
 the same grammar.
-
-A character, for `isChar`, is one Unicode code point, so an emoji like
-`😀` is one character, though it's two in a JavaScript string's
-`length`. A letter with a combining accent, like `e` followed by U+0301,
-is two.
 
 `isDateTimeLocal` and `isTimeLocal` are like `isDateTime` and `isTime`
 without an offset. A leap second is at 23:59:60 UTC, and a time without
@@ -158,7 +152,12 @@ and the functions follow RFC 9651. The only difference is in
 base64, and RFC 8941's grammar allows it anywhere, so `isSfBinary`
 rejects `:a=b:`.
 
-The other formats in the registry don't have functions yet.
+The package doesn't support `char` or `decimal`, because the registry
+doesn't say exactly what's valid for them. It defines a `char` only as
+"a single character" with no definition of a character, and it says that
+`decimal` is "used in a variety of conflicting ways and is not
+interoperable." The other formats in the registry don't have functions
+yet.
 
 ## The `email` and `idn-email` formats
 

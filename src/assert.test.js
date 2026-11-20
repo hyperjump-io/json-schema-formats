@@ -147,13 +147,6 @@ const specs = {
     alphabet: "()[]{}a\\-?*+|^$,1",
     seeds: ["(a)", "[a-z]+", "a{1,2}", "\\d"]
   },
-  char: {
-    is: Formats.isChar, assert: Formats.assertChar, error: Formats.InvalidCharError, format: "char",
-    reasons: ["missing", "too-long"],
-    parts: ["character"],
-    alphabet: "a😀\uD800",
-    seeds: ["a", "😀"]
-  },
   dateTimeLocal: {
     is: Formats.isDateTimeLocal, assert: Formats.assertDateTimeLocal, error: Formats.InvalidDateTimeLocalError, format: "date-time-local",
     reasons: ["invalid-character", "invalid-value", "missing", "nonexistent-date"],
@@ -379,8 +372,6 @@ describe("What's wrong and where", () => {
     [Formats.assertRelativeJsonPointer, "01/a", { reason: "invalid-value", part: "number", start: 0, end: 2 }],
     [Formats.assertRelativeJsonPointer, "0+1#", { reason: "invalid-character", part: "index manipulation", start: 3, end: 4 }],
     [Formats.assertRegex, "(", { reason: "invalid-syntax", part: "regex", start: 0, end: 1, message: "Invalid regex: ( — Unterminated group" }],
-    [Formats.assertChar, "ab", { reason: "too-long", part: "character", start: 1, end: 2, message: "Invalid char: ab — it has more than one character, at 1" }],
-    [Formats.assertChar, "😀a", { reason: "too-long", part: "character", start: 2, end: 3 }],
     [Formats.assertDateTimeLocal, "2021-02-29T00:00:00", { reason: "nonexistent-date", part: "day", start: 8, end: 10, message: "Invalid date-time-local: 2021-02-29T00:00:00 — 2021-02 has 28 days, at 8" }],
     [Formats.assertDateTimeLocal, "2020-01-01T00:00:00Z", { reason: "invalid-character", part: "second", start: 19, end: 20, message: `Invalid date-time-local: 2020-01-01T00:00:00Z — "Z" isn't allowed after the second, at 19; a local time has no offset` }],
     [Formats.assertTimeLocal, "23:59:60", { reason: "invalid-value", part: "second", start: 6, end: 8, message: "Invalid time-local: 23:59:60 — the second must be 00-59, at 6; a leap second can't be checked without an offset" }],
