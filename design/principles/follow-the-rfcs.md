@@ -33,13 +33,14 @@ in:
   RFC's range is `%x26 / %x28-3B`, which leaves it out.
 - `date-time-local` and `time-local` have no leap seconds, since one
   can't be checked without an offset (see
-  [OpenAPI formats](../components/openapi-formats.md#local-dates-and-times)).
+  [Registry formats](../components/registry-formats.md#local-dates-and-times)).
 - `http-date` is RFC 9110's, which obsoletes the RFC 7231 that the
-  OpenAPI Format Registry names, with the same grammar (see
-  [OpenAPI formats](../components/openapi-formats.md#http-dates)).
+  OpenAPI Format Registry names, with the same grammar. The JSON Schema
+  Format Registry names RFC 9110 (see
+  [Registry formats](../components/registry-formats.md#http-dates)).
 - `ipv4-cidr` and `ipv6-cidr` have no ABNF in an RFC, so their grammar
-  is written from the registry's and the RFCs' prose (see
-  [OpenAPI formats](../components/openapi-formats.md#cidr)).
+  is written from the OpenAPI registry's and the RFCs' prose (see
+  [Registry formats](../components/registry-formats.md#cidr)).
 - The `sf-` formats are RFC 9651's, which obsoletes the RFC 8941 that the
-  registry names. Its `sf-binary` allows `=` only at the end (see
-  [OpenAPI formats](../components/openapi-formats.md#structured-fields)).
+  registries name. Its `sf-binary` allows `=` only at the end (see
+  [Registry formats](../components/registry-formats.md#structured-fields)).

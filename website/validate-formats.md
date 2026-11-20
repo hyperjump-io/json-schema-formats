@@ -97,28 +97,30 @@ RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
 `2024-03-10t09:30:00z`. A duration's letters have to be uppercase, so
 `isDuration` rejects `p1d`.
 
-## OpenAPI formats
+## Registry formats
 
 *Coming soon*
 
 The package also has functions for some of the formats in the
-[OpenAPI Format Registry](https://spec.openapis.org/registry/format/),
-which OpenAPI documents use beside JSON Schema's. They're the ones that
-say exactly what's valid. These are for strings:
+[JSON Schema Format Registry](https://github.com/json-schema-org/json-schema-spec/blob/main/specs/registries/format.json)
+and the [OpenAPI Format Registry](https://spec.openapis.org/registry/format/),
+which list formats that other specifications define. They're the ones
+that say exactly what's valid. The tables say which registry each one is
+in. These are for strings:
 
-| Format | Function | Specification |
-| --- | --- | --- |
-| `date-time-local` | `isDateTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date "T" partial-time` |
-| `time-local` | `isTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
-| `ipv4-cidr` | `isIPv4Cidr` | An `ipv4` address and a prefix length, in [RFC 4632](https://www.rfc-editor.org/rfc/rfc4632.html#section-3.1)'s notation |
-| `ipv6-cidr` | `isIPv6Cidr` | An `ipv6` address and a prefix length, in [RFC 4291](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3)'s notation |
-| `language` | `isLanguageTag` | [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1) `Language-Tag` |
-| `http-date` | `isHttpDate` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
-| `media-range` | `isMediaRange` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1) `media-range` |
-| `sf-binary` | `isSfBinary` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5) `sf-binary` |
-| `sf-boolean` | `isSfBoolean` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6) `sf-boolean` |
-| `sf-string` | `isSfString` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3) `sf-string` |
-| `sf-token` | `isSfToken` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4) `sf-token` |
+| Format | Function | Registry | Specification |
+| --- | --- | --- | --- |
+| `date-time-local` | `isDateTimeLocal` | OpenAPI | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date "T" partial-time` |
+| `time-local` | `isTimeLocal` | OpenAPI | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
+| `ipv4-cidr` | `isIPv4Cidr` | OpenAPI | An `ipv4` address and a prefix length, in [RFC 4632](https://www.rfc-editor.org/rfc/rfc4632.html#section-3.1)'s notation |
+| `ipv6-cidr` | `isIPv6Cidr` | OpenAPI | An `ipv6` address and a prefix length, in [RFC 4291](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3)'s notation |
+| `language` | `isLanguageTag` | OpenAPI | [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1) `Language-Tag` |
+| `http-date` | `isHttpDate` | Both | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
+| `media-range` | `isMediaRange` | Both | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1) `media-range` |
+| `sf-binary` | `isSfBinary` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5) `sf-binary` |
+| `sf-boolean` | `isSfBoolean` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6) `sf-boolean` |
+| `sf-string` | `isSfString` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3) `sf-string` |
+| `sf-token` | `isSfToken` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4) `sf-token` |
 
 These are for numbers, and take a `number`. Check that a value is a
 number before you call one:
@@ -128,17 +130,17 @@ const validateInt32 = (value: unknown) =>
   typeof value !== "number" || isInt32(value);
 ```
 
-| Format | Function | Valid values |
-| --- | --- | --- |
-| `int8` | `isInt8` | Integers from -128 to 127 |
-| `int16` | `isInt16` | Integers from -32,768 to 32,767 |
-| `int32` | `isInt32` | Integers from -2,147,483,648 to 2,147,483,647 |
-| `uint8` | `isUint8` | Integers from 0 to 255 |
-| `uint16` | `isUint16` | Integers from 0 to 65,535 |
-| `uint32` | `isUint32` | Integers from 0 to 4,294,967,295 |
-| `double-int` | `isDoubleInt` | Integers from -(2^53 - 1) to 2^53 - 1, which a double stores without losing precision |
-| `sf-integer` | `isSfInteger` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1) integers, from -999,999,999,999,999 to 999,999,999,999,999 |
-| `sf-decimal` | `isSfDecimal` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2) decimals, with at most 12 digits before the point and 3 after it |
+| Format | Function | Registry | Valid values |
+| --- | --- | --- | --- |
+| `int8` | `isInt8` | Both | Integers from -128 to 127 |
+| `int16` | `isInt16` | Both | Integers from -32,768 to 32,767 |
+| `int32` | `isInt32` | Both | Integers from -2,147,483,648 to 2,147,483,647 |
+| `uint8` | `isUint8` | Both | Integers from 0 to 255 |
+| `uint16` | `isUint16` | OpenAPI | Integers from 0 to 65,535 |
+| `uint32` | `isUint32` | OpenAPI | Integers from 0 to 4,294,967,295 |
+| `double-int` | `isDoubleInt` | Both | Integers from -(2^53 - 1) to 2^53 - 1, which a double stores without losing precision |
+| `sf-integer` | `isSfInteger` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1) integers, from -999,999,999,999,999 to 999,999,999,999,999 |
+| `sf-decimal` | `isSfDecimal` | Both | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2) decimals, with at most 12 digits before the point and 3 after it |
 
 A number format checks the number that parsing the JSON gave, so a
 number is only as precise as a double. Every valid value is checked
@@ -148,8 +150,9 @@ is a valid `int8`. An `sf-decimal` counts the digits of the shortest
 decimal that's the number, so `1.230` has 2 digits after the point, and
 `0.1 + 0.2`, which is `0.30000000000000004`, has 17.
 
-The registry names RFC 7231 for `http-date`. RFC 9110 replaced it, with
-the same grammar.
+The OpenAPI registry names RFC 7231 for `http-date`. RFC 9110 replaced
+it, with the same grammar, and it's the one the JSON Schema registry
+names.
 
 `isDateTimeLocal` and `isTimeLocal` are like `isDateTime` and `isTime`
 without an offset. A leap second is at 23:59:60 UTC, and a time without
@@ -194,20 +197,21 @@ has to be at 23:59:60. The day name isn't checked.
 The names of days and months are case-sensitive, as RFC 9110 says, so
 `isHttpDate` rejects `sun, 06 Nov 1994 08:49:37 GMT`.
 
-The registry names RFC 8941 for the `sf-` formats. RFC 9651 replaced it,
+The registries name RFC 8941 for the `sf-` formats. RFC 9651 replaced it,
 and the functions follow RFC 9651. The only difference is in
 `isSfBinary`: RFC 9651 allows `=` only as padding at the end of the
 base64, and RFC 8941's grammar allows it anywhere, so `isSfBinary`
 rejects `:a=b:`.
 
-The package doesn't support the registry's formats that don't say
+The package doesn't support the registries' formats that don't say
 exactly what's valid: `char`, `decimal`, `float`, `double`, `decimal128`,
 `int64`, `uint64`, `unixtime`, `binary`, and `html`. For example, the
-registry defines a `char` only as "a single character" with no definition
-of a character, and it says that `decimal` is "used in a variety of
-conflicting ways and is not interoperable." It doesn't support `password` or
-`commonmark` either, since every string is valid for them, or `byte` and
-`base64url`, which the registry deprecates in favor of `contentEncoding`.
+registries define a `char` only as "a single character" with no
+definition of a character, and the OpenAPI registry says that `decimal`
+is "used in a variety of conflicting ways and is not interoperable." It
+doesn't support `password` or `commonmark` either, since every string is
+valid for them, or `byte` and `base64url`, which the registries
+deprecate.
 
 ## The `email` and `idn-email` formats
 

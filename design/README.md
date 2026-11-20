@@ -48,5 +48,6 @@ hand and have JSDoc explaining the details. Documentation for users is in
   internationalized domains
 - [URIs and IRIs](components/uris.md): `@hyperjump/uri` and schemes that
   it doesn't know
-- [OpenAPI formats](components/openapi-formats.md): which of the OpenAPI
-  Format Registry's formats are here, HTTP dates, and structured fields
+- [Registry formats](components/registry-formats.md): which of the JSON
+  Schema and OpenAPI format registries' formats are here, HTTP dates, and
+  structured fields

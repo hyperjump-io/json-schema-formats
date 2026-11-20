@@ -1,27 +1,51 @@
-# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc4632.js`, `src/rfc4291.js`, `src/rfc5646.js`, `src/rfc9110.js`, `src/rfc9651.js`)
+# Registry formats (`src/registry.js`, `src/rfc3339.js`, `src/rfc4632.js`, `src/rfc4291.js`, `src/rfc5646.js`, `src/rfc9110.js`, `src/rfc9651.js`)
 
-The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
-lists the formats that OpenAPI documents use, JSON Schema's and others.
-This package has the others that are specified exactly, strings and
-numbers, so an OpenAPI validator can use it the way a JSON Schema
-validator does. It
-leaves out the ones whose definitions don't say exactly what's valid (see
+A format registry lists formats that other specifications define,
+beside the ones the JSON Schema validation specification defines. There
+are two:
+
+- The [JSON Schema Format Registry](https://github.com/json-schema-org/json-schema-spec/blob/main/specs/registries/format.json),
+  which the JSON Schema validation specification says implementations
+  should support as if it defined them. It isn't published yet. This is
+  its URL in the specification.
+- The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/),
+  the formats that OpenAPI documents use.
+
+This package has the registries' formats that are specified exactly,
+strings and numbers, so a validator can use them the way it uses JSON
+Schema's. It leaves out the ones whose definitions don't say exactly
+what's valid (see
 [Support only what's specified](../principles/support-only-whats-specified.md)). They're
 exported from the main entry, after JSON Schema's, and each has `is` and
 `assert` functions, errors, and a diagnosis like every format here.
 
-| Format | Module | Rule |
-| --- | --- | --- |
-| `date-time-local` | `rfc3339.js` | `full-date "T" partial-time` |
-| `time-local` | `rfc3339.js` | `partial-time` |
-| `ipv4-cidr` | `rfc4632.js` | `IPv4address "/" ipv4-prefix-length` |
-| `ipv6-cidr` | `rfc4291.js` | `IPv6address "/" ipv6-prefix-length` |
-| `language` | `rfc5646.js` | `Language-Tag` |
-| `http-date` | `rfc9110.js` | `HTTP-date` |
-| `media-range` | `rfc9110.js` | `media-range` |
-| `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc9651.js` | RFC 9651's rules of the same names |
-| `int8`, `int16`, `int32`, `uint8`, `uint16`, `uint32`, `double-int` | `openapi.js` | An integer in the registry's range |
-| `sf-integer`, `sf-decimal` | `rfc9651.js` | RFC 9651's ranges and digits |
+Nothing here depends on which registry a format comes from, so the code
+and the documents don't divide them by registry. A format that's in
+both is defined by the same specification in both. Where the registries
+name different specifications for it, that's said with the format.
+
+| Format | Registry | Module | Rule |
+| --- | --- | --- | --- |
+| `date-time-local` | OpenAPI | `rfc3339.js` | `full-date "T" partial-time` |
+| `time-local` | OpenAPI | `rfc3339.js` | `partial-time` |
+| `ipv4-cidr` | OpenAPI | `rfc4632.js` | `IPv4address "/" ipv4-prefix-length` |
+| `ipv6-cidr` | OpenAPI | `rfc4291.js` | `IPv6address "/" ipv6-prefix-length` |
+| `language` | OpenAPI | `rfc5646.js` | `Language-Tag` |
+| `http-date` | Both | `rfc9110.js` | `HTTP-date` |
+| `media-range` | Both | `rfc9110.js` | `media-range` |
+| `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | Both | `rfc9651.js` | RFC 9651's rules of the same names |
+| `int8`, `int16`, `int32`, `uint8`, `double-int` | Both | `registry.js` | An integer in the registry's range |
+| `uint16`, `uint32` | OpenAPI | `registry.js` | An integer in the registry's range |
+| `sf-integer`, `sf-decimal` | Both | `rfc9651.js` | RFC 9651's ranges and digits |
+
+The integer formats and the local dates and times have no specification
+but the OpenAPI Format Registry, which defines them. The JSON Schema
+Format Registry names the OpenAPI Specification for `int8`, `int32`, and
+`uint8`, and nothing for `int16` and `double-int`. The other formats are
+defined by the RFCs in the table.
+
+Rejected: a module for each registry. A format is in a module for the
+specification that defines it, and a registry only lists it.
 
 The JSON Schema Test Suite doesn't have them, so their tests are in its
 format in `test-suite/tests/` (see [Files](../style/files.md)), and
@@ -29,13 +53,13 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
 
 ## Numbers
 
-The registry types the number formats as JSON numbers. Their functions
+The registries type the number formats as JSON numbers. Their functions
 take a JavaScript `number`, and are like the string formats' in
 everything that a span isn't needed for. The integer formats and
-`double-int` are in `openapi.js`, since the registry defines them, and
+`double-int` are in `registry.js`, since the OpenAPI registry defines them, and
 `sf-integer` and `sf-decimal` are in `rfc9651.js`, with the other
 structured fields. They share `isIntegerIn` and `integerProblem`, in
-`openapi.js`. Their errors extend `NumberFormatError`, in `diagnose.js`,
+`registry.js`. Their errors extend `NumberFormatError`, in `diagnose.js`,
 which has no problem or span.
 
 ### The API
@@ -134,14 +158,14 @@ precision. A text just past a range is still out of it as a double:
 `9007199254740993` is 2^53, which isn't a `double-int`.
 
 Rejected: checking the JSON text. The functions are given values, by a
-JSON Schema or OpenAPI validator that parsed the JSON, and the text
+validator that parsed the JSON, and the text
 isn't there to check.
 
 ### `sf-decimal`
 
 `sf-decimal` follows RFC 9651's
 ABNF, `["-"] 1*12DIGIT "." 1*3DIGIT`, so a value with more than three
-digits after the point isn't valid. The registry says the same. RFC
+digits after the point isn't valid. The registries say the same. RFC
 9651's serialization rounds such a value to three digits instead of
 failing, which would make `1.2345` an `sf-decimal`, but that's what an
 implementation does with a value it's given, not what's valid.
@@ -158,9 +182,9 @@ These are ambiguous (see
 | Format | What's left open |
 | --- | --- |
 | `char` | It's "a single character", with no definition of a character. |
-| `decimal` | The registry says that the format is "used in a variety of conflicting ways and is not interoperable." |
+| `decimal` | The JSON Schema registry gives it "unspecified precision and range", and the OpenAPI registry says that the format is "used in a variety of conflicting ways and is not interoperable." |
 | `float`, `double` | They're IEEE 754 single and double precision numbers. Whether a JSON number has to be exactly representable, which `0.1` isn't, or only in range isn't said. |
-| `decimal128` | The registry prefers a string, and names `NaN`, `-INF`, and `INF`, but gives no syntax for it. A JSON number loses its digits when it's parsed, so its 34 digits can't be counted. |
+| `decimal128` | The OpenAPI registry prefers a string, and names `NaN`, `-INF`, and `INF`, but gives no syntax for it. A JSON number loses its digits when it's parsed, so its 34 digits can't be counted. |
 | `int64`, `uint64` | The range is exact, but a string is recommended past 2^53, with no syntax for it: a sign, leading zeros, or whitespace. |
 | `unixtime` | It's seconds since 1970, as a number or a string. Whether it can be negative or fractional, and what the string is, isn't said. |
 | `binary` | It's "any sequence of octets", with no encoding in a JSON string. |
@@ -172,11 +196,13 @@ These have nothing to check, so their functions would always be `true`:
 - `commonmark` is CommonMark, which says that "any sequence of characters
   is a valid CommonMark document."
 
-These are deprecated in the registry, which says to use JSON Schema's
-`contentEncoding` in OpenAPI 3.1 instead:
+These are deprecated in both registries. The OpenAPI registry says to
+use JSON Schema's `contentEncoding` in OpenAPI 3.1 instead:
 
 - `byte`, which is RFC 4648's base64.
 - `base64url`, which is RFC 4648's base64url.
+
+`binary` is deprecated in the JSON Schema registry too.
 
 ## Local dates and times
 
@@ -190,7 +216,7 @@ that a local time has none.
 
 ## CIDR
 
-The registry's `ipv4-cidr` and `ipv6-cidr` are an address that's valid
+The OpenAPI registry's `ipv4-cidr` and `ipv6-cidr` are an address that's valid
 for `ipv4` or `ipv6`, `/`, and a prefix length that's "a decimal integer"
 from 0 to 32 or 128. A bare address isn't valid. RFC 4632 and RFC 4291,
 which the registry cites for the notation, have no ABNF for it, so the
@@ -214,7 +240,7 @@ decisions:
 
 ## Language tags
 
-`language` is RFC 5646's `Language-Tag`, which the registry names. RFC
+`language` is RFC 5646's `Language-Tag`, which the OpenAPI registry names. RFC
 5646 calls a tag that matches it "well-formed", and a tag "valid" if it
 also has subtags from the IANA Language Subtag Registry and no repeated
 variant or singleton. The registry points at the rule, so `language` is
@@ -231,8 +257,9 @@ place gets a hint that lists what can come there.
 
 ## HTTP dates
 
-The registry names RFC 7231 for `http-date`. RFC 9110 obsoletes it, with
-the same `HTTP-date` grammar, so the grammar is RFC 9110's, in
+The JSON Schema registry names RFC 9110 for `http-date`, and the OpenAPI
+registry names RFC 7231. RFC 9110 obsoletes RFC 7231, with the same
+`HTTP-date` grammar, so the grammar is RFC 9110's, in
 `scripts/generate-patterns.js`. The grammar has `2DIGIT` for the hour,
 the minute, and the second, with their range in a comment on
 `time-of-day`, `00:00:00 - 23:59:60`. The range is written out as ABNF in
@@ -294,7 +321,7 @@ escapes.
 ## Structured fields
 
 `sf-binary`, `sf-boolean`, `sf-string`, and `sf-token` are RFC 9651's.
-The registry names RFC 8941, which RFC 9651 obsoletes. RFC 9651 moves the
+Both registries name RFC 8941, which RFC 9651 obsoletes. RFC 9651 moves the
 ABNF to an informative appendix, Appendix C, which is what
 `scripts/generate-patterns.js` has.
 
@@ -304,7 +331,7 @@ valid here. RFC 9651's `sf-string` allows the same characters as RFC
 8941's, written differently, and its `sf-token` and `sf-boolean` are the
 same.
 
-Rejected: RFC 8941, though the registry names it. Its `sf-binary` allows
+Rejected: RFC 8941, though the registries name it. Its `sf-binary` allows
 base64 that can't be decoded, like `:a=b:`.
 
 `sf-string`'s `\` can only escape `"` and `\`, and anything else is

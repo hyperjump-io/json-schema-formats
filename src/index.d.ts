@@ -370,8 +370,9 @@ export const isRegex: (regex: string) => boolean;
 export const assertRegex: (regex: string) => void;
 
 /**
- * The 'int8' format from the OpenAPI Format Registry. Validates that a
- * number is a signed 8-bit integer: an integer from -128 to 127.
+ * The 'int8' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is a signed 8-bit integer: an integer from -128 to
+ * 127.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int8.html)
  */
@@ -386,8 +387,9 @@ export const isInt8: (n: number) => boolean;
 export const assertInt8: (n: number) => void;
 
 /**
- * The 'int16' format from the OpenAPI Format Registry. Validates that a
- * number is a signed 16-bit integer: an integer from -32768 to 32767.
+ * The 'int16' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is a signed 16-bit integer: an integer from -32768 to
+ * 32767.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int16.html)
  */
@@ -402,8 +404,9 @@ export const isInt16: (n: number) => boolean;
 export const assertInt16: (n: number) => void;
 
 /**
- * The 'int32' format from the OpenAPI Format Registry. Validates that a
- * number is a signed 32-bit integer: an integer from -2147483648 to 2147483647.
+ * The 'int32' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is a signed 32-bit integer: an integer from
+ * -2147483648 to 2147483647.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int32.html)
  */
@@ -418,8 +421,9 @@ export const isInt32: (n: number) => boolean;
 export const assertInt32: (n: number) => void;
 
 /**
- * The 'uint8' format from the OpenAPI Format Registry. Validates that a
- * number is an unsigned 8-bit integer: an integer from 0 to 255.
+ * The 'uint8' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is an unsigned 8-bit integer: an integer from 0 to
+ * 255.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/uint8.html)
  */
@@ -466,9 +470,9 @@ export const isUint32: (n: number) => boolean;
 export const assertUint32: (n: number) => void;
 
 /**
- * The 'double-int' format from the OpenAPI Format Registry. Validates that a
- * number is an integer that a double can store without losing precision:
- * from -(2^53 - 1) to 2^53 - 1, like `Number.isSafeInteger`.
+ * The 'double-int' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is an integer that a double can store without losing
+ * precision: from -(2^53 - 1) to 2^53 - 1, like `Number.isSafeInteger`.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/double-int.html)
  */
@@ -484,12 +488,12 @@ export const isDoubleInt: (n: number) => boolean;
 export const assertDoubleInt: (n: number) => void;
 
 /**
- * The 'sf-integer' format from the OpenAPI Format Registry. Validates that a
- * number is a structured field integer as defined by
+ * The 'sf-integer' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is a structured field integer as defined by
  * [RFC 9651, section 3.3.1](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1):
  * an integer from -999,999,999,999,999 to 999,999,999,999,999.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-integer.html)
+ * @see [RFC 9651, section 3.3.1](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1)
  */
 export const isSfInteger: (n: number) => boolean;
 
@@ -502,13 +506,13 @@ export const isSfInteger: (n: number) => boolean;
 export const assertSfInteger: (n: number) => void;
 
 /**
- * The 'sf-decimal' format from the OpenAPI Format Registry. Validates that a
- * number is a structured field decimal as defined by
+ * The 'sf-decimal' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a number is a structured field decimal as defined by
  * [RFC 9651, section 3.3.2](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2):
- * at most 12 digits before the point and at most 3 after it, in the
- * shortest decimal that's the number.
+ * at most 12 digits before the point and at most 3 after it, in the shortest
+ * decimal that's the number.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-decimal.html)
+ * @see [RFC 9651, section 3.3.2](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2)
  */
 export const isSfDecimal: (n: number) => boolean;
 
@@ -613,7 +617,7 @@ export const assertIPv6Cidr: (cidr: string) => void;
  * against the IANA Language Subtag Registry, and a tag can repeat a variant
  * or a singleton.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/language.html)
+ * @see [RFC 5646, section 2.1](https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1)
  */
 export const isLanguageTag: (tag: string) => boolean;
 
@@ -627,17 +631,18 @@ export const isLanguageTag: (tag: string) => boolean;
 export const assertLanguageTag: (tag: string) => void;
 
 /**
- * The 'http-date' format from the OpenAPI Format Registry. Validates that a
- * string represents an HTTP date as defined by [RFC 9110, section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7),
+ * The 'http-date' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents an HTTP date as defined by
+ * [RFC 9110, section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7),
  * which obsoletes RFC 7231 with the same grammar. The day has to be in its
- * month, the day name has to be the date's, and a second of 60 has to be a
- * leap second.
+ * month, the day name has to be the date's, and a second of 60 has to be a leap
+ * second.
  *
  * **NOTE**: The obsolete RFC 850 form has a 2-digit year, with no century.
  * Its day name isn't checked, and its leap second is only checked for being
  * at 23:59:60.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/http-date.html)
+ * @see [RFC 9110, section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7)
  */
 export const isHttpDate: (date: string) => boolean;
 
@@ -650,10 +655,11 @@ export const isHttpDate: (date: string) => boolean;
 export const assertHttpDate: (date: string) => void;
 
 /**
- * The 'media-range' format from the OpenAPI Format Registry. Validates that a
- * string represents a media range as defined by [RFC 9110, section 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1).
+ * The 'media-range' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents a media range as defined by
+ * [RFC 9110, section 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1).
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/media-range.html)
+ * @see [RFC 9110, section 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1)
  */
 export const isMediaRange: (mediaRange: string) => boolean;
 
@@ -666,13 +672,14 @@ export const isMediaRange: (mediaRange: string) => boolean;
 export const assertMediaRange: (mediaRange: string) => void;
 
 /**
- * The 'sf-binary' format from the OpenAPI Format Registry. Validates that a
- * string represents a structured field byte sequence as defined by
+ * The 'sf-binary' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents a structured field byte sequence as
+ * defined by
  * [RFC 9651, section 3.3.5](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5),
- * which obsoletes the RFC 8941 that the registry names. `=` is only allowed
- * as padding at the end, which RFC 8941's grammar didn't require.
+ * which obsoletes the RFC 8941 that the registries name. `=` is only allowed as
+ * padding at the end, which RFC 8941's grammar didn't require.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-binary.html)
+ * @see [RFC 9651, section 3.3.5](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5)
  */
 export const isSfBinary: (binary: string) => boolean;
 
@@ -686,11 +693,11 @@ export const isSfBinary: (binary: string) => boolean;
 export const assertSfBinary: (binary: string) => void;
 
 /**
- * The 'sf-boolean' format from the OpenAPI Format Registry. Validates that a
- * string represents a structured field boolean as defined by
+ * The 'sf-boolean' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents a structured field boolean as defined by
  * [RFC 9651, section 3.3.6](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6).
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-boolean.html)
+ * @see [RFC 9651, section 3.3.6](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6)
  */
 export const isSfBoolean: (boolean: string) => boolean;
 
@@ -704,12 +711,12 @@ export const isSfBoolean: (boolean: string) => boolean;
 export const assertSfBoolean: (boolean: string) => void;
 
 /**
- * The 'sf-string' format from the OpenAPI Format Registry. Validates that a
- * string represents a structured field string as defined by
+ * The 'sf-string' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents a structured field string as defined by
  * [RFC 9651, section 3.3.3](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3),
  * with its quotes.
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-string.html)
+ * @see [RFC 9651, section 3.3.3](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3)
  */
 export const isSfString: (string: string) => boolean;
 
@@ -723,11 +730,11 @@ export const isSfString: (string: string) => boolean;
 export const assertSfString: (string: string) => void;
 
 /**
- * The 'sf-token' format from the OpenAPI Format Registry. Validates that a
- * string represents a structured field token as defined by
+ * The 'sf-token' format from the JSON Schema and OpenAPI format registries.
+ * Validates that a string represents a structured field token as defined by
  * [RFC 9651, section 3.3.4](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4).
  *
- * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-token.html)
+ * @see [RFC 9651, section 3.3.4](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4)
  */
 export const isSfToken: (token: string) => boolean;
 

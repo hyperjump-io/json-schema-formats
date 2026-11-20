@@ -155,7 +155,7 @@ await testSuite(jsonSchemaTestSuite, "format-uuid", 2020, (uuid) => typeof uuid 
 await testSuite(ours, "format-email", 2020, (email) => typeof email !== "string" || isEmail(email));
 await testSuite(ours, "format-idn-email", 2020, (email) => typeof email !== "string" || isIdnEmail(email));
 
-// OpenAPI Format Registry
+// Format registries
 await testSuite(ours, "format-date-time-local", 2020, (dateTime) => typeof dateTime !== "string" || isDateTimeLocal(dateTime));
 await testSuite(ours, "format-time-local", 2020, (time) => typeof time !== "string" || isTimeLocal(time));
 await testSuite(ours, "format-ipv4-cidr", 2020, (cidr) => typeof cidr !== "string" || isIPv4Cidr(cidr));

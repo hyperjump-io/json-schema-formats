@@ -1,5 +1,5 @@
 import { FormatError, NumberFormatError, charAt, end, invalidCharacter, isProblem, matchEnd, missing, problem } from "./diagnose.js";
-import { integerProblem, isIntegerIn } from "./openapi.js";
+import { integerProblem, isIntegerIn } from "./registry.js";
 import {
   base64Chars, base64Padding, sfBinary as sfBinaryPattern, sfBoolean as sfBooleanPattern, sfString as sfStringPattern,
   sfToken as sfTokenPattern, sfTokenChars, sfUnescapedChars

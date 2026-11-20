@@ -40,13 +40,13 @@ export {
 // JSON Schema Validation - Regular Expressions
 export { isRegex, assertRegex, InvalidRegexError } from "./ecma262.js";
 
-// OpenAPI Format Registry
+// Format registries
 export {
   isInt8, isInt16, isInt32, isUint8, isUint16, isUint32, isDoubleInt,
   assertInt8, assertInt16, assertInt32, assertUint8, assertUint16, assertUint32, assertDoubleInt,
   InvalidInt8Error, InvalidInt16Error, InvalidInt32Error, InvalidUint8Error, InvalidUint16Error, InvalidUint32Error,
   InvalidDoubleIntError
-} from "./openapi.js";
+} from "./registry.js";
 export {
   isDateTimeLocal, isTimeLocal, assertDateTimeLocal, assertTimeLocal, InvalidDateTimeLocalError, InvalidTimeLocalError
 } from "./rfc3339.js";

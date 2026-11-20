@@ -19,4 +19,4 @@ checked with the generic syntax only (see
 validators of its own, with one exception: `isHttpDate` accepts an
 rfc850-date without checking its day name, which needs the century that
 its 2-digit year leaves out (see
-[OpenAPI formats](../components/openapi-formats.md#the-rfc850-dates-century)).
+[Registry formats](../components/registry-formats.md#the-rfc850-dates-century)).

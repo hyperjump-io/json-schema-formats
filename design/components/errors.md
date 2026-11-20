@@ -79,7 +79,7 @@ InvalidInt8Error: Invalid int8: 300 — it must be -128 to 127
 ```
 
 Their reasons are `not-an-integer`, `out-of-range`, and `too-precise`
-(see [OpenAPI formats](openapi-formats.md#errors)).
+(see [Registry formats](registry-formats.md#errors)).
 
 ## URIs and IRIs
 
