@@ -4,5 +4,12 @@ scratch/
 benchmark/
 TODO*
 
-# Downloaded by `vale sync`
-.vale/
+# Downloaded by `vale sync`, except this package's vocabulary
+.vale/*
+!.vale/styles/
+.vale/styles/*
+!.vale/styles/config/
+.vale/styles/config/*
+!.vale/styles/config/vocabularies/
+.vale/styles/config/vocabularies/*
+!.vale/styles/config/vocabularies/JsonSchemaFormats/
