@@ -178,7 +178,8 @@ exactly what's valid: `char`, `decimal`, `float`, `double`, `decimal128`,
 registry defines a `char` only as "a single character" with no definition
 of a character, and it says that `decimal` is "used in a variety of
 conflicting ways and is not interoperable." It doesn't support `password` or
-`commonmark` either, since every string is valid for them. The other
+`commonmark` either, since every string is valid for them, or `byte` and
+`base64url`, which the registry deprecates in favor of `contentEncoding`. The other
 formats in the registry don't have functions yet.
 
 ## The `email` and `idn-email` formats

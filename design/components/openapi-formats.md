@@ -31,8 +31,6 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
   numbers. A number has no span for an error to point at, and one past
   2^53 is rounded before a validator sees it. How the API takes them is
   open.
-- **Deprecated**: `byte` and `base64url`, which are RFC 4648's base64 and
-  base64url.
 
 `sf-decimal` is decided, for when numbers are: it follows RFC 9651's
 ABNF, `["-"] 1*12DIGIT "." 1*3DIGIT`, so a value with more than three
@@ -62,6 +60,12 @@ These have nothing to check, so their functions would always be `true`:
 - `password` is "a string that hints to obscure the value".
 - `commonmark` is CommonMark, which says that "any sequence of characters
   is a valid CommonMark document."
+
+These are deprecated in the registry, which says to use JSON Schema's
+`contentEncoding` in OpenAPI 3.1 instead:
+
+- `byte`, which is RFC 4648's base64.
+- `base64url`, which is RFC 4648's base64url.
 
 ## Local dates and times
 
