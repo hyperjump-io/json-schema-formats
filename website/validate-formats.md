@@ -97,6 +97,67 @@ RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
 `2024-03-10t09:30:00z`. A duration's letters have to be uppercase, so
 `isDuration` rejects `p1d`.
 
+## OpenAPI formats
+
+*Coming soon*
+
+The package also has functions for some of the formats in the
+[OpenAPI Format Registry](https://spec.openapis.org/registry/format/),
+which OpenAPI documents use beside JSON Schema's. They're the formats
+for strings that have a grammar:
+
+| Format | Function | Specification |
+| --- | --- | --- |
+| `char` | `isChar` | [OpenAPI Format Registry](https://spec.openapis.org/registry/format/char.html), one character |
+| `date-time-local` | `isDateTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date "T" partial-time` |
+| `time-local` | `isTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
+| `http-date` | `isHttpDate` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
+| `media-range` | `isMediaRange` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1) `media-range` |
+| `sf-binary` | `isSfBinary` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.5) `sf-binary` |
+| `sf-boolean` | `isSfBoolean` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.6) `sf-boolean` |
+| `sf-string` | `isSfString` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.3) `sf-string` |
+| `sf-token` | `isSfToken` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.4) `sf-token` |
+
+The registry names RFC 7231 for `http-date`. RFC 9110 replaced it, with
+the same grammar.
+
+A character, for `isChar`, is one Unicode code point, so an emoji like
+`😀` is one character, though it's two in a JavaScript string's
+`length`. A letter with a combining accent, like `e` followed by U+0301,
+is two.
+
+`isDateTimeLocal` and `isTimeLocal` are like `isDateTime` and `isTime`
+without an offset. A leap second is at 23:59:60 UTC, and a time without
+an offset can't be put in UTC, so they never accept one.
+
+`isHttpDate` checks more than the grammar:
+
+- The day has to be in its month.
+- The day name has to be the date's. RFC 9110 gives the parts of a date
+  the meaning they have in RFC 5322, which says so.
+- A second of `60` has to be at the end of a day that had a leap second.
+
+```typescript
+isHttpDate("Sun, 06 Nov 1994 08:49:37 GMT"); // true
+isHttpDate("Mon, 06 Nov 1994 08:49:37 GMT"); // false
+```
+
+An HTTP date can also be in two obsolete forms, which `isHttpDate`
+accepts: `Sunday, 06-Nov-94 08:49:37 GMT` and `Sun Nov  6 08:49:37 1994`.
+The first one's year has only two digits, so the century isn't known.
+`isHttpDate` checks only what doesn't need the century. February 29 has
+to be in a year that's a leap year in some century, and a leap second
+has to be at 23:59:60. The day name isn't checked.
+
+The names of days and months are case-sensitive, as RFC 9110 says, so
+`isHttpDate` rejects `sun, 06 Nov 1994 08:49:37 GMT`.
+
+`isSfBinary` follows RFC 8941's grammar, which allows `=` anywhere in the
+base64, not only at the end. RFC 9651, which replaces RFC 8941, allows it
+only at the end.
+
+The other formats in the registry don't have functions yet.
+
 ## The `email` and `idn-email` formats
 
 An email address's domain can be an address literal in brackets, like

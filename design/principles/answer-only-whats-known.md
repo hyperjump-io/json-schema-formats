@@ -16,4 +16,7 @@ can't tell it apart from an answer.
 functions don't follow it: a URI of a scheme that it doesn't know is
 checked with the generic syntax only (see
 [URIs and IRIs](../components/uris.md)). This package keeps it for the
-validators of its own.
+validators of its own, with one exception: `isHttpDate` accepts an
+rfc850-date without checking its day name, which needs the century that
+its 2-digit year leaves out (see
+[OpenAPI formats](../components/openapi-formats.md#the-rfc850-dates-century)).

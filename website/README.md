@@ -27,6 +27,8 @@ The package offers the following:
 - **Every format JSON Schema defines.** Dates and times, email
   addresses, hostnames, IP addresses, URIs and IRIs, UUIDs, URI
   templates, JSON Pointers, and regular expressions.
+- **Formats from the OpenAPI Format Registry** that have a grammar, like
+  `http-date` and `media-range`.
 - **The specifications' grammars.** The package checks each format with
   the grammar from the RFC that defines it.
 - **Errors that say what's wrong and where.** Each error has a reason,
@@ -42,7 +44,8 @@ uses it to validate the `format` keyword.
 
 - [Install](install.md): setup for Node.js, browsers, and TypeScript
 - [Validate formats](validate-formats.md): the function for each format,
-  and the formats that changed between JSON Schema versions
+  the formats that changed between JSON Schema versions, and the OpenAPI
+  formats
 - [Find what's wrong](find-whats-wrong.md): the `assert` functions and the
   errors that they throw
 - [URIs and IRIs](uris-and-iris.md): schemes, and the errors for URIs and

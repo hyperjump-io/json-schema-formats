@@ -38,10 +38,11 @@ format's parts, like `"year" | "month" | "day"`.
 | `missing` | Empty, where the part would be |
 | `too-long` | The characters past the limit |
 | `invalid-order` | A duration's unit that's out of order |
-| `invalid-escape` | A JSON Pointer's `~` and the character after it |
+| `invalid-escape` | A JSON Pointer's `~`, or an `sf-string`'s `\`, and the character after it |
 | `invalid-percent-encoding` | A `%` and up to two characters after it |
 | `nonexistent-date` | The day |
 | `nonexistent-leap-second` | The second |
+| `wrong-day-name` | An HTTP date's day name |
 | `invalid-idn` | The whole hostname |
 | `invalid-syntax` | The whole regular expression |
 

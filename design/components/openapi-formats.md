@@ -1,0 +1,131 @@
+# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc9110.js`, `src/rfc8941.js`)
+
+The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
+lists the formats that OpenAPI documents use, JSON Schema's and others.
+This package has the others that are strings with a grammar, so an
+OpenAPI validator can use it the way a JSON Schema validator does. They're
+exported from the main entry, after JSON Schema's, and each has `is` and
+`assert` functions, errors, and a diagnosis like every format here.
+
+| Format | Module | Rule |
+| --- | --- | --- |
+| `char` | `openapi.js` | One code point |
+| `date-time-local` | `rfc3339.js` | `full-date "T" partial-time` |
+| `time-local` | `rfc3339.js` | `partial-time` |
+| `http-date` | `rfc9110.js` | `HTTP-date` |
+| `media-range` | `rfc9110.js` | `media-range` |
+| `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc8941.js` | RFC 8941's rules of the same names |
+
+`src/openapi.test.js` has their examples, since there's no test suite for
+them, and `src/assert.test.js` tests their diagnoses like the others'.
+
+## What's not here yet
+
+- **Numbers**: `int8` to `uint64`, `double-int`, `float`, `double`,
+  `decimal`, `decimal128`, `sf-integer`, `sf-decimal`, and `unixtime`.
+  The registry types them as JSON numbers, some of them as numbers or
+  strings. A number has no span for an error to point at, and one past
+  2^53 is rounded before a validator sees it. How the API takes them is
+  open.
+- **Strings with a grammar**: `ipv4-cidr`, `ipv6-cidr`, and `language`
+  (RFC 5646).
+- **Deprecated**: `byte`, `base64url`, and `binary`.
+- **No syntax to check**: `password`, `commonmark`, and `html`.
+
+## Characters
+
+The registry says that a `char` is "a single character". Here, a
+character is a code point, so `😀`, which is two UTF-16 code units, is
+one. A string's `length` would reject it, which is what the first
+version of this format did.
+
+Rejected: a grapheme cluster, like `e` with a combining accent. It needs
+`Intl.Segmenter`, and the clusters change with Unicode versions, so two
+engines could disagree about a value.
+
+## Local dates and times
+
+`date-time-local` and `time-local` are RFC 3339's rules without the
+offset. A leap second is at 23:59:60 UTC, and without an offset a local
+time can't be put in UTC, so neither allows `60`, the way `time` doesn't
+(see [Dates and times](dates-and-times.md#leap-seconds)). `date-time-local`
+checks the day in its month with `date-time`'s check. The diagnoses reuse
+`date`'s and `time`'s steps, and a value with an offset gets the hint
+that a local time has none.
+
+## HTTP dates
+
+The registry names RFC 7231 for `http-date`. RFC 9110 obsoletes it, with
+the same `HTTP-date` grammar, so the grammar is RFC 9110's, in
+`scripts/generate-patterns.js`. The grammar has `2DIGIT` for the hour,
+the minute, and the second, with their range in a comment on
+`time-of-day`, `00:00:00 - 23:59:60`. The range is written out as ABNF in
+each of them (see [Follow the RFCs](../principles/follow-the-rfcs.md)).
+The day is `2DIGIT` with no range, so the check for the day in its month
+also rejects `00`.
+
+An HTTP date has three forms. The pattern is the grammar, and the checks
+after it read the parts from where they are in the form the value is in:
+an IMF-fixdate has `,` after a 3-letter day name, an asctime-date has a
+space, and an rfc850-date has a longer day name.
+
+The checks after the pattern:
+
+- **The day is in its month**, as for `date`. It's `nonexistent-date`.
+- **The day name is the date's.** RFC 9110 says that the parts of a date
+  mean what they do in RFC 5322, and RFC 5322 says that a day of the week
+  has to be the date's. `date-math.js` has `dayOfWeek`, which computes it
+  from the date, because `Date` takes years 0 to 99 to be 1900 to 1999. It's
+  `wrong-day-name`, a reason of its own: the day exists, and either the
+  name or the date is wrong.
+- **A second of 60 is a leap second**, as for `date-time`, in GMT. It's
+  `nonexistent-leap-second`.
+
+The names are case-sensitive, since the grammar has them as `%s"..."`,
+and the diagnosis hints so for a name in another case.
+
+### The rfc850-date's century
+
+An rfc850-date's year has two digits. RFC 9110 says that a recipient
+takes it to be within 50 years of now, which would make the answer
+depend on a clock: a validator would give a different answer for the
+same value from one year to the next. So the checks use only what's known
+without the century:
+
+- February 29 needs the year to be a leap year in some century. That's
+  `daysInMonth` of the two digits as a year, since `00` is a leap year
+  like 2000 is.
+- A leap second has to be at 23:59:60, which every leap second is.
+- The day name isn't checked. It's a different day in each century.
+
+These accept some values that are wrong in the century the RFC means,
+but never reject one that's right in it. That's an exception to
+[Answer only what's known](../principles/answer-only-whats-known.md),
+which would throw for an rfc850-date, since its day name can't be
+checked. HTTP still requires recipients to accept the form, so throwing
+would make a value that HTTP accepts an error.
+
+## Media ranges
+
+`media-range` is RFC 9110's, with the rules it uses from other sections
+of RFC 9110 copied in: `token`, `parameters`, `OWS`, and `quoted-string`.
+`obs-text` is `%x80-FF`, which is octets in HTTP, and is code points
+U+0080 to U+00FF in a JavaScript string, so `é` is allowed in a quoted
+string and `ā` isn't. The diagnosis walks the type, the subtype, and each
+parameter, and a parameter's quoted string has its own loop for its
+escapes.
+
+## Structured fields
+
+`sf-binary`, `sf-boolean`, `sf-string`, and `sf-token` are RFC 8941's,
+which the registry names. RFC 9651 obsoletes RFC 8941 and moves the ABNF
+to an informative appendix. Its `sf-string` allows the same characters,
+written differently, and its `sf-token` and `sf-boolean` are the same. Its
+`sf-binary` allows `=` only at the end, where RFC 8941's allows it
+anywhere in the base64, so `:a=b:` is valid here.
+
+Open question: whether to follow RFC 9651's `sf-binary`, which is what
+current HTTP implementations parse, while the registry names RFC 8941.
+
+`sf-string`'s `\` can only escape `"` and `\`, and anything else is
+`invalid-escape`, like a JSON Pointer's `~`.

@@ -91,6 +91,15 @@ The following table shows the error that each function throws:
 | `assertRegex` | `InvalidRegexError` |
 | `assertUri`, `assertUriReference` | `InvalidUriError` |
 | `assertIri`, `assertIriReference` | `InvalidIriError` |
+| `assertChar` | `InvalidCharError` |
+| `assertDateTimeLocal` | `InvalidDateTimeLocalError` |
+| `assertTimeLocal` | `InvalidTimeLocalError` |
+| `assertHttpDate` | `InvalidHttpDateError` |
+| `assertMediaRange` | `InvalidMediaRangeError` |
+| `assertSfBinary` | `InvalidSfBinaryError` |
+| `assertSfBoolean` | `InvalidSfBooleanError` |
+| `assertSfString` | `InvalidSfStringError` |
+| `assertSfToken` | `InvalidSfTokenError` |
 
 The errors for URIs and IRIs come from `@hyperjump/uri`, and their
 properties are different. For more information, see
@@ -109,10 +118,11 @@ TypeScript checks a `switch` on them.
 | `missing` | A part isn't there. |
 | `too-long` | A part has more characters than it can have. The span is the characters past the limit. |
 | `invalid-order` | A duration's units aren't in the order that they have to be in. |
-| `invalid-escape` | A JSON Pointer has a `~` that isn't followed by `0` or `1`. |
+| `invalid-escape` | An escape isn't followed by a character that it can escape, like a `~` in a JSON Pointer that isn't followed by `0` or `1`, or a `\` in an `sf-string` that isn't followed by `"` or `\`. |
 | `invalid-percent-encoding` | A URI Template has a `%` that isn't followed by two hex digits. |
 | `nonexistent-date` | The day isn't in the month, like February 29 in a year that isn't a leap year. |
 | `nonexistent-leap-second` | A date-time has a second of `60` at a time that didn't have a leap second. |
+| `wrong-day-name` | An HTTP date's day name isn't the day of its date. |
 | `invalid-idn` | An internationalized hostname breaks a rule of IDNA2008 or UTS #46. |
 | `invalid-syntax` | A regular expression doesn't compile. |
 

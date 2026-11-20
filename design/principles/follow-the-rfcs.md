@@ -31,3 +31,9 @@ in:
   [Email addresses](../components/email.md#internationalized-domains)).
 - RFC 6570's `literals` include `'` (`%x26-3B`), as 1.1.0's did. The
   RFC's range is `%x26 / %x28-3B`, which leaves it out.
+- `date-time-local` and `time-local` have no leap seconds, since one
+  can't be checked without an offset (see
+  [OpenAPI formats](../components/openapi-formats.md#local-dates-and-times)).
+- `http-date` is RFC 9110's, which obsoletes the RFC 7231 that the
+  OpenAPI Format Registry names, with the same grammar (see
+  [OpenAPI formats](../components/openapi-formats.md#http-dates)).
