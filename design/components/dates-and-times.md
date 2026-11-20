@@ -27,8 +27,9 @@ only one. It's `nonexistent-leap-second` when it fails.
 
 `time` has no date, so a leap second can't be checked, and `isTime`
 rejects one. Its pattern has `time-second` without `60`. The JSON Schema
-Test Suite expects some leap seconds to be valid in `time`, and
-`src/json-schema-test-suite.test.js` skips those tests.
+Test Suite agrees from v1. Its tests that expect some leap seconds to be
+valid in `time` are in `optional/format-time`, for releases up to
+2020-12, and `src/json-schema-test-suite.test.js` doesn't run them.
 
 Rejected: accepting `60` in any `time`. It would be valid for most times
 of day, when a leap second can only be at 23:59:60 UTC.
