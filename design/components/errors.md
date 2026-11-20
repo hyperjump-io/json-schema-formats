@@ -66,6 +66,21 @@ character or a space other than U+0020, is written as its code point,
 like `U+00A0`. A problem that `idn-hostname` or the engine reports has
 their words and no position, since they don't say where.
 
+## Numbers
+
+The errors of the number formats, like `InvalidInt8Error`, have `value`,
+which is the number, and `reason`, and no `part`, `start`, or `end`. A
+number is one value, so there's no part of it to point at. They're
+declared with their own properties in `src/index.d.ts`, and the message
+has no position:
+
+```text
+InvalidInt8Error: Invalid int8: 300 — it must be -128 to 127
+```
+
+Their reasons are `not-an-integer`, `out-of-range`, and `too-precise`
+(see [OpenAPI formats](openapi-formats.md#errors)).
+
 ## URIs and IRIs
 
 The URI and IRI functions throw `@hyperjump/uri`'s `InvalidUriError` and

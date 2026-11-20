@@ -27,9 +27,79 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
 ## What's not here yet
 
 - **Numbers**: `int8` to `int32`, `uint8` to `uint32`, `double-int`,
-  `sf-integer`, and `sf-decimal`. The registry types them as JSON
-  numbers. A number has no span for an error to point at, so how the API
-  takes them is open.
+  `sf-integer`, and `sf-decimal`. They're designed (see
+  [Numbers](#numbers)), and not implemented yet.
+
+## Numbers
+
+The registry types the number formats as JSON numbers. Their functions
+take a JavaScript `number`, and are like the string formats' in
+everything that a span isn't needed for.
+
+### The API
+
+Each one has an `is` function and an `assert` function, like every
+format here:
+
+```typescript
+isInt8(value: number): boolean
+assertInt8(value: number): void
+```
+
+A format applies only to values of its type, so the caller checks the
+type before calling one, as for the string formats:
+
+```typescript
+const validateInt8 = (value: unknown) =>
+  typeof value !== "number" || isInt8(value);
+```
+
+`NaN` and `Infinity` can't come from JSON, but a JavaScript caller can
+pass them, and they're invalid.
+
+Rejected:
+
+- **No `assert` functions for numbers.** Every format has both functions,
+  and a number's error still says something that `false` doesn't: which
+  bound it's past, or that it isn't an integer.
+- **Taking `unknown`.** No other format's functions check their value's
+  type.
+
+### Errors
+
+A number's error has `value`, which is the number, and `reason`, with no
+`part`, `start`, or `end` (see [Errors](errors.md#numbers)). A span
+points at something in a string. A number is one value, which the caller
+already has the place of.
+
+| Reason | When |
+| --- | --- |
+| `not-an-integer` | An integer format's value has a fraction, or is `NaN` or `Infinity` |
+| `out-of-range` | The value is past one of the format's bounds |
+| `too-precise` | An `sf-decimal` has more than 3 digits after the point |
+
+```text
+InvalidInt8Error: Invalid int8: 300 — it must be -128 to 127
+InvalidInt8Error: Invalid int8: 1.5 — it isn't an integer
+InvalidSfDecimalError: Invalid sf-decimal: 1.2345 — it has 4 digits after the point; an sf-decimal can have 3
+```
+
+An `sf-decimal` with more than 12 digits before the point is
+`out-of-range`, since that's a value of 10^12 or more.
+
+Rejected:
+
+- **A span over `String(value)`.** It would point into a string that the
+  caller didn't give.
+- **`too-small` and `too-large`** in place of `out-of-range`. The message
+  says which bound, and a caller rarely handles the two differently.
+
+`src/assert.test.js` makes its values by changing strings, so the number
+formats need their own: random numbers, and the edges of each range. The
+rest of the test is the same, including that every reason an error
+declares comes up.
+
+### The parsed value
 
 The number formats are checked on the value that parsing the JSON gives,
 a JavaScript number, and not on the JSON text, which a validator doesn't
@@ -63,7 +133,9 @@ Rejected: checking the JSON text. The functions are given values, by a
 JSON Schema or OpenAPI validator that parsed the JSON, and the text
 isn't there to check.
 
-`sf-decimal` is decided, for when numbers are: it follows RFC 9651's
+### `sf-decimal`
+
+`sf-decimal` follows RFC 9651's
 ABNF, `["-"] 1*12DIGIT "." 1*3DIGIT`, so a value with more than three
 digits after the point isn't valid. The registry says the same. RFC
 9651's serialization rounds such a value to three digits instead of
