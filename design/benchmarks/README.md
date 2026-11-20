@@ -12,3 +12,4 @@ version, like a checkout of v1.1.0. Run each in its own process, and
 don't run anything else while it runs.
 
 - [Speed](speed.md) (2026-11-04)
+- [Speed of the registry formats](speed-registry-formats.md) (2026-11-20)

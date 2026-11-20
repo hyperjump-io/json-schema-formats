@@ -151,7 +151,7 @@ export class InvalidSfIntegerError extends NumberFormatError {
 
 /** @type API.isSfDecimal */
 export const isSfDecimal = (n) => {
-  return Number.isFinite(n) && Math.abs(n) < 1e12 && fractionDigits(n) <= 3;
+  return Number.isFinite(n) && Math.abs(n) < 1e12 && hasThousandths(n);
 };
 
 /** @type API.assertSfDecimal */
@@ -175,9 +175,20 @@ export class InvalidSfDecimalError extends NumberFormatError {
 }
 
 /**
+ * Whether a number below 10^12 has at most 3 digits after the point, in the shortest string that parses back to it.
+ * `n * 1000` isn't exact, since `1.005 * 1000` is `1004.9999999999999`, but it's within a small fraction of the
+ * integer, so rounding finds the thousandths. Division is exact to the nearest double, so `m / 1000` is the number
+ * that the decimal m/1000 parses to, and it's `n` exactly when `n` can be written with 3 digits after the point. It's
+ * `fractionDigits(n) <= 3`, without making a string.
+ *
+ * @type (n: number) => boolean
+ */
+const hasThousandths = (n) => Math.round(n * 1000) / 1000 === n;
+
+/**
  * How many digits a number has after the point, in the shortest string that parses back to it, which is what `String`
- * gives. A small number's string has an exponent, like "1e-7", and the exponent moves the point. Arithmetic would be
- * wrong, since `1.005 * 1000` is `1004.9999999999999`.
+ * gives. A small number's string has an exponent, like "1e-7", and the exponent moves the point. It's for the text of
+ * an error.
  *
  * @type (n: number) => number
  */

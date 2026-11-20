@@ -1,4 +1,4 @@
-import { daysInMonth, hasLeapSecond } from "./date-math.js";
+import { daysInMonth, hasLeapSecond, twoDigits } from "./date-math.js";
 import {
   FormatError, delimiter, end, field, invalidCharacter, isProblem, matchEnd, missing, problem, sequence, show
 } from "./diagnose.js";
@@ -12,11 +12,6 @@ import {
  * @import * as API from "./index.d.ts"
  * @import { Problem, Step } from "./diagnose.js"
  */
-
-// The number that two digits at `index` are. It's for values that a pattern matched, and is faster than making a
-// substring to parse.
-/** @type (value: string, index: number) => number */
-const twoDigits = (value, index) => (value.charCodeAt(index) - 0x30) * 10 + value.charCodeAt(index + 1) - 0x30;
 
 /** @type (date: string) => Problem | undefined */
 const checkDayInMonth = (date) => {

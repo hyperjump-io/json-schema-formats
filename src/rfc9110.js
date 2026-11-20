@@ -1,4 +1,4 @@
-import { dayOfWeek, daysInMonth, hasLeapSecond } from "./date-math.js";
+import { dayOfWeek, daysInMonth, hasLeapSecond, twoDigits } from "./date-math.js";
 import {
   FormatError, charAt, delimiter, end, field, invalidCharacter, invalidValue, isProblem, matchEnd, missing, problem,
   sequence
@@ -81,6 +81,34 @@ export class InvalidMediaRangeError extends FormatError {
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const shortDayNames = dayNames.map((dayName) => dayName.slice(0, 3));
+
+/**
+ * The number of the month whose name is at `index`, from 1 to 12. The pattern matched it, so it's one of the 12 names,
+ * and the fewest letters that tell them apart are read.
+ *
+ * @type (date: string, index: number) => number
+ */
+const monthOf = (date, index) => {
+  switch (date[index]) {
+    case "J":
+      return date[index + 1] === "a" ? 1 : (date[index + 2] === "n" ? 6 : 7);
+    case "F":
+      return 2;
+    case "M":
+      return date[index + 2] === "r" ? 3 : 5;
+    case "A":
+      return date[index + 1] === "p" ? 4 : 8;
+    case "S":
+      return 9;
+    case "O":
+      return 10;
+    case "N":
+      return 11;
+    default:
+      return 12;
+  }
+};
 
 /**
  * Where the parts of a date that the pattern matched are. An IMF-fixdate has "," after its day name, an asctime-date
@@ -110,30 +138,35 @@ const layoutOf = (date) => {
  */
 const checkHttpDate = (date) => {
   const at = layoutOf(date);
-  const day = Number(date.slice(at.day, at.day + 2));
-  const monthName = date.slice(at.month, at.month + 3);
-  const month = monthNames.indexOf(monthName) + 1;
-  const yearText = date.slice(at.year, at.year + at.yearLength);
-  const year = Number(yearText);
+  // An asctime-date's day can be a space and 1 digit
+  const day = date.charCodeAt(at.day) === 0x20 ? date.charCodeAt(at.day + 1) - 0x30 : twoDigits(date, at.day);
+  const month = monthOf(date, at.month);
+  const year = at.yearLength === 4 ? twoDigits(date, at.year) * 100 + twoDigits(date, at.year + 2) : twoDigits(date, at.year);
 
   // For a 2-digit year, this is the days in the month in a leap year if the year can be one in some century
   const days = daysInMonth(month, year);
   if (day === 0 || day > days) {
+    const monthName = monthNames[month - 1];
+    const yearText = date.slice(at.year, at.year + at.yearLength);
     const monthOfYear = at.yearLength === 4 ? `${monthName} ${yearText}` : `${monthName} of a year ending in ${yearText}`;
     const text = day === 0 ? "there's no day 00" : `${monthOfYear} has ${days} days`;
     return problem("nonexistent-date", "day", at.day, at.day + 2, text);
   }
 
+  // A date with a 4-digit year has a 3-letter day name
   if (at.yearLength === 4) {
-    const dayName = dayNames[dayOfWeek(year, month, day)];
-    if (!dayName.startsWith(date.slice(0, at.dayNameEnd))) {
-      const text = `${String(day).padStart(2, "0")} ${monthName} ${yearText} was a ${dayName}`;
+    const weekday = dayOfWeek(year, month, day);
+    if (!date.startsWith(shortDayNames[weekday])) {
+      const yearText = date.slice(at.year, at.year + 4);
+      const text = `${String(day).padStart(2, "0")} ${monthNames[month - 1]} ${yearText} was a ${dayNames[weekday]}`;
       return problem("wrong-day-name", "day name", 0, at.dayNameEnd, text);
     }
   }
 
+  // The only second that starts with "6" is 60
   const second = at.time + 6;
-  if (date.slice(second, second + 2) === "60") {
+  if (date[second] === "6") {
+    const yearText = date.slice(at.year, at.year + at.yearLength);
     const hadOne = at.yearLength === 4
       ? hasLeapSecond(new Date(`${yearText}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${date.slice(at.time, at.time + 6)}59Z`))
       : date.slice(at.time, at.time + 5) === "23:59";

@@ -171,8 +171,20 @@ failing, which would make `1.2345` an `sf-decimal`, but that's what an
 implementation does with a value it's given, not what's valid.
 
 An `sf-decimal`'s digits are counted in the shortest string that parses
-back to the number, which is what `String` gives. Arithmetic doesn't
-work for that, since `1.005 * 1000` is `1004.9999999999999`.
+back to the number, which is what `String` gives. `isSfDecimal` gets the
+same answer without making the string: it rounds `n * 1000` to an
+integer `m` and checks that `m / 1000` is `n`. Multiplying isn't exact,
+since `1.005 * 1000` is `1004.9999999999999`, but below 10^12 it's within
+a small fraction of the integer, so rounding finds it. Division is exact
+to the nearest double, so `m / 1000` is the number that the decimal
+m/1000 parses to. The two agreed on 15 million random numbers, 1.9
+million of them valid, and on the bounds. The error's text still counts
+the digits in `String(n)`.
+
+Rejected:
+
+- **Counting the digits in `String(n)`**, which `isSfDecimal` did first.
+  It took 30 times as long (see [Speed](../benchmarks/speed-registry-formats.md)).
 
 ## What's not supported
 
@@ -238,6 +250,14 @@ decisions:
   `dec-octet`. "A decimal integer" doesn't say, and a prefix length is
   written without them in every example.
 
+Rejected:
+
+- **Checking the prefix length before the address**, with `ipv6Address`
+  and `ipv6PrefixLength` on each side of the `/`. It's 8 times as fast for
+  a prefix length that's out of range, since the address pattern doesn't
+  backtrack through its forms for it, but a quarter slower for a valid
+  value (see [Speed](../benchmarks/speed-registry-formats.md)).
+
 ## Language tags
 
 `language` is RFC 5646's `Language-Tag`, which the OpenAPI registry names. RFC
@@ -270,7 +290,11 @@ also rejects `00`.
 An HTTP date has three forms. The pattern is the grammar, and the checks
 after it read the parts from where they are in the form the value is in:
 an IMF-fixdate has `,` after a 3-letter day name, an asctime-date has a
-space, and an rfc850-date has a longer day name.
+space, and an rfc850-date has a longer day name. As for `date`, the
+checks read the digits by their character codes and the month by the
+fewest letters that tell the names apart, without making substrings.
+With substrings, the checks took four times as long, and `isHttpDate`
+took over twice as long (see [Speed](../benchmarks/speed-registry-formats.md)).
 
 The checks after the pattern:
 

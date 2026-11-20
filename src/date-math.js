@@ -1,3 +1,8 @@
+// The number that two digits at `index` are. It's for values that a pattern matched, and is faster than making a
+// substring to parse.
+/** @type (value: string, index: number) => number */
+export const twoDigits = (value, index) => (value.charCodeAt(index) - 0x30) * 10 + value.charCodeAt(index + 1) - 0x30;
+
 // The days in each month, by its number. February is 28 here, and 29 in a leap year.
 const monthLengths = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
