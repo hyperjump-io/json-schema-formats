@@ -1,4 +1,4 @@
-# OpenAPI formats (`src/rfc3339.js`, `src/rfc9110.js`, `src/rfc9651.js`)
+# OpenAPI formats (`src/rfc3339.js`, `src/rfc4632.js`, `src/rfc4291.js`, `src/rfc5646.js`, `src/rfc9110.js`, `src/rfc9651.js`)
 
 The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
 lists the formats that OpenAPI documents use, JSON Schema's and others.
@@ -13,6 +13,9 @@ exported from the main entry, after JSON Schema's, and each has `is` and
 | --- | --- | --- |
 | `date-time-local` | `rfc3339.js` | `full-date "T" partial-time` |
 | `time-local` | `rfc3339.js` | `partial-time` |
+| `ipv4-cidr` | `rfc4632.js` | `IPv4address "/" ipv4-prefix-length` |
+| `ipv6-cidr` | `rfc4291.js` | `IPv6address "/" ipv6-prefix-length` |
+| `language` | `rfc5646.js` | `Language-Tag` |
 | `http-date` | `rfc9110.js` | `HTTP-date` |
 | `media-range` | `rfc9110.js` | `media-range` |
 | `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc9651.js` | RFC 9651's rules of the same names |
@@ -29,8 +32,6 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
   strings. A number has no span for an error to point at, and one past
   2^53 is rounded before a validator sees it. How the API takes them is
   open.
-- **Strings with a grammar**: `ipv4-cidr`, `ipv6-cidr`, and `language`
-  (RFC 5646).
 - **Deprecated**: `byte`, `base64url`, and `binary`.
 - **No syntax to check**: `password`, `commonmark`, and `html`.
 
@@ -48,6 +49,47 @@ time can't be put in UTC, so neither allows `60`, the way `time` doesn't
 checks the day in its month with `date-time`'s check. The diagnoses reuse
 `date`'s and `time`'s steps, and a value with an offset gets the hint
 that a local time has none.
+
+## CIDR
+
+The registry's `ipv4-cidr` and `ipv6-cidr` are an address that's valid
+for `ipv4` or `ipv6`, `/`, and a prefix length that's "a decimal integer"
+from 0 to 32 or 128. A bare address isn't valid. RFC 4632 and RFC 4291,
+which the registry cites for the notation, have no ABNF for it, so the
+grammar is written from their prose, with the address rules that `ipv4`
+and `ipv6` use. `ipv6-cidr` is in `rfc4291.js`, with `ipv6`, since RFC
+4291 defines its notation. The diagnosis of the address is `ipv4`'s or
+`ipv6`'s, and the prefix length's is `diagnoseCidr`, in `rfc4632.js`.
+
+Neither the registry nor the RFCs settle two things, so they're
+decisions:
+
+- **The bits after the prefix can be set**, as in `10.0.0.1/8`. The
+  registry's rules don't restrict them, and RFC 4291 writes
+  `2001:0DB8:0:CD30:123:4567:89AB:CDEF/60` as a node address with the
+  prefix of its subnet. Some tools take the notation to name a network,
+  which can't have them, like Python's `ip_network`, and some don't, like
+  its `ip_interface`.
+- **The prefix length has no leading zeros**, like an IPv4 address's
+  `dec-octet`. "A decimal integer" doesn't say, and a prefix length is
+  written without them in every example.
+
+## Language tags
+
+`language` is RFC 5646's `Language-Tag`, which the registry names. RFC
+5646 calls a tag that matches it "well-formed", and a tag "valid" if it
+also has subtags from the IANA Language Subtag Registry and no repeated
+variant or singleton. The registry points at the rule, so `language` is
+well-formed: checking that it's valid would need the IANA registry's data
+in the package. The function is `isLanguageTag`, since `isLanguage`
+wouldn't say what it checks.
+
+The ABNF matches in any case, as RFC 5646 says tags are compared, and
+the grandfathered tags are in it. The diagnosis reads one subtag at a
+time. A subtag's kind follows from its length and its characters, like 4
+letters for a script, and the kinds come in a fixed order, so each
+subtag is either the next kind that fits or out of place. A subtag out of
+place gets a hint that lists what can come there.
 
 ## HTTP dates
 

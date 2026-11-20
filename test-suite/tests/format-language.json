@@ -1,0 +1,234 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "language validation",
+    "tests": [
+        {
+            "description": "validation of non-string language values",
+            "schema": {
+                "format": "language"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of well-formed language tags",
+            "comment": "A tag is well-formed if it matches the Language-Tag rule. Whether its subtags are in the IANA Language Subtag Registry, and whether it repeats a variant or a singleton, make it valid or not, which the format doesn't check.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "language"
+            },
+            "specification": [
+                {
+                    "rfc5646": "2.1"
+                },
+                {
+                    "rfc5646": "2.2.9"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a language",
+                    "data": "en",
+                    "valid": true
+                },
+                {
+                    "description": "a language and a region",
+                    "data": "en-US",
+                    "valid": true
+                },
+                {
+                    "description": "a region of 3 digits",
+                    "data": "es-419",
+                    "valid": true
+                },
+                {
+                    "description": "a language, a script, and a region",
+                    "data": "zh-Hant-TW",
+                    "valid": true
+                },
+                {
+                    "description": "an extended language",
+                    "data": "zh-yue-HK",
+                    "valid": true
+                },
+                {
+                    "description": "three extended languages",
+                    "data": "zh-yue-abc-def-HK",
+                    "valid": true
+                },
+                {
+                    "description": "two variants",
+                    "data": "sl-rozaj-biske",
+                    "valid": true
+                },
+                {
+                    "description": "a variant that starts with a digit",
+                    "data": "de-DE-1901",
+                    "valid": true
+                },
+                {
+                    "description": "an extension and private use",
+                    "data": "en-a-bbb-x-a-ccc",
+                    "valid": true
+                },
+                {
+                    "description": "private use only",
+                    "data": "x-whatever",
+                    "valid": true
+                },
+                {
+                    "description": "an irregular grandfathered tag",
+                    "data": "i-klingon",
+                    "valid": true
+                },
+                {
+                    "description": "a regular grandfathered tag",
+                    "data": "zh-min-nan",
+                    "valid": true
+                },
+                {
+                    "description": "any case",
+                    "data": "EN-us",
+                    "valid": true
+                },
+                {
+                    "description": "subtags for private use",
+                    "data": "qaa-Qaaa-QM-x-southern",
+                    "valid": true
+                },
+                {
+                    "description": "a repeated variant, which is well-formed but not valid",
+                    "data": "de-DE-1901-1901",
+                    "valid": true
+                },
+                {
+                    "description": "a repeated singleton, which is well-formed but not valid",
+                    "data": "en-a-bbb-a-ccc",
+                    "valid": true
+                },
+                {
+                    "description": "subtags that aren't in the IANA registry",
+                    "data": "xx-YY",
+                    "valid": true
+                },
+                {
+                    "description": "an empty string",
+                    "data": "",
+                    "valid": false
+                },
+                {
+                    "description": "a language of 1 letter",
+                    "data": "e",
+                    "valid": false
+                },
+                {
+                    "description": "a language of 9 letters",
+                    "data": "abcdefghi",
+                    "valid": false
+                },
+                {
+                    "description": "a language with a digit",
+                    "data": "1en",
+                    "valid": false
+                },
+                {
+                    "description": "an underscore",
+                    "data": "en_US",
+                    "valid": false
+                },
+                {
+                    "description": "an empty subtag",
+                    "data": "en--US",
+                    "valid": false
+                },
+                {
+                    "description": "a hyphen at the end",
+                    "data": "en-",
+                    "valid": false
+                },
+                {
+                    "description": "a 3-letter subtag after a region",
+                    "data": "en-US-abc",
+                    "valid": false
+                },
+                {
+                    "description": "two scripts",
+                    "data": "en-Latn-Latn",
+                    "valid": false
+                },
+                {
+                    "description": "two regions",
+                    "data": "en-US-GB",
+                    "valid": false
+                },
+                {
+                    "description": "four extended languages",
+                    "data": "zh-yue-abc-def-ghi",
+                    "valid": false
+                },
+                {
+                    "description": "an extended language after a 4-letter language",
+                    "data": "abcd-yue",
+                    "valid": false
+                },
+                {
+                    "description": "an extension without subtags",
+                    "data": "tlh-a-b-foo",
+                    "valid": false
+                },
+                {
+                    "description": "a singleton at the end",
+                    "data": "en-a",
+                    "valid": false
+                },
+                {
+                    "description": "x at the end",
+                    "data": "en-x",
+                    "valid": false
+                },
+                {
+                    "description": "an extension without a language",
+                    "data": "a-value",
+                    "valid": false
+                },
+                {
+                    "description": "a subtag of 9 characters",
+                    "data": "en-abcdefghi",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

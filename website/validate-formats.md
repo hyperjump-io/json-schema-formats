@@ -110,6 +110,9 @@ for strings that have a grammar:
 | --- | --- | --- |
 | `date-time-local` | `isDateTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `full-date "T" partial-time` |
 | `time-local` | `isTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
+| `ipv4-cidr` | `isIPv4Cidr` | An `ipv4` address and a prefix length, in [RFC 4632](https://www.rfc-editor.org/rfc/rfc4632.html#section-3.1)'s notation |
+| `ipv6-cidr` | `isIPv6Cidr` | An `ipv6` address and a prefix length, in [RFC 4291](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3)'s notation |
+| `language` | `isLanguageTag` | [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1) `Language-Tag` |
 | `http-date` | `isHttpDate` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
 | `media-range` | `isMediaRange` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1) `media-range` |
 | `sf-binary` | `isSfBinary` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5) `sf-binary` |
@@ -123,6 +126,23 @@ the same grammar.
 `isDateTimeLocal` and `isTimeLocal` are like `isDateTime` and `isTime`
 without an offset. A leap second is at 23:59:60 UTC, and a time without
 an offset can't be put in UTC, so they never accept one.
+
+`isIPv4Cidr` and `isIPv6Cidr` take an address, `/`, and a prefix length,
+like `10.0.0.0/8` or `2001:db8::/32`. The address can have bits set after
+the prefix, like `10.0.0.1/8`, which is how RFC 4291 writes an address
+with the prefix of its network. The prefix length can't have a leading
+zero, like the octets of an IPv4 address.
+
+`isLanguageTag` checks that a language tag is well-formed: that it
+matches RFC 5646's grammar, in any case. A well-formed tag isn't always
+valid. It doesn't check the subtags against the IANA Language Subtag
+Registry, so `xx-YY` is well-formed, and a tag can repeat a variant, like
+`de-DE-1901-1901`.
+
+```typescript
+isLanguageTag("zh-Hant-TW"); // true
+isLanguageTag("en_US"); // false
+```
 
 `isHttpDate` checks more than the grammar:
 

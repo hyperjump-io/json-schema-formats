@@ -411,6 +411,71 @@ export const isTimeLocal: (time: string) => boolean;
 export const assertTimeLocal: (time: string) => void;
 
 /**
+ * The 'ipv4-cidr' format from the OpenAPI Format Registry. Validates that a
+ * string is an IPv4 address, like {@link isIPv4}, then "/" and a prefix
+ * length of 0 to 32, in the notation of [RFC 4632, section 3.1](https://www.rfc-editor.org/rfc/rfc4632.html#section-3.1).
+ *
+ * **NOTE**: The bits of the address after the prefix can be set, as in
+ * `10.0.0.1/8`, and the prefix length can't have a leading zero.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/ipv4-cidr.html)
+ */
+export const isIPv4Cidr: (cidr: string) => boolean;
+
+/**
+ * Checks that `cidr` is an IPv4 address with a prefix length, like
+ * {@link isIPv4Cidr}, and throws an error that says what's wrong and where
+ * if it isn't.
+ *
+ * @throws {InvalidIPv4CidrError} If `cidr` isn't an IPv4 address with a prefix length.
+ */
+export const assertIPv4Cidr: (cidr: string) => void;
+
+/**
+ * The 'ipv6-cidr' format from the OpenAPI Format Registry. Validates that a
+ * string is an IPv6 address, like {@link isIPv6}, then "/" and a prefix
+ * length of 0 to 128, in the notation of [RFC 4291, section 2.3](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3).
+ *
+ * **NOTE**: The bits of the address after the prefix can be set, as in
+ * `2001:db8::1/32`, and the prefix length can't have a leading zero.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/ipv6-cidr.html)
+ */
+export const isIPv6Cidr: (cidr: string) => boolean;
+
+/**
+ * Checks that `cidr` is an IPv6 address with a prefix length, like
+ * {@link isIPv6Cidr}, and throws an error that says what's wrong and where
+ * if it isn't.
+ *
+ * @throws {InvalidIPv6CidrError} If `cidr` isn't an IPv6 address with a prefix length.
+ */
+export const assertIPv6Cidr: (cidr: string) => void;
+
+/**
+ * The 'language' format from the OpenAPI Format Registry. Validates that a
+ * string is a well-formed language tag: one that matches the "Language-Tag"
+ * rule in [RFC 5646, section 2.1](https://www.rfc-editor.org/rfc/rfc5646.html#section-2.1),
+ * in any case.
+ *
+ * **NOTE**: A well-formed tag isn't always valid. The subtags aren't checked
+ * against the IANA Language Subtag Registry, and a tag can repeat a variant
+ * or a singleton.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/language.html)
+ */
+export const isLanguageTag: (tag: string) => boolean;
+
+/**
+ * Checks that `tag` is a well-formed language tag, like
+ * {@link isLanguageTag}, and throws an error that says what's wrong and
+ * where if it isn't.
+ *
+ * @throws {InvalidLanguageTagError} If `tag` isn't a well-formed language tag.
+ */
+export const assertLanguageTag: (tag: string) => void;
+
+/**
  * The 'http-date' format from the OpenAPI Format Registry. Validates that a
  * string represents an HTTP date as defined by [RFC 9110, section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7),
  * which obsoletes RFC 7231 with the same grammar. The day has to be in its
@@ -771,6 +836,36 @@ export class InvalidTimeLocalError extends Error implements FormatErrorPropertie
   readonly value: string;
   readonly reason: "invalid-character" | "invalid-value" | "missing";
   readonly part: "hour" | "minute" | "second" | "fraction";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't an IPv4 address with a prefix length. {@link assertIPv4Cidr} throws it. */
+export class InvalidIPv4CidrError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing", "octet" | "prefix length"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing";
+  readonly part: "octet" | "prefix length";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't an IPv6 address with a prefix length. {@link assertIPv6Cidr} throws it. */
+export class InvalidIPv6CidrError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing", "group" | "octet" | "prefix length"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing";
+  readonly part: "group" | "octet" | "prefix length";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a well-formed language tag. {@link assertLanguageTag} throws it. */
+export class InvalidLanguageTagError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing" | "too-long", "language" | "subtag" | "extension" | "private use"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing" | "too-long";
+  readonly part: "language" | "subtag" | "extension" | "private use";
   readonly start: number;
   readonly end: number;
   private constructor();

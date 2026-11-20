@@ -1,6 +1,7 @@
 import { FormatError, invalidCharacter, missing, nest, problem } from "./diagnose.js";
-import { ipv6Address } from "./patterns.js";
+import { ipv6Address, ipv6Cidr as ipv6CidrPattern, ipv6PrefixLength } from "./patterns.js";
 import { diagnoseIPv4 } from "./rfc2673.js";
+import { diagnoseCidr } from "./rfc4632.js";
 
 /**
  * @import * as API from "./index.d.ts"
@@ -33,6 +34,35 @@ export class InvalidIPv6Error extends FormatError {
   constructor(value, problem) {
     super("ipv6", value, problem);
     this.name = "InvalidIPv6Error";
+  }
+}
+
+/**
+ * @type API.isIPv6Cidr
+ * @function
+ */
+export const isIPv6Cidr = RegExp.prototype.test.bind(ipv6CidrPattern);
+
+/** @type API.assertIPv6Cidr */
+export const assertIPv6Cidr = (cidr) => {
+  if (!isIPv6Cidr(cidr)) {
+    throw new InvalidIPv6CidrError(cidr, diagnoseCidr(cidr, diagnoseIPv6, ipv6PrefixLength, 128));
+  }
+};
+
+/**
+ * A value isn't an IPv6 address with a prefix length. {@link assertIPv6Cidr} throws it.
+ *
+ * @hideconstructor
+ */
+export class InvalidIPv6CidrError extends FormatError {
+  /**
+   * @param {string} value
+   * @param {Problem | undefined} problem
+   */
+  constructor(value, problem) {
+    super("ipv6-cidr", value, problem);
+    this.name = "InvalidIPv6CidrError";
   }
 }
 

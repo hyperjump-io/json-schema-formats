@@ -21,6 +21,10 @@ apply it is supported, with the decision recorded with its component.
 `http-date`'s 2-digit year is one: RFC 9110 says what it means, but
 following it would take a clock (see
 [OpenAPI formats](../components/openapi-formats.md#the-rfc850-dates-century)).
+The CIDR formats are another: the registry's rules are exact, and leave
+whether the bits after the prefix can be set, which the package decides
+by what the rules say (see
+[OpenAPI formats](../components/openapi-formats.md#cidr)).
 
 This is a different question from
 [Follow the RFCs](follow-the-rfcs.md), which says how a format is

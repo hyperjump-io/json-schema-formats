@@ -147,6 +147,27 @@ const specs = {
     alphabet: "()[]{}a\\-?*+|^$,1",
     seeds: ["(a)", "[a-z]+", "a{1,2}", "\\d"]
   },
+  ipv4Cidr: {
+    is: Formats.isIPv4Cidr, assert: Formats.assertIPv4Cidr, error: Formats.InvalidIPv4CidrError, format: "ipv4-cidr",
+    reasons: ["invalid-character", "invalid-value", "missing"],
+    parts: ["octet", "prefix length"],
+    alphabet: "0123459./a",
+    seeds: ["10.0.0.0/8", "192.168.1.0/24", "0.0.0.0/0", "1.2.3.4/32"]
+  },
+  ipv6Cidr: {
+    is: Formats.isIPv6Cidr, assert: Formats.assertIPv6Cidr, error: Formats.InvalidIPv6CidrError, format: "ipv6-cidr",
+    reasons: ["invalid-character", "invalid-value", "missing"],
+    parts: ["group", "octet", "prefix length"],
+    alphabet: "0129af:./g",
+    seeds: ["2001:db8::/32", "::1/128", "::/0", "::ffff:1.2.3.4/96", "1:2:3:4:5:6:7:8/64"]
+  },
+  languageTag: {
+    is: Formats.isLanguageTag, assert: Formats.assertLanguageTag, error: Formats.InvalidLanguageTagError, format: "language",
+    reasons: ["invalid-character", "invalid-value", "missing", "too-long"],
+    parts: ["language", "subtag", "extension", "private use"],
+    alphabet: "aZx1-_",
+    seeds: ["en-US", "zh-Hant-TW", "zh-yue-HK", "de-DE-1901", "sl-rozaj-biske", "en-a-bbb-x-a-ccc", "x-whatever", "i-klingon", "abcdefgh-Latn-419"]
+  },
   dateTimeLocal: {
     is: Formats.isDateTimeLocal, assert: Formats.assertDateTimeLocal, error: Formats.InvalidDateTimeLocalError, format: "date-time-local",
     reasons: ["invalid-character", "invalid-value", "missing", "nonexistent-date"],
@@ -372,6 +393,21 @@ describe("What's wrong and where", () => {
     [Formats.assertRelativeJsonPointer, "01/a", { reason: "invalid-value", part: "number", start: 0, end: 2 }],
     [Formats.assertRelativeJsonPointer, "0+1#", { reason: "invalid-character", part: "index manipulation", start: 3, end: 4 }],
     [Formats.assertRegex, "(", { reason: "invalid-syntax", part: "regex", start: 0, end: 1, message: "Invalid regex: ( — Unterminated group" }],
+    [Formats.assertIPv4Cidr, "1.2.3.4", { reason: "missing", part: "prefix length", start: 7, end: 7, message: `Invalid ipv4-cidr: 1.2.3.4 — it has no "/" and prefix length, at 7` }],
+    [Formats.assertIPv4Cidr, "1.2.3.4/33", { reason: "invalid-value", part: "prefix length", start: 8, end: 10, message: "Invalid ipv4-cidr: 1.2.3.4/33 — the prefix length must be 0-32, at 8" }],
+    [Formats.assertIPv4Cidr, "1.2.3.4/08", { reason: "invalid-value", part: "prefix length", start: 8, end: 10, message: "Invalid ipv4-cidr: 1.2.3.4/08 — the prefix length can't have a leading zero, at 8" }],
+    [Formats.assertIPv4Cidr, "256.0.0.0/8", { reason: "invalid-value", part: "octet", start: 0, end: 3 }],
+    [Formats.assertIPv6Cidr, "::1/129", { reason: "invalid-value", part: "prefix length", start: 4, end: 7, message: "Invalid ipv6-cidr: ::1/129 — the prefix length must be 0-128, at 4" }],
+    [Formats.assertIPv6Cidr, "1::2::3/64", { reason: "invalid-value", part: "group", start: 4, end: 6 }],
+    [Formats.assertLanguageTag, "en_US", { reason: "invalid-character", part: "language", start: 2, end: 3, message: `Invalid language: en_US — "_" isn't allowed in a language tag, at 2; subtags have letters and digits, separated by "-"` }],
+    [Formats.assertLanguageTag, "1en", { reason: "invalid-character", part: "language", start: 0, end: 1 }],
+    [Formats.assertLanguageTag, "e", { reason: "invalid-value", part: "language", start: 0, end: 1, message: "Invalid language: e — the language must be 2-8 letters, at 0" }],
+    [Formats.assertLanguageTag, "en-abcdefghi", { reason: "too-long", part: "subtag", start: 11, end: 12, message: "Invalid language: en-abcdefghi — a subtag can have at most 8 characters, at 11" }],
+    [Formats.assertLanguageTag, "en-US-abc", { reason: "invalid-value", part: "subtag", start: 6, end: 9, message: `Invalid language: en-US-abc — "abc" can't be a subtag here, at 6; a subtag here can be a variant (5-8 letters and digits, or a digit and 3 more), an extension (a singleton and its subtags), or private use ("x" and its subtags)` }],
+    [Formats.assertLanguageTag, "en-Latn-Latn", { reason: "invalid-value", part: "subtag", start: 8, end: 12 }],
+    [Formats.assertLanguageTag, "tlh-a-b-foo", { reason: "missing", part: "extension", start: 5, end: 5, message: `Invalid language: tlh-a-b-foo — the extension "a" has no subtags after it, at 5` }],
+    [Formats.assertLanguageTag, "en-x", { reason: "missing", part: "private use", start: 4, end: 4, message: `Invalid language: en-x — "x" has no subtags after it, at 4` }],
+    [Formats.assertLanguageTag, "en-", { reason: "missing", part: "subtag", start: 3, end: 3 }],
     [Formats.assertDateTimeLocal, "2021-02-29T00:00:00", { reason: "nonexistent-date", part: "day", start: 8, end: 10, message: "Invalid date-time-local: 2021-02-29T00:00:00 — 2021-02 has 28 days, at 8" }],
     [Formats.assertDateTimeLocal, "2020-01-01T00:00:00Z", { reason: "invalid-character", part: "second", start: 19, end: 20, message: `Invalid date-time-local: 2020-01-01T00:00:00Z — "Z" isn't allowed after the second, at 19; a local time has no offset` }],
     [Formats.assertTimeLocal, "23:59:60", { reason: "invalid-value", part: "second", start: 6, end: 8, message: "Invalid time-local: 23:59:60 — the second must be 00-59, at 6; a leap second can't be checked without an offset" }],

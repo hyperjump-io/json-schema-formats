@@ -93,6 +93,9 @@ The following table shows the error that each function throws:
 | `assertIri`, `assertIriReference` | `InvalidIriError` |
 | `assertDateTimeLocal` | `InvalidDateTimeLocalError` |
 | `assertTimeLocal` | `InvalidTimeLocalError` |
+| `assertIPv4Cidr` | `InvalidIPv4CidrError` |
+| `assertIPv6Cidr` | `InvalidIPv6CidrError` |
+| `assertLanguageTag` | `InvalidLanguageTagError` |
 | `assertHttpDate` | `InvalidHttpDateError` |
 | `assertMediaRange` | `InvalidMediaRangeError` |
 | `assertSfBinary` | `InvalidSfBinaryError` |

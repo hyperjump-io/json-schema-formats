@@ -44,6 +44,9 @@ export { isRegex, assertRegex, InvalidRegexError } from "./ecma262.js";
 export {
   isDateTimeLocal, isTimeLocal, assertDateTimeLocal, assertTimeLocal, InvalidDateTimeLocalError, InvalidTimeLocalError
 } from "./rfc3339.js";
+export { isIPv4Cidr, assertIPv4Cidr, InvalidIPv4CidrError } from "./rfc4632.js";
+export { isIPv6Cidr, assertIPv6Cidr, InvalidIPv6CidrError } from "./rfc4291.js";
+export { isLanguageTag, assertLanguageTag, InvalidLanguageTagError } from "./rfc5646.js";
 export { isHttpDate, isMediaRange, assertHttpDate, assertMediaRange, InvalidHttpDateError, InvalidMediaRangeError } from "./rfc9110.js";
 export {
   isSfBinary, isSfBoolean, isSfString, isSfToken,

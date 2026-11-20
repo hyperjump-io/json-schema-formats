@@ -1,0 +1,146 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "ipv4-cidr validation",
+    "tests": [
+        {
+            "description": "validation of non-string ipv4-cidr values",
+            "schema": {
+                "format": "ipv4-cidr"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of IPv4 addresses with prefix lengths",
+            "comment": "The registry says that the address must be a valid ipv4 address and that the prefix length is a decimal integer from 0 to 32. It doesn't restrict the bits after the prefix, and RFC 4632 doesn't either.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "ipv4-cidr"
+            },
+            "specification": [
+                {
+                    "rfc4632": "3.1"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "the registry's first example",
+                    "data": "10.0.0.0/8",
+                    "valid": true
+                },
+                {
+                    "description": "the registry's second example",
+                    "data": "192.168.1.0/24",
+                    "valid": true
+                },
+                {
+                    "description": "a prefix length of 0",
+                    "data": "0.0.0.0/0",
+                    "valid": true
+                },
+                {
+                    "description": "a prefix length of 32",
+                    "data": "1.2.3.4/32",
+                    "valid": true
+                },
+                {
+                    "description": "bits set after the prefix",
+                    "data": "10.0.0.1/8",
+                    "valid": true
+                },
+                {
+                    "description": "a prefix length past 32",
+                    "data": "1.2.3.4/33",
+                    "valid": false
+                },
+                {
+                    "description": "a prefix length with a leading zero",
+                    "data": "1.2.3.4/08",
+                    "valid": false
+                },
+                {
+                    "description": "a negative prefix length",
+                    "data": "1.2.3.4/-1",
+                    "valid": false
+                },
+                {
+                    "description": "an address without a prefix length",
+                    "data": "1.2.3.4",
+                    "valid": false
+                },
+                {
+                    "description": "a slash without a prefix length",
+                    "data": "1.2.3.4/",
+                    "valid": false
+                },
+                {
+                    "description": "a prefix length without an address",
+                    "data": "/8",
+                    "valid": false
+                },
+                {
+                    "description": "an address with fewer than 4 octets",
+                    "data": "10/8",
+                    "valid": false
+                },
+                {
+                    "description": "an invalid address",
+                    "data": "256.0.0.0/8",
+                    "valid": false
+                },
+                {
+                    "description": "an octet with a leading zero",
+                    "data": "01.2.3.4/8",
+                    "valid": false
+                },
+                {
+                    "description": "two prefix lengths",
+                    "data": "1.2.3.4/8/8",
+                    "valid": false
+                },
+                {
+                    "description": "a space before the slash",
+                    "data": "1.2.3.4 /8",
+                    "valid": false
+                },
+                {
+                    "description": "an IPv6 address",
+                    "data": "::1/128",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

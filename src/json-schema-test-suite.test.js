@@ -10,6 +10,8 @@ import {
   isEmail,
   isHostname,
   isHttpDate,
+  isIPv4Cidr,
+  isIPv6Cidr,
   isIdn,
   isIdnEmail,
   isIPv4,
@@ -17,6 +19,7 @@ import {
   isIri,
   isIriReference,
   isJsonPointer,
+  isLanguageTag,
   isMediaRange,
   isRegex,
   isRelativeJsonPointer,
@@ -146,6 +149,9 @@ await testSuite(ours, "format-idn-email", 2020, (email) => typeof email !== "str
 // OpenAPI Format Registry
 await testSuite(ours, "format-date-time-local", 2020, (dateTime) => typeof dateTime !== "string" || isDateTimeLocal(dateTime));
 await testSuite(ours, "format-time-local", 2020, (time) => typeof time !== "string" || isTimeLocal(time));
+await testSuite(ours, "format-ipv4-cidr", 2020, (cidr) => typeof cidr !== "string" || isIPv4Cidr(cidr));
+await testSuite(ours, "format-ipv6-cidr", 2020, (cidr) => typeof cidr !== "string" || isIPv6Cidr(cidr));
+await testSuite(ours, "format-language", 2020, (tag) => typeof tag !== "string" || isLanguageTag(tag));
 await testSuite(ours, "format-http-date", 2020, (date) => typeof date !== "string" || isHttpDate(date));
 await testSuite(ours, "format-media-range", 2020, (mediaRange) => typeof mediaRange !== "string" || isMediaRange(mediaRange));
 await testSuite(ours, "format-sf-binary", 2020, (binary) => typeof binary !== "string" || isSfBinary(binary));

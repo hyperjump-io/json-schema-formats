@@ -1,0 +1,136 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "ipv6-cidr validation",
+    "tests": [
+        {
+            "description": "validation of non-string ipv6-cidr values",
+            "schema": {
+                "format": "ipv6-cidr"
+            },
+            "tests": [
+                {
+                    "description": "all string formats ignore integers",
+                    "data": 12,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore floats",
+                    "data": 13.7,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all string formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of IPv6 addresses with prefix lengths",
+            "comment": "The registry says that the address must be a valid ipv6 address and that the prefix length is a decimal integer from 0 to 128. RFC 4291 shows an address with bits set after the prefix as a legal way to write a node address with its prefix.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "ipv6-cidr"
+            },
+            "specification": [
+                {
+                    "rfc4291": "2.3"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "the registry's first example",
+                    "data": "2001:db8::/32",
+                    "valid": true
+                },
+                {
+                    "description": "the registry's second example",
+                    "data": "::1/128",
+                    "valid": true
+                },
+                {
+                    "description": "a prefix length of 0",
+                    "data": "::/0",
+                    "valid": true
+                },
+                {
+                    "description": "RFC 4291's example, written in full",
+                    "data": "2001:0DB8:0000:CD30:0000:0000:0000:0000/60",
+                    "valid": true
+                },
+                {
+                    "description": "RFC 4291's example, with ::",
+                    "data": "2001:0DB8::CD30:0:0:0:0/60",
+                    "valid": true
+                },
+                {
+                    "description": "RFC 4291's example, with :: at the end",
+                    "data": "2001:0DB8:0:CD30::/60",
+                    "valid": true
+                },
+                {
+                    "description": "RFC 4291's node address with its prefix",
+                    "data": "2001:0DB8:0:CD30:123:4567:89AB:CDEF/60",
+                    "valid": true
+                },
+                {
+                    "description": "an address that ends with an IPv4 address",
+                    "data": "::ffff:1.2.3.4/96",
+                    "valid": true
+                },
+                {
+                    "description": "too few groups, as RFC 4291 shows",
+                    "data": "2001:0DB8:0:CD3/60",
+                    "valid": false
+                },
+                {
+                    "description": "a prefix length past 128",
+                    "data": "::1/129",
+                    "valid": false
+                },
+                {
+                    "description": "a prefix length with a leading zero",
+                    "data": "::1/012",
+                    "valid": false
+                },
+                {
+                    "description": "an address without a prefix length",
+                    "data": "::1",
+                    "valid": false
+                },
+                {
+                    "description": "a slash without a prefix length",
+                    "data": "::1/",
+                    "valid": false
+                },
+                {
+                    "description": "an invalid address",
+                    "data": "1::2::3/64",
+                    "valid": false
+                },
+                {
+                    "description": "an IPv4 address",
+                    "data": "10.0.0.0/8",
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}
