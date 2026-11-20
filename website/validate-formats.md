@@ -99,8 +99,6 @@ RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
 
 ## Registry formats
 
-*Coming soon*
-
 The package also has functions for some of the formats in the
 [JSON Schema Format Registry](https://github.com/json-schema-org/json-schema-spec/blob/main/specs/registries/format.json)
 and the [OpenAPI Format Registry](https://spec.openapis.org/registry/format/),

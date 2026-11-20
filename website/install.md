@@ -30,8 +30,6 @@ information, see [Find what's wrong](find-whats-wrong.md).
 
 ### Types for URIs and IRIs
 
-*Coming soon*
-
 The functions for URIs and IRIs are type guards from `@hyperjump/uri`. The
 package exports the types that they narrow to:
 

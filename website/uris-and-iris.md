@@ -20,8 +20,6 @@ A relative reference doesn't have a scheme, so `isUriReference` and
 
 ## Schemes that aren't known
 
-*Coming soon*
-
 `@hyperjump/uri` knows the `http`, `https`, `file`, `urn`, `tag`, `data`,
 and `did` schemes, and the `uuid` namespace of `urn`. An identifier with
 any other scheme, or a URN of another namespace, is checked with the
@@ -41,8 +39,6 @@ For the rules of each scheme that it knows, see
 in the `@hyperjump/uri` docs.
 
 ## Errors
-
-*Coming soon*
 
 `assertUri` and `assertUriReference` throw an `InvalidUriError`, and
 `assertIri` and `assertIriReference` throw an `InvalidIriError`:

@@ -1,7 +1,5 @@
 # Find what's wrong
 
-*Coming soon*
-
 Each format has an `assert` function too. It checks a value like the `is`
 function does, and returns nothing if the value is valid. If it isn't, the
 function throws an error that says what's wrong and where:
