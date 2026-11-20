@@ -47,4 +47,4 @@ hand and have JSDoc explaining the details. Documentation for users is in
 - [Email addresses](components/email.md): address literals and
   internationalized domains
 - [URIs and IRIs](components/uris.md): `@hyperjump/uri` and schemes that
-  aren't known
+  it doesn't know

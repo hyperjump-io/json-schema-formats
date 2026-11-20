@@ -328,9 +328,14 @@ describe("URIs and IRIs, from @hyperjump/uri", () => {
     expect(Formats.assertIri("http://examplé.com")).to.equal(undefined);
   });
 
-  test("a scheme or URN namespace that isn't known throws", () => {
-    expect(thrown(() => Formats.isUri("ftp://example.com"))).to.be.instanceOf(Formats.UnknownSchemeError);
-    expect(thrown(() => Formats.isUri("urn:isbn:0451450523"))).to.be.instanceOf(Formats.UnknownUrnNamespaceError);
-    expect(thrown(() => Formats.isUri("http://[v7.future]/"))).to.be.instanceOf(Formats.UnsupportedIpVersionError);
+  test("a scheme or URN namespace that isn't known has the generic syntax only", () => {
+    expect(Formats.isUri("ftp://example.com")).to.equal(true);
+    expect(Formats.isUri("urn:isbn:0451450523")).to.equal(true);
+    expect(Formats.isUri("ftp://exa mple.com")).to.equal(false);
+  });
+
+  test("a scheme that's known has its rules", () => {
+    expect(Formats.isUri("http:///a")).to.equal(false);
+    expect(Formats.isUri("urn:uuid:x")).to.equal(false);
   });
 });

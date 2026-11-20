@@ -33,8 +33,7 @@ information, see [Find what's wrong](find-whats-wrong.md).
 *Coming soon*
 
 The functions for URIs and IRIs are type guards from `@hyperjump/uri`. The
-package exports the types that they narrow to, and the type of their
-options:
+package exports the types that they narrow to:
 
 | Type | Description |
 | --- | --- |
@@ -42,7 +41,6 @@ options:
 | `UriReference` | A string that `isUriReference` or `assertUriReference` checked |
 | `Iri` | A string that `isIri` or `assertIri` checked |
 | `IriReference` | A string that `isIriReference` or `assertIriReference` checked |
-| `Options` | The options of the functions for URIs and IRIs. For more information, see [URIs and IRIs](uris-and-iris.md). |
 
 For example, a function that requires a `Uri` accepts a value after
 `isUri` checks it:

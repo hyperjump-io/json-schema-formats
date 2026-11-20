@@ -69,9 +69,8 @@ their words and no position, since they don't say where.
 
 The URI and IRI functions throw `@hyperjump/uri`'s `InvalidUriError` and
 `InvalidIriError`, which have `rule` and `component` in place of `part`.
-The package exports them, with `UnknownSchemeError`,
-`UnknownUrnNamespaceError`, and `UnsupportedIpVersionError`, so a caller
-can catch them without importing `@hyperjump/uri`.
+The package exports them, so a caller can catch them without importing
+`@hyperjump/uri`.
 
 ## Rejected
 

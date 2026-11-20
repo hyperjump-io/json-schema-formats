@@ -67,7 +67,7 @@
     "vitest": "*"
   },
   "dependencies": {
-    "@hyperjump/uri": "file:../uri",
+    "@hyperjump/uri": "^2.0.2",
     "idn-hostname": "^15.1.2"
   }
 }

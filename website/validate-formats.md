@@ -46,7 +46,7 @@ specification that defines what's valid:
 | `regex` | `isRegex` | [ECMA-262](https://tc39.es/ecma262/#sec-regexp-regular-expression-objects) |
 
 The functions for URIs and IRIs check a value with the rules of its
-scheme, and they can throw. For more information, see
+scheme, if it's a scheme that they know. For more information, see
 [URIs and IRIs](uris-and-iris.md).
 
 ## Formats that changed

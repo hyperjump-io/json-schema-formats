@@ -1,9 +1,7 @@
-import type { Iri, IriReference, Options, Uri, UriReference } from "@hyperjump/uri";
+import type { Iri, IriReference, Uri, UriReference } from "@hyperjump/uri";
 
-export type { Iri, IriReference, Options, Uri, UriReference } from "@hyperjump/uri";
-export {
-  InvalidUriError, InvalidIriError, UnknownSchemeError, UnknownUrnNamespaceError, UnsupportedIpVersionError
-} from "@hyperjump/uri";
+export type { Iri, IriReference, Uri, UriReference } from "@hyperjump/uri";
+export { InvalidUriError, InvalidIriError } from "@hyperjump/uri";
 
 /**
  * The 'date' format. Validates that a string represents a date according to
@@ -227,109 +225,69 @@ export const assertIPv6: (ip: string) => void;
  * 3986](https://www.rfc-editor.org/rfc/rfc3986.html), with the rules of its
  * scheme, by [`@hyperjump/uri`](https://hyperjump.io/uri/).
  *
- * **NOTE**: A URI of a scheme that isn't known can't be validated, so it
- * throws. `@hyperjump/uri` knows `http`, `https`, `file`, `tag`, and `urn`
- * (with the `uuid` namespace). Pass others in `customSchemes`.
+ * **NOTE**: A URI of a scheme that `@hyperjump/uri` doesn't know is checked
+ * with the generic syntax only. It knows `http`, `https`, `file`, `urn` (with
+ * the `uuid` namespace), `tag`, `data`, and `did`.
  *
- * @throws {UnknownSchemeError} If the scheme isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  * @see [JSON Schema Core, section 7.3.5](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.5)
  */
-export const isUri: (uri: string, options?: Options) => uri is Uri;
+export const isUri: (uri: string) => uri is Uri;
 
 /**
  * Checks that `uri` is a URI, like {@link isUri}, and throws an error that
  * says what's wrong and where if it isn't.
  *
  * @throws {InvalidUriError} If `uri` isn't a URI.
- * @throws {UnknownSchemeError} If the scheme isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  */
-export const assertUri: (uri: string, options?: Options) => asserts uri is Uri;
+export const assertUri: (uri: string) => asserts uri is Uri;
 
 /**
  * The 'uri-reference' format. Validates that a string represents a URI
  * Reference as defined by [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html),
  * with the rules of its scheme if it has one, like {@link isUri}.
  *
- * @throws {UnknownSchemeError} If it has a scheme that isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  * @see [JSON Schema Core, section 7.3.5](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.5)
  */
-export const isUriReference: (uri: string, options?: Options) => uri is UriReference;
+export const isUriReference: (uri: string) => uri is UriReference;
 
 /**
  * Checks that `uri` is a URI Reference, like {@link isUriReference}.
  *
  * @throws {InvalidUriError} If `uri` isn't a URI Reference.
- * @throws {UnknownSchemeError} If it has a scheme that isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  */
-export const assertUriReference: (uri: string, options?: Options) => asserts uri is UriReference;
+export const assertUriReference: (uri: string) => asserts uri is UriReference;
 
 /**
  * The 'iri' format. Validates that a string represents an IRI as defined by
  * [RFC 3987](https://www.rfc-editor.org/rfc/rfc3987.html), with the rules of
  * its scheme, like {@link isUri}.
  *
- * @throws {UnknownSchemeError} If the scheme isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  * @see [JSON Schema Core, section 7.3.5](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.5)
  */
-export const isIri: (iri: string, options?: Options) => iri is Iri;
+export const isIri: (iri: string) => iri is Iri;
 
 /**
  * Checks that `iri` is an IRI, like {@link isIri}.
  *
  * @throws {InvalidIriError} If `iri` isn't an IRI.
- * @throws {UnknownSchemeError} If the scheme isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  */
-export const assertIri: (iri: string, options?: Options) => asserts iri is Iri;
+export const assertIri: (iri: string) => asserts iri is Iri;
 
 /**
  * The 'iri-reference' format. Validates that a string represents an IRI
  * Reference as defined by [RFC 3987](https://www.rfc-editor.org/rfc/rfc3987.html),
  * with the rules of its scheme if it has one, like {@link isUri}.
  *
- * @throws {UnknownSchemeError} If it has a scheme that isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  * @see [JSON Schema Core, section 7.3.5](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-01#section-7.3.5)
  */
-export const isIriReference: (iri: string, options?: Options) => iri is IriReference;
+export const isIriReference: (iri: string) => iri is IriReference;
 
 /**
  * Checks that `iri` is an IRI Reference, like {@link isIriReference}.
  *
  * @throws {InvalidIriError} If `iri` isn't an IRI Reference.
- * @throws {UnknownSchemeError} If it has a scheme that isn't known.
- * @throws {UnknownUrnNamespaceError} If it's a URN of a namespace that isn't
- *   known.
- * @throws {UnsupportedIpVersionError} If the host is an IP literal of a
- *   future version.
  */
-export const assertIriReference: (iri: string, options?: Options) => asserts iri is IriReference;
+export const assertIriReference: (iri: string) => asserts iri is IriReference;
 
 /**
  * The 'uuid' format. Validates that a string represents a UUID address as

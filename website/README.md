@@ -45,5 +45,5 @@ uses it to validate the `format` keyword.
   and the formats that changed between JSON Schema versions
 - [Find what's wrong](find-whats-wrong.md): the `assert` functions and the
   errors that they throw
-- [URIs and IRIs](uris-and-iris.md): schemes, and the errors for a scheme
-  that isn't known
+- [URIs and IRIs](uris-and-iris.md): schemes, and the errors for URIs and
+  IRIs
