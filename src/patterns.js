@@ -44,6 +44,12 @@ export const timeSecond = /^(?:[0-5][0-9]|60)$/u;
 // RFC 3339 time-second, without leap seconds
 export const timeSecondWithoutLeapSecond = /^(?:[0-5][0-9])$/u;
 
+// RFC 3339 partial-time, without leap seconds
+export const timeLocal = /^(?:(?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}[0-5][0-9](?:\u{2E}[0-9]+)?)$/u;
+
+// RFC 3339 full-date "T" partial-time, without leap seconds
+export const dateTimeLocal = /^(?:[0-9]{4}\u{2D}(?:0[1-9]|1[0-2])\u{2D}(?:0[1-9]|[12][0-9]|3[01])[Tt](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}[0-5][0-9](?:\u{2E}[0-9]+)?)$/u;
+
 // RFC 9557 date-time-ext
 export const dateTimeExt = /^(?:[0-9]{4}\u{2D}(?:0[1-9]|1[0-2])\u{2D}(?:0[1-9]|[12][0-9]|3[01])[Tt](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}(?:[0-5][0-9]|60)(?:\u{2E}[0-9]+)?(?:[Zz]|[\u{2B}\u{2D}](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9])(?:\u{5B}\u{21}?(?:(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12})(?:\u{2F}(?:[A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,13}|\u{2E}[\u{2B}\u{2D}0-9A-Z\u{5F}a-z][\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{0,12}|\u{2E}\u{2E}[\u{2B}\u{2D}\u{2E}0-9A-Z\u{5F}a-z]{1,12}))*|[\u{2B}\u{2D}](?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9])\u{5D})?(?:\u{5B}\u{21}?[\u{5F}a-z][\u{2D}0-9\u{5F}a-z]*\u{3D}[0-9A-Za-z]+(?:\u{2D}[0-9A-Za-z]+)*\u{5D})*)$/u;
 
@@ -142,3 +148,72 @@ export const jsonPointer = /^(?:(?:\u{2F}(?:[^\u{2F}\u{7E}]|\u{7E}[01])*)*)$/u;
 
 // draft-bhutton-relative-json-pointer-00 relative-json-pointer
 export const relativeJsonPointer = /^(?:(?:0|[1-9][0-9]*)(?:[\u{2B}\u{2D}](?:0|[1-9][0-9]*))?(?:\u{2F}(?:[^\u{2F}\u{7E}]|\u{7E}[01])*)*|(?:0|[1-9][0-9]*)\u{23})$/u;
+
+// RFC 9110 HTTP-date
+export const httpDate = /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\u{2C}\u{20}[0-9]{2}\u{20}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\u{20}[0-9]{4}\u{20}(?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}(?:[0-5][0-9]|60)\u{20}GMT|(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\u{2C}\u{20}[0-9]{2}\u{2D}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\u{2D}[0-9]{2}\u{20}(?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}(?:[0-5][0-9]|60)\u{20}GMT|(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\u{20}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\u{20}(?:[0-9]{2}|\u{20}[0-9])\u{20}(?:[01][0-9]|2[0-3])\u{3A}[0-5][0-9]\u{3A}(?:[0-5][0-9]|60)\u{20}[0-9]{4})$/u;
+
+// RFC 9110 day-name
+export const httpDayName = /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/u;
+
+// RFC 9110 day-name-l
+export const httpDayNameL = /^(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/u;
+
+// RFC 9110 day
+export const httpDay = /^(?:[0-9]{2})$/u;
+
+// RFC 9110 1DIGIT, the day of a date3 after SP
+export const httpOneDigitDay = /^(?:[0-9])$/u;
+
+// RFC 9110 month
+export const httpMonth = /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/u;
+
+// RFC 9110 year
+export const httpYear = /^(?:[0-9]{4})$/u;
+
+// RFC 9110 2DIGIT, the year of a date2
+export const httpTwoDigitYear = /^(?:[0-9]{2})$/u;
+
+// RFC 9110 hour
+export const httpHour = /^(?:[01][0-9]|2[0-3])$/u;
+
+// RFC 9110 minute
+export const httpMinute = /^(?:[0-5][0-9])$/u;
+
+// RFC 9110 second
+export const httpSecond = /^(?:[0-5][0-9]|60)$/u;
+
+// *ALPHA
+export const alphas = /[A-Za-z]*/uy;
+
+// RFC 9110 media-range
+export const mediaRange = /^(?:(?:\u{2A}\u{2F}\u{2A}|[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]+\u{2F}\u{2A}|[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]+\u{2F}[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]+)(?:[\u{9}\u{20}]*\u{3B}[\u{9}\u{20}]*(?:[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]+\u{3D}(?:[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]+|\u{22}(?:[\u{9}\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}\u{80}-\u{FF}]|\u{5C}[\u{9}\u{20}-\u{7E}\u{80}-\u{FF}])*\u{22}))?)*)$/u;
+
+// RFC 9110 *tchar
+export const tchars = /[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}\u{2E}0-9A-Z\u{5E}-z\u{7C}\u{7E}]*/uy;
+
+// RFC 9110 *qdtext
+export const quotedStringChars = /[\u{9}\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}\u{80}-\u{FF}]*/uy;
+
+// RFC 9110 HTAB / SP / VCHAR / obs-text, what follows the \ of a quoted-pair
+export const quotedPairChar = /^(?:[\u{9}\u{20}-\u{7E}\u{80}-\u{FF}])$/u;
+
+// RFC 8941 sf-string
+export const sfString = /^(?:\u{22}(?:[\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}]|\u{5C}[\u{22}\u{5C}])*\u{22})$/u;
+
+// RFC 8941 sf-token
+export const sfToken = /^(?:[\u{2A}A-Za-z][\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}-\u{3A}A-Z\u{5E}-z\u{7C}\u{7E}]*)$/u;
+
+// RFC 8941 sf-binary
+export const sfBinary = /^(?:\u{3A}[\u{2B}\u{2F}-9\u{3D}A-Za-z]*\u{3A})$/u;
+
+// RFC 8941 sf-boolean
+export const sfBoolean = /^(?:\u{3F}[01])$/u;
+
+// RFC 8941 *unescaped
+export const sfUnescapedChars = /[\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}]*/uy;
+
+// RFC 8941 *( tchar / ":" / "/" ), what follows an sf-token's first character
+export const sfTokenChars = /[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}-\u{3A}A-Z\u{5E}-z\u{7C}\u{7E}]*/uy;
+
+// RFC 8941 *base64
+export const base64Chars = /[\u{2B}\u{2F}-9\u{3D}A-Za-z]*/uy;

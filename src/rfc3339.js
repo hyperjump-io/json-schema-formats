@@ -3,8 +3,9 @@ import {
   FormatError, delimiter, end, field, invalidCharacter, isProblem, matchEnd, missing, problem, sequence, show
 } from "./diagnose.js";
 import {
-  dateFullyear, dateMday, dateMonth, dateTime as dateTimePattern, digits, duration as durationPattern, fullDate,
-  time as timePattern, timeHour, timeMinute, timeSecond, timeSecondWithoutLeapSecond
+  dateFullyear, dateMday, dateMonth, dateTime as dateTimePattern, dateTimeLocal as dateTimeLocalPattern, digits,
+  duration as durationPattern, fullDate, time as timePattern, timeHour, timeLocal as timeLocalPattern, timeMinute,
+  timeSecond, timeSecondWithoutLeapSecond
 } from "./patterns.js";
 
 /**
@@ -237,6 +238,88 @@ export const diagnoseDateTime = (dateTime, after = end("offset")) => {
   ]);
   return isProblem(result) ? result : checkDayInMonth(dateTime) ?? checkLeapSecond(dateTime);
 };
+
+/**
+ * @type API.isTimeLocal
+ * @function
+ */
+export const isTimeLocal = RegExp.prototype.test.bind(timeLocalPattern);
+
+/** @type API.assertTimeLocal */
+export const assertTimeLocal = (time) => {
+  if (!isTimeLocal(time)) {
+    const result = sequence(time, 0, localTimeSteps);
+    throw new InvalidTimeLocalError(time, isProblem(result) ? result : undefined);
+  }
+};
+
+/**
+ * A value isn't a time without an offset. {@link assertTimeLocal} throws it.
+ *
+ * @hideconstructor
+ */
+export class InvalidTimeLocalError extends FormatError {
+  /**
+   * @param {string} value
+   * @param {Problem | undefined} problem
+   */
+  constructor(value, problem) {
+    super("time-local", value, problem);
+    this.name = "InvalidTimeLocalError";
+  }
+}
+
+/** @type API.isDateTimeLocal */
+export const isDateTimeLocal = (dateTime) => {
+  return dateTimeLocalPattern.test(dateTime) && checkDayInMonth(dateTime) === undefined;
+};
+
+/** @type API.assertDateTimeLocal */
+export const assertDateTimeLocal = (dateTime) => {
+  if (!isDateTimeLocal(dateTime)) {
+    const result = sequence(dateTime, 0, [...dateSteps, delimiter("T", "day", "time", true), ...localTimeSteps]);
+    throw new InvalidDateTimeLocalError(dateTime, isProblem(result) ? result : checkDayInMonth(dateTime));
+  }
+};
+
+/**
+ * A value isn't a date-time without an offset. {@link assertDateTimeLocal} throws it.
+ *
+ * @hideconstructor
+ */
+export class InvalidDateTimeLocalError extends FormatError {
+  /**
+   * @param {string} value
+   * @param {Problem | undefined} problem
+   */
+  constructor(value, problem) {
+    super("date-time-local", value, problem);
+    this.name = "InvalidDateTimeLocalError";
+  }
+}
+
+// What follows the second of a time without an offset: a fraction, and the end
+/** @type Step */
+const localTimeEnd = (value, start) => {
+  const fractionEnd = secfrac(value, start);
+  if (isProblem(fractionEnd) || fractionEnd === value.length) {
+    return fractionEnd;
+  }
+
+  const after = fractionEnd > start ? "fraction" : "second";
+  const hint = "Zz+-".includes(value[fractionEnd]) ? "a local time has no offset" : undefined;
+  return invalidCharacter(value, fractionEnd, after, `after the ${after}`, hint);
+};
+
+/** @type Step[] */
+const localTimeSteps = [
+  field("hour", digits, timeHour, "00-23"),
+  delimiter(":", "hour", "minute"),
+  field("minute", digits, timeMinute, "00-59"),
+  delimiter(":", "minute", "second"),
+  field("second", digits, timeSecondWithoutLeapSecond, "00-59", "a leap second can't be checked without an offset"),
+  localTimeEnd
+];
 
 /**
  * @type API.isDuration

@@ -11,6 +11,21 @@ export const isLeapYear = (year) => {
   return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
 };
 
+// The offset of each month, for dayOfWeek, by its number
+const monthOffsets = [0, 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
+
+/**
+ * The day of the week of a date in the proleptic Gregorian calendar, from 0 for Sunday to 6 for Saturday. It's
+ * Sakamoto's method. `Date` isn't used, because it takes years 0-99 to be 1900-1999.
+ *
+ * @type (year: number, month: number, day: number) => number
+ */
+export const dayOfWeek = (year, month, day) => {
+  const y = month < 3 ? year - 1 : year;
+  const days = y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + monthOffsets[month] + day;
+  return ((days % 7) + 7) % 7;
+};
+
 /** @type (date: Date) => boolean */
 export const hasLeapSecond = (date) => {
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");

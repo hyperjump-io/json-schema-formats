@@ -146,6 +146,77 @@ const specs = {
     parts: ["regex"],
     alphabet: "()[]{}a\\-?*+|^$,1",
     seeds: ["(a)", "[a-z]+", "a{1,2}", "\\d"]
+  },
+  char: {
+    is: Formats.isChar, assert: Formats.assertChar, error: Formats.InvalidCharError, format: "char",
+    reasons: ["missing", "too-long"],
+    parts: ["character"],
+    alphabet: "a😀\uD800",
+    seeds: ["a", "😀"]
+  },
+  dateTimeLocal: {
+    is: Formats.isDateTimeLocal, assert: Formats.assertDateTimeLocal, error: Formats.InvalidDateTimeLocalError, format: "date-time-local",
+    reasons: ["invalid-character", "invalid-value", "missing", "nonexistent-date"],
+    parts: [...dateParts, "time", "hour", "minute", "second", "fraction"],
+    alphabet: "0123456789:-TtZ+.",
+    seeds: ["2020-02-29T23:59:59", "2021-02-28t00:00:00.5", "2020-04-30T12:00:00", "2020-01-01"]
+  },
+  timeLocal: {
+    is: Formats.isTimeLocal, assert: Formats.assertTimeLocal, error: Formats.InvalidTimeLocalError, format: "time-local",
+    reasons: ["invalid-character", "invalid-value", "missing"],
+    parts: ["hour", "minute", "second", "fraction"],
+    alphabet: "0123456789:Z+.x",
+    seeds: ["23:59:59", "12:00:00.5", "00:00:00"]
+  },
+  httpDate: {
+    is: Formats.isHttpDate, assert: Formats.assertHttpDate, error: Formats.InvalidHttpDateError, format: "http-date",
+    reasons: ["invalid-character", "invalid-value", "missing", "nonexistent-date", "nonexistent-leap-second", "wrong-day-name"],
+    parts: ["day name", "day", "month", "year", "hour", "minute", "second", "time zone"],
+    alphabet: "0123469 ,:-SunMonTueFebNovGMTday",
+    seeds: [
+      "Sun, 06 Nov 1994 08:49:37 GMT",
+      "Sunday, 06-Nov-94 08:49:37 GMT",
+      "Sun Nov  6 08:49:37 1994",
+      "Sat, 31 Dec 2016 23:59:60 GMT",
+      "Thu, 29 Feb 2024 00:00:00 GMT",
+      "Thursday, 29-Feb-24 23:59:60 GMT",
+      "Mon Jun 30 23:59:60 2015"
+    ]
+  },
+  mediaRange: {
+    is: Formats.isMediaRange, assert: Formats.assertMediaRange, error: Formats.InvalidMediaRangeError, format: "media-range",
+    reasons: ["invalid-character", "missing"],
+    parts: ["type", "subtype", "parameter name", "parameter value"],
+    alphabet: "a*/;= \t\"\\,é",
+    seeds: ["text/html", "*/*", "text/*;q=1", "a/b ; c=\"d\\\"e\" ;; f=g", "a/b;"]
+  },
+  sfBinary: {
+    is: Formats.isSfBinary, assert: Formats.assertSfBinary, error: Formats.InvalidSfBinaryError, format: "sf-binary",
+    reasons: ["invalid-character", "missing"],
+    parts: ["byte sequence"],
+    alphabet: ":aZ0+/=-",
+    seeds: [":aGVsbG8=:", "::"]
+  },
+  sfBoolean: {
+    is: Formats.isSfBoolean, assert: Formats.assertSfBoolean, error: Formats.InvalidSfBooleanError, format: "sf-boolean",
+    reasons: ["invalid-character", "missing"],
+    parts: ["boolean"],
+    alphabet: "?012",
+    seeds: ["?0", "?1"]
+  },
+  sfString: {
+    is: Formats.isSfString, assert: Formats.assertSfString, error: Formats.InvalidSfStringError, format: "sf-string",
+    reasons: ["invalid-character", "missing", "invalid-escape"],
+    parts: ["string"],
+    alphabet: "\"\\a é\t",
+    seeds: ["\"a b\"", "\"\\\"\\\\\"", "\"\""]
+  },
+  sfToken: {
+    is: Formats.isSfToken, assert: Formats.assertSfToken, error: Formats.InvalidSfTokenError, format: "sf-token",
+    reasons: ["invalid-character", "missing"],
+    parts: ["token"],
+    alphabet: "aZ*:/0!\" ,",
+    seeds: ["foo", "*a:b/c", "a"]
   }
 };
 
@@ -307,7 +378,31 @@ describe("What's wrong and where", () => {
     [Formats.assertJsonPointer, "/a~2", { reason: "invalid-escape", part: "reference token", start: 2, end: 4, message: `Invalid json-pointer: /a~2 — "~" must be followed by "0" or "1", at 2` }],
     [Formats.assertRelativeJsonPointer, "01/a", { reason: "invalid-value", part: "number", start: 0, end: 2 }],
     [Formats.assertRelativeJsonPointer, "0+1#", { reason: "invalid-character", part: "index manipulation", start: 3, end: 4 }],
-    [Formats.assertRegex, "(", { reason: "invalid-syntax", part: "regex", start: 0, end: 1, message: "Invalid regex: ( — Unterminated group" }]
+    [Formats.assertRegex, "(", { reason: "invalid-syntax", part: "regex", start: 0, end: 1, message: "Invalid regex: ( — Unterminated group" }],
+    [Formats.assertChar, "ab", { reason: "too-long", part: "character", start: 1, end: 2, message: "Invalid char: ab — it has more than one character, at 1" }],
+    [Formats.assertChar, "😀a", { reason: "too-long", part: "character", start: 2, end: 3 }],
+    [Formats.assertDateTimeLocal, "2021-02-29T00:00:00", { reason: "nonexistent-date", part: "day", start: 8, end: 10, message: "Invalid date-time-local: 2021-02-29T00:00:00 — 2021-02 has 28 days, at 8" }],
+    [Formats.assertDateTimeLocal, "2020-01-01T00:00:00Z", { reason: "invalid-character", part: "second", start: 19, end: 20, message: `Invalid date-time-local: 2020-01-01T00:00:00Z — "Z" isn't allowed after the second, at 19; a local time has no offset` }],
+    [Formats.assertTimeLocal, "23:59:60", { reason: "invalid-value", part: "second", start: 6, end: 8, message: "Invalid time-local: 23:59:60 — the second must be 00-59, at 6; a leap second can't be checked without an offset" }],
+    [Formats.assertTimeLocal, "12:00:00.5+01:00", { reason: "invalid-character", part: "fraction", start: 10, end: 11 }],
+    [Formats.assertHttpDate, "Mon, 06 Nov 1994 08:49:37 GMT", { reason: "wrong-day-name", part: "day name", start: 0, end: 3, message: "Invalid http-date: Mon, 06 Nov 1994 08:49:37 GMT — 06 Nov 1994 was a Sunday, at 0" }],
+    [Formats.assertHttpDate, "Sun, 31 Nov 1994 08:49:37 GMT", { reason: "nonexistent-date", part: "day", start: 5, end: 7, message: "Invalid http-date: Sun, 31 Nov 1994 08:49:37 GMT — Nov 1994 has 30 days, at 5" }],
+    [Formats.assertHttpDate, "Monday, 29-Feb-21 00:00:00 GMT", { reason: "nonexistent-date", part: "day", start: 8, end: 10, message: "Invalid http-date: Monday, 29-Feb-21 00:00:00 GMT — Feb of a year ending in 21 has 28 days, at 8" }],
+    [Formats.assertHttpDate, "Sun, 31 Dec 2017 23:59:60 GMT", { reason: "nonexistent-leap-second", part: "second", start: 23, end: 25 }],
+    [Formats.assertHttpDate, "Sunday, 06-Nov-94 08:49:60 GMT", { reason: "nonexistent-leap-second", part: "second", start: 24, end: 26 }],
+    [Formats.assertHttpDate, "sun, 06 Nov 1994 08:49:37 GMT", { reason: "invalid-value", part: "day name", start: 0, end: 3, message: `Invalid http-date: sun, 06 Nov 1994 08:49:37 GMT — the day name must be "Mon" to "Sun", or "Monday" to "Sunday", at 0; day names are case-sensitive` }],
+    [Formats.assertHttpDate, "Sun, 06 Nov 1994 08:49:37 UTC", { reason: "invalid-character", part: "time zone", start: 26, end: 27, message: `Invalid http-date: Sun, 06 Nov 1994 08:49:37 UTC — "U" isn't allowed in the time zone, at 26; it must be "GMT"` }],
+    [Formats.assertHttpDate, "Sun Nov 6 08:49:37 1994", { reason: "invalid-value", part: "day", start: 8, end: 9 }],
+    [Formats.assertMediaRange, "text", { reason: "missing", part: "subtype", start: 4, end: 4, message: "Invalid media-range: text — it has no subtype, at 4" }],
+    [Formats.assertMediaRange, "text/html,text/plain", { reason: "invalid-character", part: "subtype", start: 9, end: 10, message: `Invalid media-range: text/html,text/plain — "," isn't allowed after the subtype, at 9; a parameter starts with ";"` }],
+    [Formats.assertMediaRange, "text/html ", { reason: "invalid-character", part: "subtype", start: 9, end: 10 }],
+    [Formats.assertMediaRange, "text/html;charset = utf-8", { reason: "invalid-character", part: "parameter name", start: 17, end: 18 }],
+    [Formats.assertMediaRange, "a/b;c=\"d", { reason: "missing", part: "parameter value", start: 8, end: 8, message: `Invalid media-range: a/b;c="d — it has no closing double quote, at 8` }],
+    [Formats.assertSfBinary, ":a b:", { reason: "invalid-character", part: "byte sequence", start: 2, end: 3, message: `Invalid sf-binary: :a b: — " " isn't allowed in the byte sequence, at 2; base64 has letters, digits, "+", "/", and "="` }],
+    [Formats.assertSfBoolean, "?2", { reason: "invalid-character", part: "boolean", start: 1, end: 2, message: `Invalid sf-boolean: ?2 — "2" isn't allowed after "?", at 1; it must be "0" or "1"` }],
+    [Formats.assertSfString, "\"a\\nb\"", { reason: "invalid-escape", part: "string", start: 2, end: 4, message: `Invalid sf-string: "a\\nb" — a backslash must be followed by a double quote or a backslash, at 2` }],
+    [Formats.assertSfString, "\"\u00E9\"", { reason: "invalid-character", part: "string", start: 1, end: 2, message: `Invalid sf-string: "é" — "é" isn't allowed in the string, at 1; a string can only have printable ASCII characters` }],
+    [Formats.assertSfToken, "1a", { reason: "invalid-character", part: "token", start: 0, end: 1, message: `Invalid sf-token: 1a — "1" isn't allowed at the start, at 0; a token starts with a letter or "*"` }]
   ])("%o %s", (assert, value, expected) => {
     expect(thrown(() => assert(value))).to.include(expected);
   });

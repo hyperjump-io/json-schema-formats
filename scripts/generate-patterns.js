@@ -256,11 +256,115 @@ const relativeJsonPointerRules = `
   ${jsonPointerRules}
 `;
 
+// RFC 9110, section 5.6.7. The range in time-of-day's comment is written out
+// as ABNF in hour, minute, and second.
+const httpDateRules = `
+  HTTP-date    = IMF-fixdate / obs-date
+
+  IMF-fixdate  = day-name "," SP date1 SP time-of-day SP GMT
+  ; fixed length/zone/capitalization subset of the format
+  ; see Section 3.3 of [RFC5322]
+
+  day-name     = %s"Mon" / %s"Tue" / %s"Wed"
+               / %s"Thu" / %s"Fri" / %s"Sat" / %s"Sun"
+
+  date1        = day SP month SP year
+               ; e.g., 02 Jun 1982
+
+  day          = 2DIGIT
+  month        = %s"Jan" / %s"Feb" / %s"Mar" / %s"Apr"
+               / %s"May" / %s"Jun" / %s"Jul" / %s"Aug"
+               / %s"Sep" / %s"Oct" / %s"Nov" / %s"Dec"
+  year         = 4DIGIT
+
+  GMT          = %s"GMT"
+
+  time-of-day  = hour ":" minute ":" second
+               ; 00:00:00 - 23:59:60 (leap second)
+
+  hour         = %x30-31 DIGIT / "2" %x30-33 ; 00-23
+  minute       = %x30-35 DIGIT ; 00-59
+  second       = %x30-35 DIGIT / "60" ; 00-59, 60 for a leap second
+
+  obs-date     = rfc850-date / asctime-date
+
+  rfc850-date  = day-name-l "," SP date2 SP time-of-day SP GMT
+  date2        = day "-" month "-" 2DIGIT
+               ; e.g., 02-Jun-82
+
+  day-name-l   = %s"Monday" / %s"Tuesday" / %s"Wednesday"
+               / %s"Thursday" / %s"Friday" / %s"Saturday"
+               / %s"Sunday"
+
+  asctime-date = day-name SP date3 SP time-of-day SP year
+  date3        = month SP ( 2DIGIT / ( SP 1DIGIT ))
+               ; e.g., Jun  2
+`;
+
+// RFC 9110, section 5.6.2
+const tokenRules = `
+  token          = 1*tchar
+
+  tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+                 / "+" / "-" / "." / "^" / "_" / "\`" / "|" / "~"
+                 / DIGIT / ALPHA
+                 ; any VCHAR, except delimiters
+`;
+
+// RFC 9110, section 12.5.1, with the rules it uses: type and subtype from
+// section 8.3.1, parameters from section 5.6.6, OWS from section 5.6.3,
+// quoted-string from section 5.6.4, and obs-text from section 5.5.
+const mediaRangeRules = `
+  media-range    = ( "*/*"
+                     / ( type "/" "*" )
+                     / ( type "/" subtype )
+                   ) parameters
+
+  type       = token
+  subtype    = token
+
+  parameters      = *( OWS ";" OWS [ parameter ] )
+  parameter       = parameter-name "=" parameter-value
+  parameter-name  = token
+  parameter-value = ( token / quoted-string )
+
+  OWS            = *( SP / HTAB )
+                 ; optional whitespace
+
+  quoted-string  = DQUOTE *( qdtext / quoted-pair ) DQUOTE
+  qdtext         = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text
+  quoted-pair    = "\\" ( HTAB / SP / VCHAR / obs-text )
+
+  obs-text       = %x80-FF
+
+  ${tokenRules}
+`;
+
+// RFC 8941, sections 3.3.3 to 3.3.6. tchar is from RFC 7230, which RFC 9110
+// obsoletes with the same rule.
+const structuredFieldRules = `
+  sf-string = DQUOTE *chr DQUOTE
+  chr       = unescaped / escaped
+  unescaped = %x20-21 / %x23-5B / %x5D-7E
+  escaped   = "\\" ( DQUOTE / "\\" )
+
+  sf-token = ( ALPHA / "*" ) *( tchar / ":" / "/" )
+
+  sf-binary = ":" *(base64) ":"
+  base64    = ALPHA / DIGIT / "+" / "/" / "="
+
+  sf-boolean = "?" boolean
+  boolean    = "0" / "1"
+
+  ${tokenRules}
+`;
+
 // Without a date, a leap second can't be valid.
 const timeSecondWithoutLeapSecond = `%x30-35 DIGIT`;
 
 const dateTime = abnf({ rules: dateTimeRules });
 const fragment = abnf({ anchored: false });
+const httpDate = abnf({ rules: httpDateRules });
 
 /**
  * A pattern for diagnosing, which matches as much as it can where a diagnosis puts its `lastIndex`.
@@ -292,6 +396,14 @@ literal's tag`, sticky(fragment`*( ALPHA / DIGIT / "-" )`)],
   ["timeMinute", "RFC 3339 time-minute", dateTime`time-minute`],
   ["timeSecond", "RFC 3339 time-second", dateTime`time-second`],
   ["timeSecondWithoutLeapSecond", "RFC 3339 time-second, without leap seconds", dateTime`${timeSecondWithoutLeapSecond}`],
+  ["timeLocal", "RFC 3339 partial-time, without leap seconds", dateTime`
+    time-hour ":" time-minute ":" time-second [time-secfrac]
+    time-second = ${timeSecondWithoutLeapSecond}
+  `],
+  ["dateTimeLocal", "RFC 3339 full-date \"T\" partial-time, without leap seconds", dateTime`
+    full-date "T" time-hour ":" time-minute ":" time-second [time-secfrac]
+    time-second = ${timeSecondWithoutLeapSecond}
+  `],
 
   // RFC 9557
   ["dateTimeExt", "RFC 9557 date-time-ext", abnf({ rules: dateTimeRules })`date-time suffix ${suffixRules}`],
@@ -340,7 +452,34 @@ literal's tag`, sticky(fragment`*( ALPHA / DIGIT / "-" )`)],
 
   // RFC 6901 and draft-bhutton-relative-json-pointer-00
   ["jsonPointer", "RFC 6901 json-pointer", abnf()`json-pointer ${jsonPointerRules}`],
-  ["relativeJsonPointer", "draft-bhutton-relative-json-pointer-00 relative-json-pointer", abnf()`relative-json-pointer ${relativeJsonPointerRules}`]
+  ["relativeJsonPointer", "draft-bhutton-relative-json-pointer-00 relative-json-pointer", abnf()`relative-json-pointer ${relativeJsonPointerRules}`],
+
+  // RFC 9110
+  ["httpDate", "RFC 9110 HTTP-date", abnf()`HTTP-date ${httpDateRules}`],
+  ["httpDayName", "RFC 9110 day-name", httpDate`day-name`],
+  ["httpDayNameL", "RFC 9110 day-name-l", httpDate`day-name-l`],
+  ["httpDay", "RFC 9110 day", httpDate`day`],
+  ["httpOneDigitDay", "RFC 9110 1DIGIT, the day of a date3 after SP", httpDate`1DIGIT`],
+  ["httpMonth", "RFC 9110 month", httpDate`month`],
+  ["httpYear", "RFC 9110 year", httpDate`year`],
+  ["httpTwoDigitYear", "RFC 9110 2DIGIT, the year of a date2", httpDate`2DIGIT`],
+  ["httpHour", "RFC 9110 hour", httpDate`hour`],
+  ["httpMinute", "RFC 9110 minute", httpDate`minute`],
+  ["httpSecond", "RFC 9110 second", httpDate`second`],
+  ["alphas", "*ALPHA", sticky(fragment`*ALPHA`)],
+  ["mediaRange", "RFC 9110 media-range", abnf()`media-range ${mediaRangeRules}`],
+  ["tchars", "RFC 9110 *tchar", sticky(abnf({ rules: tokenRules, anchored: false })`*tchar`)],
+  ["quotedStringChars", "RFC 9110 *qdtext", sticky(abnf({ rules: mediaRangeRules, anchored: false })`*qdtext`)],
+  ["quotedPairChar", "RFC 9110 HTAB / SP / VCHAR / obs-text, what follows the \\ of a quoted-pair", abnf({ rules: mediaRangeRules })`HTAB / SP / VCHAR / obs-text`],
+
+  // RFC 8941
+  ["sfString", "RFC 8941 sf-string", abnf()`sf-string ${structuredFieldRules}`],
+  ["sfToken", "RFC 8941 sf-token", abnf()`sf-token ${structuredFieldRules}`],
+  ["sfBinary", "RFC 8941 sf-binary", abnf()`sf-binary ${structuredFieldRules}`],
+  ["sfBoolean", "RFC 8941 sf-boolean", abnf()`sf-boolean ${structuredFieldRules}`],
+  ["sfUnescapedChars", "RFC 8941 *unescaped", sticky(abnf({ rules: structuredFieldRules, anchored: false })`*unescaped`)],
+  ["sfTokenChars", `RFC 8941 *( tchar / ":" / "/" ), what follows an sf-token's first character`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*( tchar / ":" / "/" )`)],
+  ["base64Chars", "RFC 8941 *base64", sticky(abnf({ rules: structuredFieldRules, anchored: false })`*base64`)]
 ];
 
 /** @type () => string */

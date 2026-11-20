@@ -39,3 +39,15 @@ export {
 
 // JSON Schema Validation - Regular Expressions
 export { isRegex, assertRegex, InvalidRegexError } from "./ecma262.js";
+
+// OpenAPI Format Registry
+export { isChar, assertChar, InvalidCharError } from "./openapi.js";
+export {
+  isDateTimeLocal, isTimeLocal, assertDateTimeLocal, assertTimeLocal, InvalidDateTimeLocalError, InvalidTimeLocalError
+} from "./rfc3339.js";
+export { isHttpDate, isMediaRange, assertHttpDate, assertMediaRange, InvalidHttpDateError, InvalidMediaRangeError } from "./rfc9110.js";
+export {
+  isSfBinary, isSfBoolean, isSfString, isSfToken,
+  assertSfBinary, assertSfBoolean, assertSfString, assertSfToken,
+  InvalidSfBinaryError, InvalidSfBooleanError, InvalidSfStringError, InvalidSfTokenError
+} from "./rfc8941.js";

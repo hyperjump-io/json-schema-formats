@@ -370,6 +370,177 @@ export const isRegex: (regex: string) => boolean;
 export const assertRegex: (regex: string) => void;
 
 /**
+ * The 'char' format from the OpenAPI Format Registry. Validates that a string
+ * is one character: one Unicode code point, which can be two UTF-16 code units.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/char.html)
+ */
+export const isChar: (char: string) => boolean;
+
+/**
+ * Checks that `char` is one character, like {@link isChar}, and throws an
+ * error that says what's wrong and where if it isn't.
+ *
+ * @throws {InvalidCharError} If `char` isn't one character.
+ */
+export const assertChar: (char: string) => void;
+
+/**
+ * The 'date-time-local' format from the OpenAPI Format Registry. Validates
+ * that a string represents a date-time without an offset: RFC 3339's
+ * `full-date "T" partial-time`, from [RFC 3339, section 5.6](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6).
+ *
+ * **NOTE**: Leap seconds are only allowed at specific times in UTC. Since
+ * there is no offset in this context, leap seconds are never allowed.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/date-time-local.html)
+ */
+export const isDateTimeLocal: (dateTime: string) => boolean;
+
+/**
+ * Checks that `dateTime` is a date-time without an offset, like
+ * {@link isDateTimeLocal}, and throws an error that says what's wrong and
+ * where if it isn't.
+ *
+ * @throws {InvalidDateTimeLocalError} If `dateTime` isn't a date-time without an offset.
+ */
+export const assertDateTimeLocal: (dateTime: string) => void;
+
+/**
+ * The 'time-local' format from the OpenAPI Format Registry. Validates that a
+ * string represents a time without an offset: RFC 3339's `partial-time`, from
+ * [RFC 3339, section 5.6](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6).
+ *
+ * **NOTE**: Leap seconds are only allowed on specific dates, in UTC. Since
+ * there is no date or offset in this context, leap seconds are never allowed.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/time-local.html)
+ */
+export const isTimeLocal: (time: string) => boolean;
+
+/**
+ * Checks that `time` is a time without an offset, like {@link isTimeLocal},
+ * and throws an error that says what's wrong and where if it isn't.
+ *
+ * @throws {InvalidTimeLocalError} If `time` isn't a time without an offset.
+ */
+export const assertTimeLocal: (time: string) => void;
+
+/**
+ * The 'http-date' format from the OpenAPI Format Registry. Validates that a
+ * string represents an HTTP date as defined by [RFC 9110, section 5.6.7](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7),
+ * which obsoletes RFC 7231 with the same grammar. The day has to be in its
+ * month, the day name has to be the date's, and a second of 60 has to be a
+ * leap second.
+ *
+ * **NOTE**: The obsolete RFC 850 form has a 2-digit year, with no century.
+ * Its day name isn't checked, and its leap second is only checked for being
+ * at 23:59:60.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/http-date.html)
+ */
+export const isHttpDate: (date: string) => boolean;
+
+/**
+ * Checks that `date` is an HTTP date, like {@link isHttpDate}, and throws an
+ * error that says what's wrong and where if it isn't.
+ *
+ * @throws {InvalidHttpDateError} If `date` isn't an HTTP date.
+ */
+export const assertHttpDate: (date: string) => void;
+
+/**
+ * The 'media-range' format from the OpenAPI Format Registry. Validates that a
+ * string represents a media range as defined by [RFC 9110, section 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1).
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/media-range.html)
+ */
+export const isMediaRange: (mediaRange: string) => boolean;
+
+/**
+ * Checks that `mediaRange` is a media range, like {@link isMediaRange}, and
+ * throws an error that says what's wrong and where if it isn't.
+ *
+ * @throws {InvalidMediaRangeError} If `mediaRange` isn't a media range.
+ */
+export const assertMediaRange: (mediaRange: string) => void;
+
+/**
+ * The 'sf-binary' format from the OpenAPI Format Registry. Validates that a
+ * string represents a structured field byte sequence as defined by
+ * [RFC 8941, section 3.3.5](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.5).
+ *
+ * **NOTE**: RFC 8941's grammar allows `=` anywhere in the base64, not only as
+ * padding at the end.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-binary.html)
+ */
+export const isSfBinary: (binary: string) => boolean;
+
+/**
+ * Checks that `binary` is a structured field byte sequence, like
+ * {@link isSfBinary}, and throws an error that says what's wrong and where if
+ * it isn't.
+ *
+ * @throws {InvalidSfBinaryError} If `binary` isn't a structured field byte sequence.
+ */
+export const assertSfBinary: (binary: string) => void;
+
+/**
+ * The 'sf-boolean' format from the OpenAPI Format Registry. Validates that a
+ * string represents a structured field boolean as defined by
+ * [RFC 8941, section 3.3.6](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.6).
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-boolean.html)
+ */
+export const isSfBoolean: (boolean: string) => boolean;
+
+/**
+ * Checks that `boolean` is a structured field boolean, like
+ * {@link isSfBoolean}, and throws an error that says what's wrong and where
+ * if it isn't.
+ *
+ * @throws {InvalidSfBooleanError} If `boolean` isn't a structured field boolean.
+ */
+export const assertSfBoolean: (boolean: string) => void;
+
+/**
+ * The 'sf-string' format from the OpenAPI Format Registry. Validates that a
+ * string represents a structured field string as defined by
+ * [RFC 8941, section 3.3.3](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.3),
+ * with its quotes.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-string.html)
+ */
+export const isSfString: (string: string) => boolean;
+
+/**
+ * Checks that `string` is a structured field string, like
+ * {@link isSfString}, and throws an error that says what's wrong and where
+ * if it isn't.
+ *
+ * @throws {InvalidSfStringError} If `string` isn't a structured field string.
+ */
+export const assertSfString: (string: string) => void;
+
+/**
+ * The 'sf-token' format from the OpenAPI Format Registry. Validates that a
+ * string represents a structured field token as defined by
+ * [RFC 8941, section 3.3.4](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.4).
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-token.html)
+ */
+export const isSfToken: (token: string) => boolean;
+
+/**
+ * Checks that `token` is a structured field token, like {@link isSfToken},
+ * and throws an error that says what's wrong and where if it isn't.
+ *
+ * @throws {InvalidSfTokenError} If `token` isn't a structured field token.
+ */
+export const assertSfToken: (token: string) => void;
+
+/**
  * What's wrong with a value. Each error has the reasons that it can have.
  *
  * - `invalid-character`: a character isn't allowed where it is.
@@ -379,10 +550,12 @@ export const assertRegex: (regex: string) => void;
  * - `too-long`: a part has more characters than it can. The span is the
  *   characters past the limit.
  * - `invalid-order`: a duration's units aren't in the order they have to be.
- * - `invalid-escape`: a JSON Pointer's `~` isn't followed by `0` or `1`.
+ * - `invalid-escape`: an escape isn't followed by a character it can escape,
+ *   like a JSON Pointer's `~` that isn't followed by `0` or `1`.
  * - `invalid-percent-encoding`: a `%` isn't followed by two hex digits.
  * - `nonexistent-date`: the day isn't in the month, like `2021-02-29`.
  * - `nonexistent-leap-second`: there wasn't a leap second at that time.
+ * - `wrong-day-name`: an HTTP date's day name isn't the day of its date.
  * - `invalid-idn`: an IDN hostname breaks a rule of IDNA2008 or UTS #46. The
  *   message says which, and the span is the whole hostname.
  * - `invalid-syntax`: a regular expression doesn't compile. The message is
@@ -398,6 +571,7 @@ export type FormatErrorReason
     | "invalid-percent-encoding"
     | "nonexistent-date"
     | "nonexistent-leap-second"
+    | "wrong-day-name"
     | "invalid-idn"
     | "invalid-syntax";
 
@@ -594,6 +768,96 @@ export class InvalidRegexError extends Error implements FormatErrorProperties<"i
   readonly value: string;
   readonly reason: "invalid-syntax";
   readonly part: "regex";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't one character. {@link assertChar} throws it. */
+export class InvalidCharError extends Error implements FormatErrorProperties<"missing" | "too-long", "character"> {
+  readonly value: string;
+  readonly reason: "missing" | "too-long";
+  readonly part: "character";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a date-time without an offset. {@link assertDateTimeLocal} throws it. */
+export class InvalidDateTimeLocalError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing" | "nonexistent-date", "year" | "month" | "day" | "time" | "hour" | "minute" | "second" | "fraction"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing" | "nonexistent-date";
+  readonly part: "year" | "month" | "day" | "time" | "hour" | "minute" | "second" | "fraction";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a time without an offset. {@link assertTimeLocal} throws it. */
+export class InvalidTimeLocalError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing", "hour" | "minute" | "second" | "fraction"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing";
+  readonly part: "hour" | "minute" | "second" | "fraction";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't an HTTP date. {@link assertHttpDate} throws it. */
+export class InvalidHttpDateError extends Error implements FormatErrorProperties<"invalid-character" | "invalid-value" | "missing" | "nonexistent-date" | "nonexistent-leap-second" | "wrong-day-name", "day name" | "day" | "month" | "year" | "hour" | "minute" | "second" | "time zone"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "invalid-value" | "missing" | "nonexistent-date" | "nonexistent-leap-second" | "wrong-day-name";
+  readonly part: "day name" | "day" | "month" | "year" | "hour" | "minute" | "second" | "time zone";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a media range. {@link assertMediaRange} throws it. */
+export class InvalidMediaRangeError extends Error implements FormatErrorProperties<"invalid-character" | "missing", "type" | "subtype" | "parameter name" | "parameter value"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "missing";
+  readonly part: "type" | "subtype" | "parameter name" | "parameter value";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a structured field byte sequence. {@link assertSfBinary} throws it. */
+export class InvalidSfBinaryError extends Error implements FormatErrorProperties<"invalid-character" | "missing", "byte sequence"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "missing";
+  readonly part: "byte sequence";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a structured field boolean. {@link assertSfBoolean} throws it. */
+export class InvalidSfBooleanError extends Error implements FormatErrorProperties<"invalid-character" | "missing", "boolean"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "missing";
+  readonly part: "boolean";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a structured field string. {@link assertSfString} throws it. */
+export class InvalidSfStringError extends Error implements FormatErrorProperties<"invalid-character" | "missing" | "invalid-escape", "string"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "missing" | "invalid-escape";
+  readonly part: "string";
+  readonly start: number;
+  readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a structured field token. {@link assertSfToken} throws it. */
+export class InvalidSfTokenError extends Error implements FormatErrorProperties<"invalid-character" | "missing", "token"> {
+  readonly value: string;
+  readonly reason: "invalid-character" | "missing";
+  readonly part: "token";
   readonly start: number;
   readonly end: number;
   private constructor();
