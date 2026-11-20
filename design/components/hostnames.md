@@ -27,6 +27,21 @@ A hostname that ends with a label separator, like `.` or `。`, isn't
 valid. `idn-hostname` allows a trailing one, as the DNS root, so `isIdn`
 checks for it first.
 
+### Its version
+
+Each major version of `idn-hostname` is a Unicode version: 15.1, 16.0,
+and 17.0 have the same code and get the same fixes, with the tables of
+their Unicode version. Normalization and the Unicode properties come from
+the JavaScript engine, so each one needs a Node.js whose ICU has its
+Unicode version, and this package's `engines` is the range of the one it
+uses.
+
+It's 16.0, which needs Node.js 22.12 or later, but not 23.
+`@hyperjump/uri` already needs 22.1, so it raises the floor only a
+little. 17.0 needs Node.js 24.13.1 and drops Node.js 22 while it's still
+an LTS, so it waits until Node.js 22's end of life. 15.1 works on more
+versions, but on Unicode that's two years old.
+
 ## The `hostname` format from draft-07
 
 `isAsciiIdn` is `isHostname` and `isIdn`. Most hostnames are made of

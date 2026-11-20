@@ -7,7 +7,8 @@ npm install @hyperjump/json-schema-formats
 ```
 
 The package is an ES module, and it works the same in Node.js and
-browsers. Import the functions that you use:
+browsers. It needs Node.js 22.12 or later, but not Node.js 23. Import the
+functions that you use:
 
 ```typescript
 import { isDateTime, isEmail } from "@hyperjump/json-schema-formats";

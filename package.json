@@ -29,6 +29,9 @@
   ],
   "author": "Jason Desrosiers <jdesrosi@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0 <23 || >=24.0.0"
+  },
   "repository": "github:hyperjump-io/json-schema-formats",
   "funding": {
     "type": "github",
@@ -68,6 +71,6 @@
   },
   "dependencies": {
     "@hyperjump/uri": "^2.0.2",
-    "idn-hostname": "^15.1.2"
+    "idn-hostname": "^16.0.4"
   }
 }
