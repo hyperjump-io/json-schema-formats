@@ -1,0 +1,90 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "uint8 validation",
+    "tests": [
+        {
+            "description": "validation of non-number uint8 values",
+            "schema": {
+                "format": "uint8"
+            },
+            "tests": [
+                {
+                    "description": "all number formats ignore strings",
+                    "data": "1",
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of unsigned 8-bit integers",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "uint8"
+            },
+            "tests": [
+                {
+                    "description": "the smallest value",
+                    "data": 0,
+                    "valid": true
+                },
+                {
+                    "description": "the largest value",
+                    "data": 255,
+                    "valid": true
+                },
+                {
+                    "description": "zero",
+                    "data": 0,
+                    "valid": true
+                },
+                {
+                    "description": "one less than the smallest value",
+                    "data": -1,
+                    "valid": false
+                },
+                {
+                    "description": "one more than the largest value",
+                    "data": 256,
+                    "valid": false
+                },
+                {
+                    "description": "a whole number with a fraction of zero",
+                    "data": 1.0,
+                    "valid": true
+                },
+                {
+                    "description": "a number with a fraction",
+                    "data": 1.5,
+                    "valid": false
+                },
+                {
+                    "description": "a very large number",
+                    "data": 1e+300,
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

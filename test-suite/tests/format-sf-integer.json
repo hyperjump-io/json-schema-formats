@@ -1,0 +1,95 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-integer validation",
+    "tests": [
+        {
+            "description": "validation of non-number sf-integer values",
+            "schema": {
+                "format": "sf-integer"
+            },
+            "tests": [
+                {
+                    "description": "all number formats ignore strings",
+                    "data": "1",
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field integers",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-integer"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.1"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "the largest value, 15 digits",
+                    "data": 999999999999999,
+                    "valid": true
+                },
+                {
+                    "description": "the smallest value",
+                    "data": -999999999999999,
+                    "valid": true
+                },
+                {
+                    "description": "zero",
+                    "data": 0,
+                    "valid": true
+                },
+                {
+                    "description": "a small integer",
+                    "data": 42,
+                    "valid": true
+                },
+                {
+                    "description": "16 digits",
+                    "data": 1000000000000000,
+                    "valid": false
+                },
+                {
+                    "description": "16 digits, negative",
+                    "data": -1000000000000000,
+                    "valid": false
+                },
+                {
+                    "description": "a whole number with a fraction of zero",
+                    "data": 1.0,
+                    "valid": true
+                },
+                {
+                    "description": "a number with a fraction",
+                    "data": 1.5,
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 # Validate formats
 
-Each format has an `is` function, which returns whether a string is valid
+Each format has an `is` function, which returns whether a value is valid
 for the format:
 
 ```typescript
@@ -10,8 +10,8 @@ isEmail("ada@example.com"); // true
 isIPv4("256.0.0.1"); // false
 ```
 
-The functions take only strings. JSON Schema says that a format applies
-only to strings, so check that a value is a string before you call one:
+JSON Schema's formats apply only to strings, so their functions take only
+strings. Check that a value is a string before you call one:
 
 ```typescript
 const validateEmail = (value: unknown) =>
@@ -103,8 +103,8 @@ RFC 3339 allows a lowercase `t` and `z`, so `isDateTime` accepts
 
 The package also has functions for some of the formats in the
 [OpenAPI Format Registry](https://spec.openapis.org/registry/format/),
-which OpenAPI documents use beside JSON Schema's. They're the formats
-for strings that have a grammar:
+which OpenAPI documents use beside JSON Schema's. They're the ones that
+say exactly what's valid. These are for strings:
 
 | Format | Function | Specification |
 | --- | --- | --- |
@@ -119,6 +119,34 @@ for strings that have a grammar:
 | `sf-boolean` | `isSfBoolean` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6) `sf-boolean` |
 | `sf-string` | `isSfString` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3) `sf-string` |
 | `sf-token` | `isSfToken` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4) `sf-token` |
+
+These are for numbers, and take a `number`. Check that a value is a
+number before you call one:
+
+```typescript
+const validateInt32 = (value: unknown) =>
+  typeof value !== "number" || isInt32(value);
+```
+
+| Format | Function | Valid values |
+| --- | --- | --- |
+| `int8` | `isInt8` | Integers from -128 to 127 |
+| `int16` | `isInt16` | Integers from -32,768 to 32,767 |
+| `int32` | `isInt32` | Integers from -2,147,483,648 to 2,147,483,647 |
+| `uint8` | `isUint8` | Integers from 0 to 255 |
+| `uint16` | `isUint16` | Integers from 0 to 65,535 |
+| `uint32` | `isUint32` | Integers from 0 to 4,294,967,295 |
+| `double-int` | `isDoubleInt` | Integers from -(2^53 - 1) to 2^53 - 1, which a double stores without losing precision |
+| `sf-integer` | `isSfInteger` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1) integers, from -999,999,999,999,999 to 999,999,999,999,999 |
+| `sf-decimal` | `isSfDecimal` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2) decimals, with at most 12 digits before the point and 3 after it |
+
+A number format checks the number that parsing the JSON gave, so a
+number is only as precise as a double. Every valid value is checked
+right, but a JSON number with more digits than a double can hold is
+checked as the double it became: `127.00000000000000001` is `127`, which
+is a valid `int8`. An `sf-decimal` counts the digits of the shortest
+decimal that's the number, so `1.230` has 2 digits after the point, and
+`0.1 + 0.2`, which is `0.30000000000000004`, has 17.
 
 The registry names RFC 7231 for `http-date`. RFC 9110 replaced it, with
 the same grammar.
@@ -179,8 +207,7 @@ registry defines a `char` only as "a single character" with no definition
 of a character, and it says that `decimal` is "used in a variety of
 conflicting ways and is not interoperable." It doesn't support `password` or
 `commonmark` either, since every string is valid for them, or `byte` and
-`base64url`, which the registry deprecates in favor of `contentEncoding`. The other
-formats in the registry don't have functions yet.
+`base64url`, which the registry deprecates in favor of `contentEncoding`.
 
 ## The `email` and `idn-email` formats
 

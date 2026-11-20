@@ -42,6 +42,12 @@ export { isRegex, assertRegex, InvalidRegexError } from "./ecma262.js";
 
 // OpenAPI Format Registry
 export {
+  isInt8, isInt16, isInt32, isUint8, isUint16, isUint32, isDoubleInt,
+  assertInt8, assertInt16, assertInt32, assertUint8, assertUint16, assertUint32, assertDoubleInt,
+  InvalidInt8Error, InvalidInt16Error, InvalidInt32Error, InvalidUint8Error, InvalidUint16Error, InvalidUint32Error,
+  InvalidDoubleIntError
+} from "./openapi.js";
+export {
   isDateTimeLocal, isTimeLocal, assertDateTimeLocal, assertTimeLocal, InvalidDateTimeLocalError, InvalidTimeLocalError
 } from "./rfc3339.js";
 export { isIPv4Cidr, assertIPv4Cidr, InvalidIPv4CidrError } from "./rfc4632.js";
@@ -49,7 +55,8 @@ export { isIPv6Cidr, assertIPv6Cidr, InvalidIPv6CidrError } from "./rfc4291.js";
 export { isLanguageTag, assertLanguageTag, InvalidLanguageTagError } from "./rfc5646.js";
 export { isHttpDate, isMediaRange, assertHttpDate, assertMediaRange, InvalidHttpDateError, InvalidMediaRangeError } from "./rfc9110.js";
 export {
-  isSfBinary, isSfBoolean, isSfString, isSfToken,
-  assertSfBinary, assertSfBoolean, assertSfString, assertSfToken,
-  InvalidSfBinaryError, InvalidSfBooleanError, InvalidSfStringError, InvalidSfTokenError
+  isSfBinary, isSfBoolean, isSfDecimal, isSfInteger, isSfString, isSfToken,
+  assertSfBinary, assertSfBoolean, assertSfDecimal, assertSfInteger, assertSfString, assertSfToken,
+  InvalidSfBinaryError, InvalidSfBooleanError, InvalidSfDecimalError, InvalidSfIntegerError, InvalidSfStringError,
+  InvalidSfTokenError
 } from "./rfc9651.js";

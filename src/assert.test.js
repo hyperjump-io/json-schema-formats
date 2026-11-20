@@ -350,6 +350,102 @@ describe("assert* throws exactly when is* is false", () => {
   }
 });
 
+/**
+ * @typedef {{
+ *   is: (value: number) => boolean;
+ *   assert: (value: number) => void;
+ *   error: Function;
+ *   format: string;
+ *   reasons: string[];
+ *   min: number;
+ *   max: number;
+ *   fractionDigits: number;
+ * }} NumberSpec
+ */
+
+/**
+ * The number formats. `min` and `max` are the bounds that values are made around, and `fractionDigits` is the most
+ * digits after the point that the random values have.
+ *
+ * @type Record<string, NumberSpec>
+ */
+const numberSpecs = {
+  int8: { is: Formats.isInt8, assert: Formats.assertInt8, error: Formats.InvalidInt8Error, format: "int8", reasons: ["not-an-integer", "out-of-range"], min: -128, max: 127, fractionDigits: 2 },
+  int16: { is: Formats.isInt16, assert: Formats.assertInt16, error: Formats.InvalidInt16Error, format: "int16", reasons: ["not-an-integer", "out-of-range"], min: -32768, max: 32767, fractionDigits: 2 },
+  int32: { is: Formats.isInt32, assert: Formats.assertInt32, error: Formats.InvalidInt32Error, format: "int32", reasons: ["not-an-integer", "out-of-range"], min: -2147483648, max: 2147483647, fractionDigits: 2 },
+  uint8: { is: Formats.isUint8, assert: Formats.assertUint8, error: Formats.InvalidUint8Error, format: "uint8", reasons: ["not-an-integer", "out-of-range"], min: 0, max: 255, fractionDigits: 2 },
+  uint16: { is: Formats.isUint16, assert: Formats.assertUint16, error: Formats.InvalidUint16Error, format: "uint16", reasons: ["not-an-integer", "out-of-range"], min: 0, max: 65535, fractionDigits: 2 },
+  uint32: { is: Formats.isUint32, assert: Formats.assertUint32, error: Formats.InvalidUint32Error, format: "uint32", reasons: ["not-an-integer", "out-of-range"], min: 0, max: 4294967295, fractionDigits: 2 },
+  doubleInt: { is: Formats.isDoubleInt, assert: Formats.assertDoubleInt, error: Formats.InvalidDoubleIntError, format: "double-int", reasons: ["not-an-integer", "out-of-range"], min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER, fractionDigits: 2 },
+  sfInteger: { is: Formats.isSfInteger, assert: Formats.assertSfInteger, error: Formats.InvalidSfIntegerError, format: "sf-integer", reasons: ["not-an-integer", "out-of-range"], min: -999_999_999_999_999, max: 999_999_999_999_999, fractionDigits: 2 },
+  sfDecimal: { is: Formats.isSfDecimal, assert: Formats.assertSfDecimal, error: Formats.InvalidSfDecimalError, format: "sf-decimal", reasons: ["out-of-range", "too-precise"], min: -1e12, max: 1e12, fractionDigits: 6 }
+};
+
+/** @type (spec: NumberSpec, count: number) => number[] */
+const numbersFor = (spec, count) => {
+  const next = random(42);
+  const values = [spec.min, spec.max, spec.min - 1, spec.max + 1, 0, -0, 0.5, -0.5, NaN, Infinity, -Infinity, 1e300, -1e300];
+
+  while (values.length < count) {
+    // Around a bound, or anywhere from twice past one bound to twice past the other
+    const kind = next(3);
+    const base = kind === 0 ? spec.min : kind === 1 ? spec.max : (next(4_000_001) - 2_000_000) / 1_000_000 * Math.max(Math.abs(spec.min), Math.abs(spec.max)) * 2;
+    const offset = next(21) - 10;
+    const digits = next(spec.fractionDigits + 1);
+    const value = Number((Math.trunc(base) + offset + next(10 ** digits) / 10 ** digits).toFixed(digits));
+    values.push(value);
+  }
+
+  return values;
+};
+
+/**
+ * What's wrong with what `assert*` did for `value`, if anything, and the error it threw for an invalid value.
+ *
+ * @type (spec: NumberSpec, value: number) => { failure?: string, error?: any }
+ */
+const checkNumber = (spec, value) => {
+  const valid = spec.is(value);
+  const error = /** @type any */ (thrown(() => spec.assert(value)));
+
+  if (valid) {
+    return error === undefined ? {} : { failure: `throws for a valid value: ${String(error)}` };
+  } else if (Object.getPrototypeOf(error) !== spec.error.prototype || error.name !== spec.error.name) {
+    return { failure: `throws ${String(error)}` };
+  } else if (!Object.is(error.value, value)) {
+    return { failure: "has the wrong value" };
+  } else if (!spec.reasons.includes(error.reason)) {
+    return { failure: `has an undeclared reason: ${error.reason}` };
+  } else if ("part" in error || "start" in error || "end" in error) {
+    return { failure: "has a part or a span" };
+  } else if (!error.message.startsWith(`Invalid ${spec.format}: ${String(value)} — `)) {
+    return { failure: `has the wrong message: ${error.message}` };
+  }
+
+  return { error };
+};
+
+describe("A number format's assert* throws exactly when is* is false", () => {
+  for (const [name, spec] of Object.entries(numberSpecs)) {
+    test(name, () => {
+      const failures = [];
+      const reasons = new Set(spec.reasons);
+
+      for (const value of numbersFor(spec, 10_000)) {
+        const { failure, error } = checkNumber(spec, value);
+        if (failure !== undefined) {
+          failures.push([value, failure]);
+        } else if (error !== undefined) {
+          reasons.delete(error.reason);
+        }
+      }
+
+      expect(failures.slice(0, 10)).to.deep.equal([]);
+      expect([...reasons], "reasons that didn't come up").to.deep.equal([]);
+    });
+  }
+});
+
 describe("What's wrong and where", () => {
   test.each([
     [Formats.assertDate, "2020-13-01", { reason: "invalid-value", part: "month", start: 5, end: 7, message: "Invalid date: 2020-13-01 — the month must be 01-12, at 5" }],
@@ -431,6 +527,22 @@ describe("What's wrong and where", () => {
     [Formats.assertSfString, "\"a\\nb\"", { reason: "invalid-escape", part: "string", start: 2, end: 4, message: `Invalid sf-string: "a\\nb" — a backslash must be followed by a double quote or a backslash, at 2` }],
     [Formats.assertSfString, "\"\u00E9\"", { reason: "invalid-character", part: "string", start: 1, end: 2, message: `Invalid sf-string: "é" — "é" isn't allowed in the string, at 1; a string can only have printable ASCII characters` }],
     [Formats.assertSfToken, "1a", { reason: "invalid-character", part: "token", start: 0, end: 1, message: `Invalid sf-token: 1a — "1" isn't allowed at the start, at 0; a token starts with a letter or "*"` }]
+  ])("%o %s", (assert, value, expected) => {
+    expect(thrown(() => assert(value))).to.include(expected);
+  });
+
+  test.each([
+    [Formats.assertInt8, 300, { reason: "out-of-range", message: "Invalid int8: 300 — it must be -128 to 127" }],
+    [Formats.assertInt8, 1.5, { reason: "not-an-integer", message: "Invalid int8: 1.5 — it isn't an integer" }],
+    [Formats.assertInt8, NaN, { reason: "not-an-integer", message: "Invalid int8: NaN — it isn't an integer" }],
+    [Formats.assertUint8, -1, { reason: "out-of-range", message: "Invalid uint8: -1 — it must be 0 to 255" }],
+    [Formats.assertUint32, 4294967296, { reason: "out-of-range" }],
+    [Formats.assertDoubleInt, 2 ** 53, { reason: "out-of-range", message: "Invalid double-int: 9007199254740992 — it must be -9007199254740991 to 9007199254740991" }],
+    [Formats.assertSfInteger, 1e15, { reason: "out-of-range", message: "Invalid sf-integer: 1000000000000000 — it must be -999999999999999 to 999999999999999" }],
+    [Formats.assertSfDecimal, 1.2345, { reason: "too-precise", message: "Invalid sf-decimal: 1.2345 — it has 4 digits after the point; an sf-decimal can have 3" }],
+    [Formats.assertSfDecimal, 1e-7, { reason: "too-precise", message: "Invalid sf-decimal: 1e-7 — it has 7 digits after the point; an sf-decimal can have 3" }],
+    [Formats.assertSfDecimal, 1e12, { reason: "out-of-range", message: "Invalid sf-decimal: 1000000000000 — it has more than 12 digits before the point" }],
+    [Formats.assertSfDecimal, Infinity, { reason: "out-of-range", message: "Invalid sf-decimal: Infinity — it isn't a finite number" }]
   ])("%o %s", (assert, value, expected) => {
     expect(thrown(() => assert(value))).to.include(expected);
   });

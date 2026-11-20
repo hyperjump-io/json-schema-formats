@@ -1,0 +1,90 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "double-int validation",
+    "tests": [
+        {
+            "description": "validation of non-number double-int values",
+            "schema": {
+                "format": "double-int"
+            },
+            "tests": [
+                {
+                    "description": "all number formats ignore strings",
+                    "data": "1",
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of integers that a double can store exactly",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "double-int"
+            },
+            "tests": [
+                {
+                    "description": "the largest value, 2^53 - 1",
+                    "data": 9007199254740991,
+                    "valid": true
+                },
+                {
+                    "description": "the smallest value, -(2^53 - 1)",
+                    "data": -9007199254740991,
+                    "valid": true
+                },
+                {
+                    "description": "zero",
+                    "data": 0,
+                    "valid": true
+                },
+                {
+                    "description": "2^53",
+                    "data": 9007199254740992,
+                    "valid": false
+                },
+                {
+                    "description": "-(2^53)",
+                    "data": -9007199254740992,
+                    "valid": false
+                },
+                {
+                    "description": "a whole number with a fraction of zero",
+                    "data": 1.0,
+                    "valid": true
+                },
+                {
+                    "description": "a number with a fraction",
+                    "data": 1.5,
+                    "valid": false
+                },
+                {
+                    "description": "a very large number",
+                    "data": 1e+300,
+                    "valid": false
+                }
+            ]
+        }
+    ]
+}

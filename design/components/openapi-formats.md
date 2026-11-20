@@ -1,9 +1,10 @@
-# OpenAPI formats (`src/rfc3339.js`, `src/rfc4632.js`, `src/rfc4291.js`, `src/rfc5646.js`, `src/rfc9110.js`, `src/rfc9651.js`)
+# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc4632.js`, `src/rfc4291.js`, `src/rfc5646.js`, `src/rfc9110.js`, `src/rfc9651.js`)
 
 The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
 lists the formats that OpenAPI documents use, JSON Schema's and others.
-This package has the others that are strings with a grammar, so an
-OpenAPI validator can use it the way a JSON Schema validator does. It
+This package has the others that are specified exactly, strings and
+numbers, so an OpenAPI validator can use it the way a JSON Schema
+validator does. It
 leaves out the ones whose definitions don't say exactly what's valid (see
 [Support only what's specified](../principles/support-only-whats-specified.md)). They're
 exported from the main entry, after JSON Schema's, and each has `is` and
@@ -19,22 +20,23 @@ exported from the main entry, after JSON Schema's, and each has `is` and
 | `http-date` | `rfc9110.js` | `HTTP-date` |
 | `media-range` | `rfc9110.js` | `media-range` |
 | `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc9651.js` | RFC 9651's rules of the same names |
+| `int8`, `int16`, `int32`, `uint8`, `uint16`, `uint32`, `double-int` | `openapi.js` | An integer in the registry's range |
+| `sf-integer`, `sf-decimal` | `rfc9651.js` | RFC 9651's ranges and digits |
 
 The JSON Schema Test Suite doesn't have them, so their tests are in its
 format in `test-suite/tests/` (see [Files](../style/files.md)), and
 `src/assert.test.js` tests their diagnoses like the others'.
 
-## What's not here yet
-
-- **Numbers**: `int8` to `int32`, `uint8` to `uint32`, `double-int`,
-  `sf-integer`, and `sf-decimal`. They're designed (see
-  [Numbers](#numbers)), and not implemented yet.
-
 ## Numbers
 
 The registry types the number formats as JSON numbers. Their functions
 take a JavaScript `number`, and are like the string formats' in
-everything that a span isn't needed for.
+everything that a span isn't needed for. The integer formats and
+`double-int` are in `openapi.js`, since the registry defines them, and
+`sf-integer` and `sf-decimal` are in `rfc9651.js`, with the other
+structured fields. They share `isIntegerIn` and `integerProblem`, in
+`openapi.js`. Their errors extend `NumberFormatError`, in `diagnose.js`,
+which has no problem or span.
 
 ### The API
 
@@ -95,7 +97,9 @@ Rejected:
   says which bound, and a caller rarely handles the two differently.
 
 `src/assert.test.js` makes its values by changing strings, so the number
-formats need their own: random numbers, and the edges of each range. The
+formats have their own: random integers and decimals around each bound
+and across the range, the bounds and one past them, `-0`, `NaN`, and the
+infinities. The
 rest of the test is the same, including that every reason an error
 declares comes up.
 

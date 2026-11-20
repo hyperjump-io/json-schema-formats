@@ -71,6 +71,33 @@ export class FormatError extends Error {
   }
 }
 
+/** What every error that a number format's `assert*` function throws has. A number has no parts, so there's no span. */
+export class NumberFormatError extends Error {
+  /**
+   * @param {string} format
+   * @param {number} value
+   * @param {string} reason
+   * @param {string} text
+   */
+  constructor(format, value, reason, text) {
+    super(`Invalid ${format}: ${String(value)} — ${text}`);
+
+    /**
+     * The value that isn't valid.
+     *
+     * @readonly
+     */
+    this.value = value;
+
+    /**
+     * What's wrong with `value`.
+     *
+     * @readonly
+     */
+    this.reason = reason;
+  }
+}
+
 /**
  * @param {string} reason
  * @param {string} part

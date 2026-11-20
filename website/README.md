@@ -27,8 +27,8 @@ The package offers the following:
 - **Every format JSON Schema defines.** Dates and times, email
   addresses, hostnames, IP addresses, URIs and IRIs, UUIDs, URI
   templates, JSON Pointers, and regular expressions.
-- **Formats from the OpenAPI Format Registry** that have a grammar, like
-  `http-date` and `media-range`.
+- **Formats from the OpenAPI Format Registry** that say exactly what's
+  valid, like `http-date`, `media-range`, and `int32`.
 - **The specifications' grammars.** The package checks each format with
   the grammar from the RFC that defines it.
 - **Errors that say what's wrong and where.** Each error has a reason,

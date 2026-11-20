@@ -370,6 +370,157 @@ export const isRegex: (regex: string) => boolean;
 export const assertRegex: (regex: string) => void;
 
 /**
+ * The 'int8' format from the OpenAPI Format Registry. Validates that a
+ * number is a signed 8-bit integer: an integer from -128 to 127.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int8.html)
+ */
+export const isInt8: (n: number) => boolean;
+
+/**
+ * Checks that `n` is a signed 8-bit integer, like {@link isInt8}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidInt8Error} If `n` isn't a signed 8-bit integer.
+ */
+export const assertInt8: (n: number) => void;
+
+/**
+ * The 'int16' format from the OpenAPI Format Registry. Validates that a
+ * number is a signed 16-bit integer: an integer from -32768 to 32767.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int16.html)
+ */
+export const isInt16: (n: number) => boolean;
+
+/**
+ * Checks that `n` is a signed 16-bit integer, like {@link isInt16}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidInt16Error} If `n` isn't a signed 16-bit integer.
+ */
+export const assertInt16: (n: number) => void;
+
+/**
+ * The 'int32' format from the OpenAPI Format Registry. Validates that a
+ * number is a signed 32-bit integer: an integer from -2147483648 to 2147483647.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/int32.html)
+ */
+export const isInt32: (n: number) => boolean;
+
+/**
+ * Checks that `n` is a signed 32-bit integer, like {@link isInt32}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidInt32Error} If `n` isn't a signed 32-bit integer.
+ */
+export const assertInt32: (n: number) => void;
+
+/**
+ * The 'uint8' format from the OpenAPI Format Registry. Validates that a
+ * number is an unsigned 8-bit integer: an integer from 0 to 255.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/uint8.html)
+ */
+export const isUint8: (n: number) => boolean;
+
+/**
+ * Checks that `n` is an unsigned 8-bit integer, like {@link isUint8}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidUint8Error} If `n` isn't an unsigned 8-bit integer.
+ */
+export const assertUint8: (n: number) => void;
+
+/**
+ * The 'uint16' format from the OpenAPI Format Registry. Validates that a
+ * number is an unsigned 16-bit integer: an integer from 0 to 65535.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/uint16.html)
+ */
+export const isUint16: (n: number) => boolean;
+
+/**
+ * Checks that `n` is an unsigned 16-bit integer, like {@link isUint16}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidUint16Error} If `n` isn't an unsigned 16-bit integer.
+ */
+export const assertUint16: (n: number) => void;
+
+/**
+ * The 'uint32' format from the OpenAPI Format Registry. Validates that a
+ * number is an unsigned 32-bit integer: an integer from 0 to 4294967295.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/uint32.html)
+ */
+export const isUint32: (n: number) => boolean;
+
+/**
+ * Checks that `n` is an unsigned 32-bit integer, like {@link isUint32}, and throws an
+ * error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidUint32Error} If `n` isn't an unsigned 32-bit integer.
+ */
+export const assertUint32: (n: number) => void;
+
+/**
+ * The 'double-int' format from the OpenAPI Format Registry. Validates that a
+ * number is an integer that a double can store without losing precision:
+ * from -(2^53 - 1) to 2^53 - 1, like `Number.isSafeInteger`.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/double-int.html)
+ */
+export const isDoubleInt: (n: number) => boolean;
+
+/**
+ * Checks that `n` is an integer that a double can store without losing
+ * precision, like {@link isDoubleInt}, and throws an error that says what's
+ * wrong if it isn't.
+ *
+ * @throws {InvalidDoubleIntError} If `n` isn't such an integer.
+ */
+export const assertDoubleInt: (n: number) => void;
+
+/**
+ * The 'sf-integer' format from the OpenAPI Format Registry. Validates that a
+ * number is a structured field integer as defined by
+ * [RFC 9651, section 3.3.1](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.1):
+ * an integer from -999,999,999,999,999 to 999,999,999,999,999.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-integer.html)
+ */
+export const isSfInteger: (n: number) => boolean;
+
+/**
+ * Checks that `n` is a structured field integer, like {@link isSfInteger},
+ * and throws an error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidSfIntegerError} If `n` isn't a structured field integer.
+ */
+export const assertSfInteger: (n: number) => void;
+
+/**
+ * The 'sf-decimal' format from the OpenAPI Format Registry. Validates that a
+ * number is a structured field decimal as defined by
+ * [RFC 9651, section 3.3.2](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.2):
+ * at most 12 digits before the point and at most 3 after it, in the
+ * shortest decimal that's the number.
+ *
+ * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-decimal.html)
+ */
+export const isSfDecimal: (n: number) => boolean;
+
+/**
+ * Checks that `n` is a structured field decimal, like {@link isSfDecimal},
+ * and throws an error that says what's wrong if it isn't.
+ *
+ * @throws {InvalidSfDecimalError} If `n` isn't a structured field decimal.
+ */
+export const assertSfDecimal: (n: number) => void;
+
+/**
  * The 'date-time-local' format from the OpenAPI Format Registry. Validates
  * that a string represents a date-time without an offset: RFC 3339's
  * `full-date "T" partial-time`, from [RFC 3339, section 5.6](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6).
@@ -622,6 +773,34 @@ export type FormatErrorReason
     | "wrong-day-name"
     | "invalid-idn"
     | "invalid-syntax";
+
+/**
+ * What's wrong with a number. Each number format's error has the reasons
+ * that it can have.
+ *
+ * - `not-an-integer`: an integer format's value has a fraction, or is `NaN`
+ *   or `Infinity`.
+ * - `out-of-range`: the value is past one of the format's bounds. The
+ *   message says which.
+ * - `too-precise`: an `sf-decimal` has more than 3 digits after the point.
+ */
+export type NumberFormatErrorReason
+  = "not-an-integer"
+    | "out-of-range"
+    | "too-precise";
+
+/**
+ * The properties of every error that a number format's `assert*` function
+ * throws. `R` is the reasons the error can have. A number has no parts, so
+ * there's no span.
+ */
+type NumberFormatErrorProperties<R extends NumberFormatErrorReason> = {
+  /** The value that isn't valid. */
+  readonly value: number;
+
+  /** What's wrong with `value`. */
+  readonly reason: R;
+};
 
 /**
  * The properties of every error that an `assert*` function throws. `R` is
@@ -928,5 +1107,68 @@ export class InvalidSfTokenError extends Error implements FormatErrorProperties<
   readonly part: "token";
   readonly start: number;
   readonly end: number;
+  private constructor();
+}
+
+/** A value isn't a signed 8-bit integer. {@link assertInt8} throws it. */
+export class InvalidInt8Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't a signed 16-bit integer. {@link assertInt16} throws it. */
+export class InvalidInt16Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't a signed 32-bit integer. {@link assertInt32} throws it. */
+export class InvalidInt32Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't an unsigned 8-bit integer. {@link assertUint8} throws it. */
+export class InvalidUint8Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't an unsigned 16-bit integer. {@link assertUint16} throws it. */
+export class InvalidUint16Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't an unsigned 32-bit integer. {@link assertUint32} throws it. */
+export class InvalidUint32Error extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't an integer that a double can store without losing precision. {@link assertDoubleInt} throws it. */
+export class InvalidDoubleIntError extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't a structured field integer. {@link assertSfInteger} throws it. */
+export class InvalidSfIntegerError extends Error implements NumberFormatErrorProperties<"not-an-integer" | "out-of-range"> {
+  readonly value: number;
+  readonly reason: "not-an-integer" | "out-of-range";
+  private constructor();
+}
+
+/** A value isn't a structured field decimal. {@link assertSfDecimal} throws it. */
+export class InvalidSfDecimalError extends Error implements NumberFormatErrorProperties<"out-of-range" | "too-precise"> {
+  readonly value: number;
+  readonly reason: "out-of-range" | "too-precise";
   private constructor();
 }

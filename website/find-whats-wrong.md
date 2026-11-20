@@ -102,10 +102,35 @@ The following table shows the error that each function throws:
 | `assertSfBoolean` | `InvalidSfBooleanError` |
 | `assertSfString` | `InvalidSfStringError` |
 | `assertSfToken` | `InvalidSfTokenError` |
+| `assertInt8`, `assertInt16`, `assertInt32` | `InvalidInt8Error`, `InvalidInt16Error`, `InvalidInt32Error` |
+| `assertUint8`, `assertUint16`, `assertUint32` | `InvalidUint8Error`, `InvalidUint16Error`, `InvalidUint32Error` |
+| `assertDoubleInt` | `InvalidDoubleIntError` |
+| `assertSfInteger` | `InvalidSfIntegerError` |
+| `assertSfDecimal` | `InvalidSfDecimalError` |
 
 The errors for URIs and IRIs come from `@hyperjump/uri`, and their
 properties are different. For more information, see
 [URIs and IRIs](uris-and-iris.md#errors).
+
+## Errors for numbers
+
+The errors of the number formats, like `InvalidInt32Error`, have `value`,
+which is the number, and `reason`. A number has no parts, so they don't
+have `part`, `start`, or `end`, and the message has no position:
+
+```text
+InvalidInt8Error: Invalid int8: 300 — it must be -128 to 127
+InvalidInt8Error: Invalid int8: 1.5 — it isn't an integer
+InvalidSfDecimalError: Invalid sf-decimal: 1.2345 — it has 4 digits after the point; an sf-decimal can have 3
+```
+
+Their `reason` is one of the following codes:
+
+| Reason | Description |
+| --- | --- |
+| `not-an-integer` | A format for integers has a number with a fraction, or `NaN` or `Infinity`. |
+| `out-of-range` | The number is past one of the format's bounds. The message says which. |
+| `too-precise` | An `sf-decimal` has more than 3 digits after the point. |
 
 ## Reasons
 

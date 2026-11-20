@@ -1,0 +1,116 @@
+{
+    "$schema": "../../node_modules/json-schema-test-suite/validation/validation-test-schema.json",
+    "description": "sf-decimal validation",
+    "tests": [
+        {
+            "description": "validation of non-number sf-decimal values",
+            "schema": {
+                "format": "sf-decimal"
+            },
+            "tests": [
+                {
+                    "description": "all number formats ignore strings",
+                    "data": "1",
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore objects",
+                    "data": {},
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore arrays",
+                    "data": [],
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore booleans",
+                    "data": false,
+                    "valid": true
+                },
+                {
+                    "description": "all number formats ignore nulls",
+                    "data": null,
+                    "valid": true
+                }
+            ]
+        },
+        {
+            "description": "validation of structured field decimals",
+            "comment": "RFC 9651's serialization rounds a decimal with more than 3 digits after the point, but its ABNF, which the registry repeats, doesn't allow one, so it isn't valid.",
+            "tags": [
+                "format-assertion"
+            ],
+            "schema": {
+                "format": "sf-decimal"
+            },
+            "specification": [
+                {
+                    "rfc9651": "3.3.2"
+                }
+            ],
+            "tests": [
+                {
+                    "description": "a decimal",
+                    "data": 4.5,
+                    "valid": true
+                },
+                {
+                    "description": "a negative decimal",
+                    "data": -4.5,
+                    "valid": true
+                },
+                {
+                    "description": "3 digits after the point",
+                    "data": 1.234,
+                    "valid": true
+                },
+                {
+                    "description": "4 digits after the point",
+                    "data": 1.2345,
+                    "valid": false
+                },
+                {
+                    "description": "the smallest positive value",
+                    "data": 0.001,
+                    "valid": true
+                },
+                {
+                    "description": "4 digits after the point, with leading zeros",
+                    "data": 0.0001,
+                    "valid": false
+                },
+                {
+                    "description": "a number small enough to be written with an exponent",
+                    "data": 1e-07,
+                    "valid": false
+                },
+                {
+                    "description": "12 digits before the point and 3 after",
+                    "data": 999999999999.999,
+                    "valid": true
+                },
+                {
+                    "description": "13 digits before the point",
+                    "data": 1000000000000.0,
+                    "valid": false
+                },
+                {
+                    "description": "the smallest value",
+                    "data": -999999999999.999,
+                    "valid": true
+                },
+                {
+                    "description": "a whole number",
+                    "data": 5,
+                    "valid": true
+                },
+                {
+                    "description": "zero",
+                    "data": 0,
+                    "valid": true
+                }
+            ]
+        }
+    ]
+}

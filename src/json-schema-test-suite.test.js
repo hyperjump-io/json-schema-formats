@@ -6,6 +6,7 @@ import {
   isDateTime,
   isDateTimeExt,
   isDateTimeLocal,
+  isDoubleInt,
   isDuration,
   isEmail,
   isHostname,
@@ -14,6 +15,9 @@ import {
   isIPv6Cidr,
   isIdn,
   isIdnEmail,
+  isInt8,
+  isInt16,
+  isInt32,
   isIPv4,
   isIPv6,
   isIri,
@@ -25,10 +29,15 @@ import {
   isRelativeJsonPointer,
   isSfBinary,
   isSfBoolean,
+  isSfDecimal,
+  isSfInteger,
   isSfString,
   isSfToken,
   isTime,
   isTimeLocal,
+  isUint8,
+  isUint16,
+  isUint32,
   isUri,
   isUriReference,
   isUriTemplate,
@@ -158,3 +167,12 @@ await testSuite(ours, "format-sf-binary", 2020, (binary) => typeof binary !== "s
 await testSuite(ours, "format-sf-boolean", 2020, (boolean) => typeof boolean !== "string" || isSfBoolean(boolean));
 await testSuite(ours, "format-sf-string", 2020, (string) => typeof string !== "string" || isSfString(string));
 await testSuite(ours, "format-sf-token", 2020, (token) => typeof token !== "string" || isSfToken(token));
+await testSuite(ours, "format-int8", 2020, (n) => typeof n !== "number" || isInt8(n));
+await testSuite(ours, "format-int16", 2020, (n) => typeof n !== "number" || isInt16(n));
+await testSuite(ours, "format-int32", 2020, (n) => typeof n !== "number" || isInt32(n));
+await testSuite(ours, "format-uint8", 2020, (n) => typeof n !== "number" || isUint8(n));
+await testSuite(ours, "format-uint16", 2020, (n) => typeof n !== "number" || isUint16(n));
+await testSuite(ours, "format-uint32", 2020, (n) => typeof n !== "number" || isUint32(n));
+await testSuite(ours, "format-double-int", 2020, (n) => typeof n !== "number" || isDoubleInt(n));
+await testSuite(ours, "format-sf-integer", 2020, (n) => typeof n !== "number" || isSfInteger(n));
+await testSuite(ours, "format-sf-decimal", 2020, (n) => typeof n !== "number" || isSfDecimal(n));

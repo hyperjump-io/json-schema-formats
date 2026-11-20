@@ -1,4 +1,5 @@
-import { FormatError, charAt, end, invalidCharacter, isProblem, matchEnd, missing, problem } from "./diagnose.js";
+import { FormatError, NumberFormatError, charAt, end, invalidCharacter, isProblem, matchEnd, missing, problem } from "./diagnose.js";
+import { integerProblem, isIntegerIn } from "./openapi.js";
 import {
   base64Chars, base64Padding, sfBinary as sfBinaryPattern, sfBoolean as sfBooleanPattern, sfString as sfStringPattern,
   sfToken as sfTokenPattern, sfTokenChars, sfUnescapedChars
@@ -124,6 +125,79 @@ export class InvalidSfBooleanError extends FormatError {
     this.name = "InvalidSfBooleanError";
   }
 }
+
+/** @type API.isSfInteger */
+export const isSfInteger = (n) => isIntegerIn(n, -999_999_999_999_999, 999_999_999_999_999);
+
+/** @type API.assertSfInteger */
+export const assertSfInteger = (n) => {
+  if (!isSfInteger(n)) {
+    throw new InvalidSfIntegerError(n);
+  }
+};
+
+/**
+ * A value isn't a structured field integer. {@link assertSfInteger} throws it.
+ *
+ * @hideconstructor
+ */
+export class InvalidSfIntegerError extends NumberFormatError {
+  /** @param {number} value */
+  constructor(value) {
+    super("sf-integer", value, ...integerProblem(value, -999_999_999_999_999, 999_999_999_999_999));
+    this.name = "InvalidSfIntegerError";
+  }
+}
+
+/** @type API.isSfDecimal */
+export const isSfDecimal = (n) => {
+  return Number.isFinite(n) && Math.abs(n) < 1e12 && fractionDigits(n) <= 3;
+};
+
+/** @type API.assertSfDecimal */
+export const assertSfDecimal = (n) => {
+  if (!isSfDecimal(n)) {
+    throw new InvalidSfDecimalError(n);
+  }
+};
+
+/**
+ * A value isn't a structured field decimal. {@link assertSfDecimal} throws it.
+ *
+ * @hideconstructor
+ */
+export class InvalidSfDecimalError extends NumberFormatError {
+  /** @param {number} value */
+  constructor(value) {
+    super("sf-decimal", value, ...sfDecimalProblem(value));
+    this.name = "InvalidSfDecimalError";
+  }
+}
+
+/**
+ * How many digits a number has after the point, in the shortest string that parses back to it, which is what `String`
+ * gives. A small number's string has an exponent, like "1e-7", and the exponent moves the point. Arithmetic would be
+ * wrong, since `1.005 * 1000` is `1004.9999999999999`.
+ *
+ * @type (n: number) => number
+ */
+const fractionDigits = (n) => {
+  const [mantissa, exponent = "0"] = String(n).split("e");
+  const fraction = mantissa.split(".")[1] ?? "";
+  return Math.max(0, fraction.length - Number(exponent));
+};
+
+/** @type (n: number) => [reason: string, text: string] */
+const sfDecimalProblem = (n) => {
+  if (!Number.isFinite(n)) {
+    return ["out-of-range", "it isn't a finite number"];
+  } else if (Math.abs(n) >= 1e12) {
+    return ["out-of-range", "it has more than 12 digits before the point"];
+  } else {
+    const digits = fractionDigits(n);
+    return ["too-precise", `it has ${digits} digits after the point; an sf-decimal can have 3`];
+  }
+};
 
 // Diagnosing
 
