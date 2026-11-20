@@ -172,12 +172,14 @@ and the functions follow RFC 9651. The only difference is in
 base64, and RFC 8941's grammar allows it anywhere, so `isSfBinary`
 rejects `:a=b:`.
 
-The package doesn't support `char` or `decimal`, because the registry
-doesn't say exactly what's valid for them. It defines a `char` only as
-"a single character" with no definition of a character, and it says that
-`decimal` is "used in a variety of conflicting ways and is not
-interoperable." The other formats in the registry don't have functions
-yet.
+The package doesn't support the registry's formats that don't say
+exactly what's valid: `char`, `decimal`, `float`, `double`, `decimal128`,
+`int64`, `uint64`, `unixtime`, `binary`, and `html`. For example, the
+registry defines a `char` only as "a single character" with no definition
+of a character, and it says that `decimal` is "used in a variety of
+conflicting ways and is not interoperable." It doesn't support `password` or
+`commonmark` either, since every string is valid for them. The other
+formats in the registry don't have functions yet.
 
 ## The `email` and `idn-email` formats
 

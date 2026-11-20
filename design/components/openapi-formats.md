@@ -26,19 +26,42 @@ format in `test-suite/tests/` (see [Files](../style/files.md)), and
 
 ## What's not here yet
 
-- **Numbers**: `int8` to `uint64`, `double-int`, `float`, `double`,
-  `decimal128`, `sf-integer`, `sf-decimal`, and `unixtime`.
-  The registry types them as JSON numbers, some of them as numbers or
-  strings. A number has no span for an error to point at, and one past
+- **Numbers**: `int8` to `int32`, `uint8` to `uint32`, `double-int`,
+  `sf-integer`, and `sf-decimal`. The registry types them as JSON
+  numbers. A number has no span for an error to point at, and one past
   2^53 is rounded before a validator sees it. How the API takes them is
   open.
-- **Deprecated**: `byte`, `base64url`, and `binary`.
-- **No syntax to check**: `password`, `commonmark`, and `html`.
+- **Deprecated**: `byte` and `base64url`, which are RFC 4648's base64 and
+  base64url.
 
-Not supported, because they're ambiguous (see
+`sf-decimal` is decided, for when numbers are: it follows RFC 9651's
+ABNF, `["-"] 1*12DIGIT "." 1*3DIGIT`, so a value with more than three
+digits after the point isn't valid. The registry says the same. RFC
+9651's serialization rounds such a value to three digits instead of
+failing, which would make `1.2345` an `sf-decimal`, but that's what an
+implementation does with a value it's given, not what's valid.
+
+## What's not supported
+
+These are ambiguous (see
 [Support only what's specified](../principles/support-only-whats-specified.md)):
-`char`, which is "a single character" with no definition of a character,
-and `decimal`, which the registry says isn't interoperable.
+
+| Format | What's left open |
+| --- | --- |
+| `char` | It's "a single character", with no definition of a character. |
+| `decimal` | The registry says that the format is "used in a variety of conflicting ways and is not interoperable." |
+| `float`, `double` | They're IEEE 754 single and double precision numbers. Whether a JSON number has to be exactly representable, which `0.1` isn't, or only in range isn't said. |
+| `decimal128` | The registry prefers a string, and names `NaN`, `-INF`, and `INF`, but gives no syntax for it. A JSON number loses its digits when it's parsed, so its 34 digits can't be counted. |
+| `int64`, `uint64` | The range is exact, but a string is recommended past 2^53, with no syntax for it: a sign, leading zeros, or whitespace. |
+| `unixtime` | It's seconds since 1970, as a number or a string. Whether it can be negative or fractional, and what the string is, isn't said. |
+| `binary` | It's "any sequence of octets", with no encoding in a JSON string. |
+| `html` | It's "HTML-formatted text", with no specification, so a document, a fragment, and conforming HTML are all readings of it. |
+
+These have nothing to check, so their functions would always be `true`:
+
+- `password` is "a string that hints to obscure the value".
+- `commonmark` is CommonMark, which says that "any sequence of characters
+  is a valid CommonMark document."
 
 ## Local dates and times
 

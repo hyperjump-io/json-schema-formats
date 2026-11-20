@@ -11,6 +11,11 @@ getting, so the package doesn't support the format.
   unit, and a grapheme cluster are all characters by some definition.
 - **`decimal`**: the registry says that the format is "used in a variety
   of conflicting ways and is not interoperable."
+- **`int64` and `uint64`**: the range is exact, but the string the
+  registry recommends past 2^53 has no syntax.
+
+The others it rules out, and why, are in
+[OpenAPI formats](../components/openapi-formats.md#whats-not-supported).
 
 Every JSON Schema format names a specification, so this decides which of
 the OpenAPI Format Registry's formats are here (see
