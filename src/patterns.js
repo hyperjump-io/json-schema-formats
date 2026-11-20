@@ -197,23 +197,26 @@ export const quotedStringChars = /[\u{9}\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}\u
 // RFC 9110 HTAB / SP / VCHAR / obs-text, what follows the \ of a quoted-pair
 export const quotedPairChar = /^(?:[\u{9}\u{20}-\u{7E}\u{80}-\u{FF}])$/u;
 
-// RFC 8941 sf-string
+// RFC 9651 sf-string
 export const sfString = /^(?:\u{22}(?:[\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}]|\u{5C}[\u{22}\u{5C}])*\u{22})$/u;
 
-// RFC 8941 sf-token
+// RFC 9651 sf-token
 export const sfToken = /^(?:[\u{2A}A-Za-z][\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}-\u{3A}A-Z\u{5E}-z\u{7C}\u{7E}]*)$/u;
 
-// RFC 8941 sf-binary
-export const sfBinary = /^(?:\u{3A}[\u{2B}\u{2F}-9\u{3D}A-Za-z]*\u{3A})$/u;
+// RFC 9651 sf-binary
+export const sfBinary = /^(?:\u{3A}[\u{2B}\u{2F}-9A-Za-z]*\u{3D}*\u{3A})$/u;
 
-// RFC 8941 sf-boolean
+// RFC 9651 sf-boolean
 export const sfBoolean = /^(?:\u{3F}[01])$/u;
 
-// RFC 8941 *unescaped
+// RFC 9651 *( unescaped / "%" )
 export const sfUnescapedChars = /[\u{20}\u{21}\u{23}-\u{5B}\u{5D}-\u{7E}]*/uy;
 
-// RFC 8941 *( tchar / ":" / "/" ), what follows an sf-token's first character
+// RFC 9651 *( tchar / ":" / "/" ), what follows an sf-token's first character
 export const sfTokenChars = /[\u{21}\u{23}-\u{27}\u{2A}\u{2B}\u{2D}-\u{3A}A-Z\u{5E}-z\u{7C}\u{7E}]*/uy;
 
-// RFC 8941 *base64
-export const base64Chars = /[\u{2B}\u{2F}-9\u{3D}A-Za-z]*/uy;
+// RFC 9651 *( ALPHA / DIGIT / "+" / "/" ), the characters of base64 before its padding
+export const base64Chars = /[\u{2B}\u{2F}-9A-Za-z]*/uy;
+
+// RFC 9651 *"=", base64's padding
+export const base64Padding = /\u{3D}*/uy;

@@ -37,3 +37,6 @@ in:
 - `http-date` is RFC 9110's, which obsoletes the RFC 7231 that the
   OpenAPI Format Registry names, with the same grammar (see
   [OpenAPI formats](../components/openapi-formats.md#http-dates)).
+- The `sf-` formats are RFC 9651's, which obsoletes the RFC 8941 that the
+  registry names. Its `sf-binary` allows `=` only at the end (see
+  [OpenAPI formats](../components/openapi-formats.md#structured-fields)).

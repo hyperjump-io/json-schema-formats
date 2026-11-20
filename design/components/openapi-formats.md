@@ -1,4 +1,4 @@
-# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc9110.js`, `src/rfc8941.js`)
+# OpenAPI formats (`src/openapi.js`, `src/rfc3339.js`, `src/rfc9110.js`, `src/rfc9651.js`)
 
 The [OpenAPI Format Registry](https://spec.openapis.org/registry/format/)
 lists the formats that OpenAPI documents use, JSON Schema's and others.
@@ -14,7 +14,7 @@ exported from the main entry, after JSON Schema's, and each has `is` and
 | `time-local` | `rfc3339.js` | `partial-time` |
 | `http-date` | `rfc9110.js` | `HTTP-date` |
 | `media-range` | `rfc9110.js` | `media-range` |
-| `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc8941.js` | RFC 8941's rules of the same names |
+| `sf-binary`, `sf-boolean`, `sf-string`, `sf-token` | `rfc9651.js` | RFC 9651's rules of the same names |
 
 `src/openapi.test.js` has their examples, since there's no test suite for
 them, and `src/assert.test.js` tests their diagnoses like the others'.
@@ -117,15 +117,19 @@ escapes.
 
 ## Structured fields
 
-`sf-binary`, `sf-boolean`, `sf-string`, and `sf-token` are RFC 8941's,
-which the registry names. RFC 9651 obsoletes RFC 8941 and moves the ABNF
-to an informative appendix. Its `sf-string` allows the same characters,
-written differently, and its `sf-token` and `sf-boolean` are the same. Its
-`sf-binary` allows `=` only at the end, where RFC 8941's allows it
-anywhere in the base64, so `:a=b:` is valid here.
+`sf-binary`, `sf-boolean`, `sf-string`, and `sf-token` are RFC 9651's.
+The registry names RFC 8941, which RFC 9651 obsoletes. RFC 9651 moves the
+ABNF to an informative appendix, Appendix C, which is what
+`scripts/generate-patterns.js` has.
 
-Open question: whether to follow RFC 9651's `sf-binary`, which is what
-current HTTP implementations parse, while the registry names RFC 8941.
+The two differ only in `sf-binary`. RFC 9651's has `=` only as padding at
+the end of the base64, and RFC 8941's allows it anywhere, so `:a=b:` isn't
+valid here. RFC 9651's `sf-string` allows the same characters as RFC
+8941's, written differently, and its `sf-token` and `sf-boolean` are the
+same.
+
+Rejected: RFC 8941, though the registry names it. Its `sf-binary` allows
+base64 that can't be decoded, like `:a=b:`.
 
 `sf-string`'s `\` can only escape `"` and `\`, and anything else is
 `invalid-escape`, like a JSON Pointer's `~`.

@@ -50,4 +50,4 @@ export {
   isSfBinary, isSfBoolean, isSfString, isSfToken,
   assertSfBinary, assertSfBoolean, assertSfString, assertSfToken,
   InvalidSfBinaryError, InvalidSfBooleanError, InvalidSfStringError, InvalidSfTokenError
-} from "./rfc8941.js";
+} from "./rfc9651.js";

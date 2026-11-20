@@ -468,10 +468,9 @@ export const assertMediaRange: (mediaRange: string) => void;
 /**
  * The 'sf-binary' format from the OpenAPI Format Registry. Validates that a
  * string represents a structured field byte sequence as defined by
- * [RFC 8941, section 3.3.5](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.5).
- *
- * **NOTE**: RFC 8941's grammar allows `=` anywhere in the base64, not only as
- * padding at the end.
+ * [RFC 9651, section 3.3.5](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5),
+ * which obsoletes the RFC 8941 that the registry names. `=` is only allowed
+ * as padding at the end, which RFC 8941's grammar didn't require.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-binary.html)
  */
@@ -489,7 +488,7 @@ export const assertSfBinary: (binary: string) => void;
 /**
  * The 'sf-boolean' format from the OpenAPI Format Registry. Validates that a
  * string represents a structured field boolean as defined by
- * [RFC 8941, section 3.3.6](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.6).
+ * [RFC 9651, section 3.3.6](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6).
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-boolean.html)
  */
@@ -507,7 +506,7 @@ export const assertSfBoolean: (boolean: string) => void;
 /**
  * The 'sf-string' format from the OpenAPI Format Registry. Validates that a
  * string represents a structured field string as defined by
- * [RFC 8941, section 3.3.3](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.3),
+ * [RFC 9651, section 3.3.3](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3),
  * with its quotes.
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-string.html)
@@ -526,7 +525,7 @@ export const assertSfString: (string: string) => void;
 /**
  * The 'sf-token' format from the OpenAPI Format Registry. Validates that a
  * string represents a structured field token as defined by
- * [RFC 8941, section 3.3.4](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.4).
+ * [RFC 9651, section 3.3.4](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4).
  *
  * @see [OpenAPI Format Registry](https://spec.openapis.org/registry/format/sf-token.html)
  */

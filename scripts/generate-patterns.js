@@ -340,21 +340,17 @@ const mediaRangeRules = `
   ${tokenRules}
 `;
 
-// RFC 8941, sections 3.3.3 to 3.3.6. tchar is from RFC 7230, which RFC 9110
-// obsoletes with the same rule.
+// RFC 9651, appendix C, which is informative, for what sections 3.3.3 to
+// 3.3.6 say. tchar is from RFC 9110.
 const structuredFieldRules = `
-  sf-string = DQUOTE *chr DQUOTE
-  chr       = unescaped / escaped
-  unescaped = %x20-21 / %x23-5B / %x5D-7E
-  escaped   = "\\" ( DQUOTE / "\\" )
+  sf-string        = DQUOTE *( unescaped / "%" / bs-escaped ) DQUOTE
+  sf-token         = ( ALPHA / "*" ) *( tchar / ":" / "/" )
+  sf-binary        = ":" base64 ":"
+  sf-boolean       = "?" ( "0" / "1" )
 
-  sf-token = ( ALPHA / "*" ) *( tchar / ":" / "/" )
-
-  sf-binary = ":" *(base64) ":"
-  base64    = ALPHA / DIGIT / "+" / "/" / "="
-
-  sf-boolean = "?" boolean
-  boolean    = "0" / "1"
+  unescaped    = %x20-21 / %x23-24 / %x26-5B / %x5D-7E
+  bs-escaped   = "\\" ( DQUOTE / "\\" )
+  base64       = *( ALPHA / DIGIT / "+" / "/" ) *"="
 
   ${tokenRules}
 `;
@@ -472,14 +468,15 @@ literal's tag`, sticky(fragment`*( ALPHA / DIGIT / "-" )`)],
   ["quotedStringChars", "RFC 9110 *qdtext", sticky(abnf({ rules: mediaRangeRules, anchored: false })`*qdtext`)],
   ["quotedPairChar", "RFC 9110 HTAB / SP / VCHAR / obs-text, what follows the \\ of a quoted-pair", abnf({ rules: mediaRangeRules })`HTAB / SP / VCHAR / obs-text`],
 
-  // RFC 8941
-  ["sfString", "RFC 8941 sf-string", abnf()`sf-string ${structuredFieldRules}`],
-  ["sfToken", "RFC 8941 sf-token", abnf()`sf-token ${structuredFieldRules}`],
-  ["sfBinary", "RFC 8941 sf-binary", abnf()`sf-binary ${structuredFieldRules}`],
-  ["sfBoolean", "RFC 8941 sf-boolean", abnf()`sf-boolean ${structuredFieldRules}`],
-  ["sfUnescapedChars", "RFC 8941 *unescaped", sticky(abnf({ rules: structuredFieldRules, anchored: false })`*unescaped`)],
-  ["sfTokenChars", `RFC 8941 *( tchar / ":" / "/" ), what follows an sf-token's first character`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*( tchar / ":" / "/" )`)],
-  ["base64Chars", "RFC 8941 *base64", sticky(abnf({ rules: structuredFieldRules, anchored: false })`*base64`)]
+  // RFC 9651
+  ["sfString", "RFC 9651 sf-string", abnf()`sf-string ${structuredFieldRules}`],
+  ["sfToken", "RFC 9651 sf-token", abnf()`sf-token ${structuredFieldRules}`],
+  ["sfBinary", "RFC 9651 sf-binary", abnf()`sf-binary ${structuredFieldRules}`],
+  ["sfBoolean", "RFC 9651 sf-boolean", abnf()`sf-boolean ${structuredFieldRules}`],
+  ["sfUnescapedChars", `RFC 9651 *( unescaped / "%" )`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*( unescaped / "%" )`)],
+  ["sfTokenChars", `RFC 9651 *( tchar / ":" / "/" ), what follows an sf-token's first character`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*( tchar / ":" / "/" )`)],
+  ["base64Chars", `RFC 9651 *( ALPHA / DIGIT / "+" / "/" ), the characters of base64 before its padding`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*( ALPHA / DIGIT / "+" / "/" )`)],
+  ["base64Padding", `RFC 9651 *"=", base64's padding`, sticky(abnf({ rules: structuredFieldRules, anchored: false })`*"="`)]
 ];
 
 /** @type () => string */

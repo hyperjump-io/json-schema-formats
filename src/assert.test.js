@@ -195,7 +195,7 @@ const specs = {
     reasons: ["invalid-character", "missing"],
     parts: ["byte sequence"],
     alphabet: ":aZ0+/=-",
-    seeds: [":aGVsbG8=:", "::"]
+    seeds: [":aGVsbG8=:", "::", ":YQ==:"]
   },
   sfBoolean: {
     is: Formats.isSfBoolean, assert: Formats.assertSfBoolean, error: Formats.InvalidSfBooleanError, format: "sf-boolean",
@@ -398,7 +398,8 @@ describe("What's wrong and where", () => {
     [Formats.assertMediaRange, "text/html ", { reason: "invalid-character", part: "subtype", start: 9, end: 10 }],
     [Formats.assertMediaRange, "text/html;charset = utf-8", { reason: "invalid-character", part: "parameter name", start: 17, end: 18 }],
     [Formats.assertMediaRange, "a/b;c=\"d", { reason: "missing", part: "parameter value", start: 8, end: 8, message: `Invalid media-range: a/b;c="d — it has no closing double quote, at 8` }],
-    [Formats.assertSfBinary, ":a b:", { reason: "invalid-character", part: "byte sequence", start: 2, end: 3, message: `Invalid sf-binary: :a b: — " " isn't allowed in the byte sequence, at 2; base64 has letters, digits, "+", "/", and "="` }],
+    [Formats.assertSfBinary, ":a b:", { reason: "invalid-character", part: "byte sequence", start: 2, end: 3, message: `Invalid sf-binary: :a b: — " " isn't allowed in the byte sequence, at 2; base64 has letters, digits, "+", "/", and "=" at the end` }],
+    [Formats.assertSfBinary, ":a=b:", { reason: "invalid-character", part: "byte sequence", start: 3, end: 4, message: `Invalid sf-binary: :a=b: — "b" isn't allowed in the byte sequence, at 3; "=" can only be at the end` }],
     [Formats.assertSfBoolean, "?2", { reason: "invalid-character", part: "boolean", start: 1, end: 2, message: `Invalid sf-boolean: ?2 — "2" isn't allowed after "?", at 1; it must be "0" or "1"` }],
     [Formats.assertSfString, "\"a\\nb\"", { reason: "invalid-escape", part: "string", start: 2, end: 4, message: `Invalid sf-string: "a\\nb" — a backslash must be followed by a double quote or a backslash, at 2` }],
     [Formats.assertSfString, "\"\u00E9\"", { reason: "invalid-character", part: "string", start: 1, end: 2, message: `Invalid sf-string: "é" — "é" isn't allowed in the string, at 1; a string can only have printable ASCII characters` }],

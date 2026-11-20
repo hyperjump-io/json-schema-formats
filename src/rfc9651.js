@@ -1,6 +1,6 @@
 import { FormatError, charAt, end, invalidCharacter, isProblem, matchEnd, missing, problem } from "./diagnose.js";
 import {
-  base64Chars, sfBinary as sfBinaryPattern, sfBoolean as sfBooleanPattern, sfString as sfStringPattern,
+  base64Chars, base64Padding, sfBinary as sfBinaryPattern, sfBoolean as sfBooleanPattern, sfString as sfStringPattern,
   sfToken as sfTokenPattern, sfTokenChars, sfUnescapedChars
 } from "./patterns.js";
 
@@ -188,13 +188,17 @@ const diagnoseSfBinary = (binary) => {
   }
 
   const dataEnd = matchEnd(base64Chars, binary, 1);
-  if (dataEnd === binary.length) {
-    return missing("byte sequence", dataEnd, `it has no closing ":"`);
-  } else if (binary[dataEnd] !== ":") {
-    return invalidCharacter(binary, dataEnd, "byte sequence", "in the byte sequence", `base64 has letters, digits, "+", "/", and "="`);
+  const paddingEnd = matchEnd(base64Padding, binary, dataEnd);
+  if (paddingEnd === binary.length) {
+    return missing("byte sequence", paddingEnd, `it has no closing ":"`);
+  } else if (binary[paddingEnd] !== ":") {
+    const hint = paddingEnd > dataEnd && matchEnd(base64Chars, binary, paddingEnd) > paddingEnd
+      ? `"=" can only be at the end`
+      : `base64 has letters, digits, "+", "/", and "=" at the end`;
+    return invalidCharacter(binary, paddingEnd, "byte sequence", "in the byte sequence", hint);
   }
 
-  const result = end("byte sequence")(binary, dataEnd + 1);
+  const result = end("byte sequence")(binary, paddingEnd + 1);
   return isProblem(result) ? result : undefined;
 };
 

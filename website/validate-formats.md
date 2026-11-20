@@ -113,10 +113,10 @@ for strings that have a grammar:
 | `time-local` | `isTimeLocal` | [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6) `partial-time` |
 | `http-date` | `isHttpDate` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7) `HTTP-date` |
 | `media-range` | `isMediaRange` | [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.1) `media-range` |
-| `sf-binary` | `isSfBinary` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.5) `sf-binary` |
-| `sf-boolean` | `isSfBoolean` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.6) `sf-boolean` |
-| `sf-string` | `isSfString` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.3) `sf-string` |
-| `sf-token` | `isSfToken` | [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.4) `sf-token` |
+| `sf-binary` | `isSfBinary` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.5) `sf-binary` |
+| `sf-boolean` | `isSfBoolean` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.6) `sf-boolean` |
+| `sf-string` | `isSfString` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.3) `sf-string` |
+| `sf-token` | `isSfToken` | [RFC 9651](https://www.rfc-editor.org/rfc/rfc9651.html#section-3.3.4) `sf-token` |
 
 The registry names RFC 7231 for `http-date`. RFC 9110 replaced it, with
 the same grammar.
@@ -152,9 +152,11 @@ has to be at 23:59:60. The day name isn't checked.
 The names of days and months are case-sensitive, as RFC 9110 says, so
 `isHttpDate` rejects `sun, 06 Nov 1994 08:49:37 GMT`.
 
-`isSfBinary` follows RFC 8941's grammar, which allows `=` anywhere in the
-base64, not only at the end. RFC 9651, which replaces RFC 8941, allows it
-only at the end.
+The registry names RFC 8941 for the `sf-` formats. RFC 9651 replaced it,
+and the functions follow RFC 9651. The only difference is in
+`isSfBinary`: RFC 9651 allows `=` only as padding at the end of the
+base64, and RFC 8941's grammar allows it anywhere, so `isSfBinary`
+rejects `:a=b:`.
 
 The other formats in the registry don't have functions yet.
 

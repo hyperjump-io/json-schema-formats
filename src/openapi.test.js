@@ -133,8 +133,10 @@ describe("sf-binary", () => {
   test.each([
     [":cHJldGVuZCB0aGlzIGlzIGJpbmFyeSBjb250ZW50Lg==:", true],
     ["::", true],
-    // RFC 8941's grammar allows "=" anywhere in the base64
-    [":a=b:", true],
+    [":YQ:", true],
+    [":YQ==:", true],
+    [":a=b:", false],
+    [":=a:", false],
     [":cHJldGVuZA==", false],
     ["cHJldGVuZA==", false],
     [":cHJl dGVuZA==:", false],
